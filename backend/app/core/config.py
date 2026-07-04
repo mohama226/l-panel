@@ -1,12 +1,17 @@
 from pathlib import Path
 
-from pydantic_settings import BaseSettings
+from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
 BASE_DIR = Path(__file__).resolve().parent.parent.parent
 
 
 class Settings(BaseSettings):
+
+    model_config = SettingsConfigDict(
+        env_file=BASE_DIR / ".env",
+        extra="ignore"      # <<< این خط مهم است
+    )
 
     APP_NAME: str = "LAK Panel"
 
@@ -22,9 +27,7 @@ class Settings(BaseSettings):
 
     LOG_LEVEL: str = "INFO"
 
-    class Config:
-        env_file = BASE_DIR / ".env"
-        case_sensitive = True
+    OC_SERV_USERS_FILE: str = "/etc/ocserv/ocpasswd"
 
 
 settings = Settings()
