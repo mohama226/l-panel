@@ -1,0 +1,7 @@
+APP_NAME = "LAK Panel"
+
+VERSION = "0.0.3"
+
+HOST = "0.0.0.0"
+
+PORT = 8000
