@@ -1,54 +1,36 @@
-from pathlib import Path
-
-from fastapi import FastAPI, Request
+from fastapi import FastAPI
 from fastapi.responses import HTMLResponse
-from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
+from fastapi.requests import Request
 
-from app.core.settings import APP_NAME, VERSION
+from app.core.config import settings
+from app.db.database import Base, engine
 
-from app.api.dashboard import router as dashboard_router
 
-from app.services.system_service import (
-    get_cpu_usage,
-    get_ram_usage,
-    get_disk_usage,
-    get_uptime,
-    get_ocserv_status,
-)
+# ایجاد جدول‌ها (فعلاً ساده)
+Base.metadata.create_all(bind=engine)
 
-BASE_DIR = Path(__file__).resolve().parent
 
 app = FastAPI(
-    title=APP_NAME,
-    version=VERSION
+    title=settings.APP_NAME,
+    version=settings.APP_VERSION
 )
 
-app.mount(
-    "/static",
-    StaticFiles(directory=str(BASE_DIR / "static")),
-    name="static"
-)
 
-templates = Jinja2Templates(
-    directory=str(BASE_DIR / "templates")
-)
-
-app.include_router(dashboard_router)
+templates = Jinja2Templates(directory="app/templates")
 
 
 @app.get("/", response_class=HTMLResponse)
-async def dashboard(request: Request):
-
+async def home(request: Request):
     return templates.TemplateResponse(
-        "dashboard.html",
-        {
-            "request": request,
-            "title": APP_NAME,
-            "cpu": get_cpu_usage(),
-            "ram": get_ram_usage(),
-            "disk": get_disk_usage(),
-            "uptime": get_uptime(),
-            "ocserv": get_ocserv_status(),
-        }
+        "index.html",
+        {"request": request}
     )
+
+
+@app.get("/health")
+async def health():
+    return {
+        "status": "ok",
+        "version": settings.APP_VERSION
+    }
