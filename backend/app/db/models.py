@@ -1,12 +1,59 @@
-from sqlalchemy import Column, Integer, String, DateTime
-from datetime import datetime
-from app.db.database import Base
+from sqlalchemy import Column
+from sqlalchemy import Integer
+from sqlalchemy import String
 
-class User(Base):
-    __tablename__ = "users"
+from .database import Base
 
-    id = Column(Integer, primary_key=True, index=True)
-    username = Column(String, unique=True, index=True)
-    password = Column(String)
-    created_at = Column(DateTime, default=datetime.utcnow)
-    expires_at = Column(DateTime, nullable=True)
+
+class Server(Base):
+
+    __tablename__ = "servers"
+
+    id = Column(
+        Integer,
+        primary_key=True,
+        index=True
+    )
+
+    name = Column(
+        String,
+        nullable=False
+    )
+
+    host = Column(
+        String,
+        nullable=False
+    )
+
+    ssh_port = Column(
+        Integer,
+        default=22
+    )
+
+    ssh_user = Column(
+        String,
+        nullable=False
+    )
+
+    auth_type = Column(
+        String,
+        default="password"
+    )
+
+    ssh_password = Column(
+        String
+    )
+
+    ssh_private_key = Column(
+        String
+    )
+
+    vpn_type = Column(
+        String,
+        default="ocserv"
+    )
+
+    status = Column(
+        String,
+        default="offline"
+    )
