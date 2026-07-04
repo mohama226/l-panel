@@ -30,7 +30,8 @@ async def dashboard(request: Request):
     return templates.TemplateResponse(
         "dashboard.html",
         {
-            "request": request
+            "request": request,
+            "title": APP_NAME
         }
     )
 
@@ -38,5 +39,6 @@ async def dashboard(request: Request):
 @app.get("/health")
 async def health():
     return {
-        "status": "ok"
+        "status": "ok",
+        "version": VERSION
     }
