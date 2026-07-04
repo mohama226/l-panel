@@ -54,6 +54,16 @@ systemctl enable lak-panel
 
 systemctl restart lak-panel
 
+chmod +x "$DIR/scripts/menu.sh"
+
+cat > /usr/local/bin/lak-panel << 'EOF'
+#!/bin/bash
+bash /opt/lak-panel/scripts/menu.sh
+EOF
+
+chmod +x /usr/local/bin/lak-panel
+
+
 sleep 2
 
 IP=$(hostname -I | awk '{print $1}')
