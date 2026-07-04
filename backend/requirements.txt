@@ -10,3 +10,6 @@ SQLAlchemy==2.0.41
 cryptography==45.0.5
 
 paramiko==3.5.1
+passlib[bcrypt]==1.7.4
+
+bcrypt==4.2.1
