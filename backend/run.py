@@ -1,9 +1,12 @@
 import uvicorn
 
+from app.db.database import Base
 from app.db.database import engine
-from app.db.models import Base
 
-# Create database tables
+# Import models
+import app.models.admin
+import app.models.server
+
 Base.metadata.create_all(bind=engine)
 
 if __name__ == "__main__":
