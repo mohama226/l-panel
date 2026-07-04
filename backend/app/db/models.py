@@ -19,9 +19,11 @@ class Role(Base):
 
     id = Column(Integer, primary_key=True, index=True)
 
-    name = Column(String(100), unique=True)
+    name = Column(String(50), unique=True, nullable=False)
 
     description = Column(String(255))
+
+    admins = relationship("Admin", back_populates="role")
 
 
 class Admin(Base):
@@ -29,19 +31,19 @@ class Admin(Base):
 
     id = Column(Integer, primary_key=True, index=True)
 
-    username = Column(String(100), unique=True, nullable=False)
+    username = Column(String(100), unique=True)
 
-    password = Column(String(255), nullable=False)
+    password = Column(String(255))
 
-    fullname = Column(String(255))
+    fullname = Column(String(100))
 
     active = Column(Boolean, default=True)
 
-    role_id = Column(Integer, ForeignKey("roles.id"))
-
     created_at = Column(DateTime, default=datetime.utcnow)
 
-    role = relationship("Role")
+    role_id = Column(Integer, ForeignKey("roles.id"))
+
+    role = relationship("Role", back_populates="admins")
 
 
 class Server(Base):
@@ -49,9 +51,9 @@ class Server(Base):
 
     id = Column(Integer, primary_key=True)
 
-    name = Column(String(100))
+    name = Column(String(100), unique=True)
 
-    host = Column(String(255))
+    host = Column(String(100))
 
     port = Column(Integer, default=22)
 
@@ -59,9 +61,9 @@ class Server(Base):
 
     password = Column(String(255))
 
-    token = Column(String(255))
+    enabled = Column(Boolean, default=True)
 
-    active = Column(Boolean, default=True)
+    users = relationship("VPNUser", back_populates="server")
 
 
 class Group(Base):
@@ -73,8 +75,10 @@ class Group(Base):
 
     description = Column(String(255))
 
+    users = relationship("VPNUser", back_populates="group")
 
-class User(Base):
+
+class VPNUser(Base):
     __tablename__ = "users"
 
     id = Column(Integer, primary_key=True)
@@ -87,12 +91,12 @@ class User(Base):
 
     traffic = Column(Integer, default=0)
 
-    active = Column(Boolean, default=True)
-
-    group_id = Column(Integer, ForeignKey("groups.id"))
+    enabled = Column(Boolean, default=True)
 
     server_id = Column(Integer, ForeignKey("servers.id"))
 
-    group = relationship("Group")
+    group_id = Column(Integer, ForeignKey("groups.id"))
 
-    server = relationship("Server")
+    server = relationship("Server", back_populates="users")
+
+    group = relationship("Group", back_populates="users")
