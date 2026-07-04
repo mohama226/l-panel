@@ -1,21 +1,30 @@
-# lak-panel
+# LAK Panel
 
-Web-based management panel for OCServ VPN users.
+Web management panel for OCServ VPN.
 
 ## Features
-- Create VPN users
-- Delete users
-- Manage expiry
-- OCServ integration
 
-## Tech Stack
+- User Management
+- Dashboard
+- Authentication
+- OCServ Integration
+
+## Backend
+
 - FastAPI
+- SQLAlchemy
 - SQLite
-- OCServ (ocpasswd)
 
 ## Run
 
 ```bash
 cd backend
+
+python -m venv venv
+
+source venv/bin/activate
+
 pip install -r requirements.txt
-uvicorn app.main:app --reload
+
+python run.py
+```
