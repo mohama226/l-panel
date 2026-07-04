@@ -5,11 +5,13 @@ from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
+from app.core.settings import APP_NAME, VERSION
+
 BASE_DIR = Path(__file__).resolve().parent
 
 app = FastAPI(
-    title="LAK Panel",
-    version="0.0.2"
+    title=APP_NAME,
+    version=VERSION
 )
 
 app.mount(
@@ -22,12 +24,16 @@ templates = Jinja2Templates(
     directory=str(BASE_DIR / "templates")
 )
 
+
 @app.get("/", response_class=HTMLResponse)
-async def home(request: Request):
+async def dashboard(request: Request):
     return templates.TemplateResponse(
-        "index.html",
-        {"request": request}
+        "dashboard.html",
+        {
+            "request": request
+        }
     )
+
 
 @app.get("/health")
 async def health():
