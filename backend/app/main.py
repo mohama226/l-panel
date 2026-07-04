@@ -6,6 +6,13 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 
 from app.core.settings import APP_NAME, VERSION
+from app.services.system_service import (
+    get_cpu_usage,
+    get_ram_usage,
+    get_disk_usage,
+    get_uptime,
+    get_ocserv_status,
+)
 
 BASE_DIR = Path(__file__).resolve().parent
 
@@ -31,7 +38,12 @@ async def dashboard(request: Request):
         "dashboard.html",
         {
             "request": request,
-            "title": APP_NAME
+            "title": APP_NAME,
+            "cpu": get_cpu_usage(),
+            "ram": get_ram_usage(),
+            "disk": get_disk_usage(),
+            "uptime": get_uptime(),
+            "ocserv": get_ocserv_status(),
         }
     )
 
@@ -40,5 +52,10 @@ async def dashboard(request: Request):
 async def health():
     return {
         "status": "ok",
-        "version": VERSION
+        "version": VERSION,
+        "cpu": get_cpu_usage(),
+        "ram": get_ram_usage(),
+        "disk": get_disk_usage(),
+        "uptime": get_uptime(),
+        "ocserv": get_ocserv_status(),
     }
