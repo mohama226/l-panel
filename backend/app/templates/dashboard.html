@@ -4,24 +4,33 @@
 
 <h1>Dashboard</h1>
 
-<p>Welcome to LAK Panel</p>
+<table style="font-size:20px">
 
-<div>
+<tr>
+<td><b>CPU Usage</b></td>
+<td>{{ cpu }} %</td>
+</tr>
 
-CPU : --
+<tr>
+<td><b>RAM Usage</b></td>
+<td>{{ ram }} %</td>
+</tr>
 
-</div>
+<tr>
+<td><b>Disk Usage</b></td>
+<td>{{ disk }} %</td>
+</tr>
 
-<div>
+<tr>
+<td><b>System Uptime</b></td>
+<td>{{ uptime }}</td>
+</tr>
 
-RAM : --
+<tr>
+<td><b>OCServ Status</b></td>
+<td>{{ ocserv }}</td>
+</tr>
 
-</div>
-
-<div>
-
-Disk : --
-
-</div>
+</table>
 
 {% endblock %}
