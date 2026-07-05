@@ -3,19 +3,22 @@
 {% block content %}
 
 <div class="page-header">
+
     <h1>⚙ Panel Settings</h1>
-    <p>General panel configuration</p>
+
+    <p>
+        Configure LAK Panel
+    </p>
+
 </div>
 
-<form action="/settings/dashboard" method="post">
+<div class="settings-card">
 
-    <div class="dashboard-card">
+    <form method="post" action="/settings/dashboard">
 
-        <h2 style="margin-bottom:20px;">
-            Dashboard Auto Refresh
-        </h2>
+        <h2>Dashboard Auto Refresh</h2>
 
-        <div style="margin-bottom:20px;">
+        <div class="setting-row">
 
             <label>
 
@@ -31,58 +34,62 @@
 
         </div>
 
-        <div style="margin-bottom:20px;">
+        <div class="setting-row">
 
             <label>
 
-                Refresh Interval
+                Refresh Interval (Seconds)
 
             </label>
 
             <select name="refresh_interval">
 
-                <option value="1"
-                {% if dashboard.refresh_interval==1 %}selected{% endif %}>
-                    Every 1 second
+                {% for i in [1,2,3,5,10,15,30,60] %}
+
+                <option
+                    value="{{ i }}"
+                    {% if dashboard.refresh_interval==i %}selected{% endif %}
+                >
+                    {{ i }} Second{% if i>1 %}s{% endif %}
                 </option>
 
-                <option value="2"
-                {% if dashboard.refresh_interval==2 %}selected{% endif %}>
-                    Every 2 seconds
-                </option>
-
-                <option value="5"
-                {% if dashboard.refresh_interval==5 %}selected{% endif %}>
-                    Every 5 seconds
-                </option>
-
-                <option value="10"
-                {% if dashboard.refresh_interval==10 %}selected{% endif %}>
-                    Every 10 seconds
-                </option>
-
-                <option value="30"
-                {% if dashboard.refresh_interval==30 %}selected{% endif %}>
-                    Every 30 seconds
-                </option>
-
-                <option value="60"
-                {% if dashboard.refresh_interval==60 %}selected{% endif %}>
-                    Every 60 seconds
-                </option>
+                {% endfor %}
 
             </select>
 
         </div>
 
-        <button type="submit">
+        <hr>
+
+        <h2>Date & Time</h2>
+
+        <p class="setting-desc">
+
+            بخش تنظیمات ساعت، تاریخ، فرمت نمایش و Timezone
+            در مرحله بعد اضافه می‌شود.
+
+        </p>
+
+        <hr>
+
+        <h2>Appearance</h2>
+
+        <p class="setting-desc">
+
+            Theme / Sidebar / Colors / Fonts
+
+        </p>
+
+        <hr>
+
+        <button type="submit" class="save-btn">
 
             💾 Save Settings
 
         </button>
 
-    </div>
+    </form>
 
-</form>
+</div>
 
 {% endblock %}
