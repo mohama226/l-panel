@@ -6,30 +6,34 @@ from app.repositories.user_repository import UserRepository
 
 class UserService:
 
-    def __init__(self, repo: UserRepository):
-        self.repo = repo
+    def __init__(self, repository: UserRepository):
+        self.repository = repository
 
-    def list(self):
-        return self.repo.all()
+    def get_users(self):
+        return self.repository.get_all()
 
-    def create(
+    def get_user(self, username: str):
+        return self.repository.get(username)
+
+    def create_user(
         self,
-        username,
-        password,
-        days,
-        server_id=None,
-        group_id=None,
+        username: str,
+        password: str,
+        days: int,
+        server_id: int | None = None,
+        group_id: int | None = None,
     ):
-
-        expire = datetime.utcnow() + timedelta(days=days)
 
         user = VPNUser(
             username=username,
             password=password,
-            expire=expire,
+            expire=datetime.utcnow() + timedelta(days=days),
             enabled=True,
             server_id=server_id,
             group_id=group_id,
         )
 
-        return self.repo.create(user)
+        return self.repository.create(user)
+
+    def delete_user(self, user: VPNUser):
+        return self.repository.delete(user)
