@@ -1291,3 +1291,141 @@ tbody tr:hover{
 }
 
 
+
+/* ===========================
+   SETTINGS PAGE
+=========================== */
+
+.settings-card{
+
+    max-width:900px;
+
+    margin:auto;
+
+    background:#1e293b;
+
+    border:1px solid #334155;
+
+    border-radius:16px;
+
+    padding:30px;
+
+    box-shadow:0 12px 30px rgba(0,0,0,.25);
+
+}
+
+.settings-card h2{
+
+    margin-bottom:18px;
+
+    color:#38bdf8;
+
+    font-size:20px;
+
+}
+
+.setting-row{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    gap:25px;
+
+    margin-bottom:22px;
+
+}
+
+.setting-row label{
+
+    font-size:15px;
+
+    color:#e2e8f0;
+
+    flex:1;
+
+}
+
+.setting-row select{
+
+    width:220px;
+
+}
+
+.setting-row input[type=checkbox]{
+
+    width:18px;
+
+    height:18px;
+
+    margin-right:8px;
+
+}
+
+.setting-desc{
+
+    color:#94a3b8;
+
+    font-size:14px;
+
+    margin-bottom:20px;
+
+}
+
+.settings-card hr{
+
+    border:none;
+
+    border-top:1px solid #334155;
+
+    margin:28px 0;
+
+}
+
+.save-btn{
+
+    background:#2563eb;
+
+    color:#fff;
+
+    border:none;
+
+    padding:14px 28px;
+
+    border-radius:10px;
+
+    cursor:pointer;
+
+    font-size:15px;
+
+    transition:.2s;
+
+}
+
+.save-btn:hover{
+
+    background:#1d4ed8;
+
+    transform:translateY(-2px);
+
+}
+
+@media(max-width:768px){
+
+.setting-row{
+
+    flex-direction:column;
+
+    align-items:flex-start;
+
+}
+
+.setting-row select{
+
+    width:100%;
+
+}
+
+}
