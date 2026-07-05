@@ -1,10 +1,12 @@
-// clock.js
+// backend/app/static/js/clock.js
 // نمایش تاریخ و ساعت محلی به‌صورت زنده در عنصر با id="datetime"
 
 (function () {
+    function pad(n) {
+        return n < 10 ? '0' + n : n;
+    }
+
     function formatDateTime(date) {
-        // از toLocaleString استفاده می‌کنیم تا نمایش بومی باشد.
-        // اگر بخواهی می‌توانیم locale را به 'fa-IR' یا چیز دیگر ثابت کنیم.
         const opts = {
             weekday: 'short',
             year: 'numeric',
@@ -17,7 +19,6 @@
         try {
             return date.toLocaleString(undefined, opts);
         } catch (e) {
-            // fallback ساده
             const hh = String(date.getHours()).padStart(2, '0');
             const mm = String(date.getMinutes()).padStart(2, '0');
             const ss = String(date.getSeconds()).padStart(2, '0');
@@ -32,8 +33,17 @@
         el.textContent = formatDateTime(now);
     }
 
-    document.addEventListener('DOMContentLoaded', function () {
+    function initClock() {
         updateClock();
+        // به‌روزرسانی هر 1 ثانیه
         setInterval(updateClock, 1000);
-    });
+    }
+
+    // اگر صفحه هنوز در حالت loading است، به DOMContentLoaded گوش بده
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initClock);
+    } else {
+        // صفحه قبلاً لود شده — بلافاصله اجرا کن
+        initClock();
+    }
 })();
