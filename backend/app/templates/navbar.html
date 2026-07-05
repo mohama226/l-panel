@@ -2,39 +2,32 @@
 
     <div class="topbar-left">
 
-        <div class="logo">
-            🛡 LAK PANEL
-        </div>
+        <span class="logo">
+            LAK PANEL
+        </span>
 
     </div>
 
     <div class="topbar-center">
 
-        <span class="status online">
-            🟢 OCServ Online
-        </span>
-
-        <span class="status">
-            ⚡ Agent Connected
-        </span>
-
-        <!-- ساعت و تاریخ (نمایش زنده) -->
-        <span class="topbar-clock" id="topbar-clock">
-            <span id="datetime">--:--:--</span>
+        <span id="datetime">
+            Loading...
         </span>
 
     </div>
 
     <div class="topbar-right">
 
-        <span class="version">
-            Version 1.0 Alpha
+        <span class="status online">
+            🟢 Online
         </span>
 
-        <a class="logout-btn" href="/logout">
-            Logout
-        </a>
+        <span class="version">
+            v1.0.0
+        </span>
 
     </div>
 
 </header>
+
+<script src="/static/js/clock.js"></script>
