@@ -11,10 +11,11 @@ from app.db.database import Base, engine
 from app.routers.auth import router as auth_router
 from app.routers.dashboard import router as dashboard_router
 from app.routers.users import router as users_router
+from app.routers.admins import router as admins_router
 
 BASE_DIR = Path(__file__).resolve().parent
 
-# Create Tables
+# Create Database Tables
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI(
@@ -22,22 +23,26 @@ app = FastAPI(
     version=settings.APP_VERSION,
 )
 
-# Static
+# Static Files
 app.mount(
     "/static",
     StaticFiles(directory=str(BASE_DIR / "static")),
     name="static",
 )
 
-# Routers
+# Register Routers
 app.include_router(auth_router)
 app.include_router(dashboard_router)
 
-# Users
 app.include_router(
     users_router,
     prefix="/users",
     tags=["Users"],
+)
+
+app.include_router(
+    admins_router,
+    tags=["Admins"],
 )
 
 
