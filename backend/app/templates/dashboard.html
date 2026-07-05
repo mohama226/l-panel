@@ -1,47 +1,73 @@
-{% extends "base.html" %}
+<!DOCTYPE html>
 
-{% block content %}
+<html>
 
-<h2 class="page-title">
-Dashboard
-</h2>
+<head>
 
-<div class="cards">
+<meta charset="UTF-8">
+
+<title>Dashboard</title>
+
+<link rel="stylesheet" href="/static/css/style.css">
+
+</head>
+
+<body>
+
+<div class="sidebar">
+
+<h2>LAK PANEL</h2>
+
+<ul>
+
+<li>Dashboard</li>
+
+<li>Users</li>
+
+<li>Servers</li>
+
+<li>Groups</li>
+
+<li>Admins</li>
+
+<li><a href="/logout">Logout</a></li>
+
+</ul>
+
+</div>
+
+<div class="content">
+
+<h1>Dashboard</h1>
+
+<p>Welcome Admin #{{ admin_id }}</p>
 
 <div class="card">
-<h3>CPU</h3>
-<span id="cpu">{{ cpu }} %</span>
+
+Users : 0
+
 </div>
 
 <div class="card">
-<h3>RAM</h3>
-<span id="ram">{{ ram }} %</span>
+
+Servers : 0
+
 </div>
 
 <div class="card">
-<h3>DISK</h3>
-<span id="disk">{{ disk }} %</span>
+
+Groups : 0
+
 </div>
 
 <div class="card">
-<h3>OCSERV</h3>
-<span id="ocserv">{{ ocserv }}</span>
-</div>
+
+Admins : 1
 
 </div>
 
-<div class="info-box">
-
-<h3>System Uptime</h3>
-
-<p id="uptime">
-
-{{ uptime }}
-
-</p>
-
 </div>
 
-<script src="/static/js/app.js"></script>
+</body>
 
-{% endblock %}
+</html>
