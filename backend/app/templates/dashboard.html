@@ -12,11 +12,9 @@
 
 window.dashboardSettings = {
 
-    autoRefresh:
-        {{ "true" if dashboard_settings.auto_refresh else "false" }},
+    autoRefresh: {{ "true" if dashboard.auto_refresh else "false" }},
 
-    interval:
-        {{ dashboard_settings.refresh_interval }}
+    interval: {{ dashboard.refresh_interval }}
 
 };
 
