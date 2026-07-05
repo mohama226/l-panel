@@ -3,13 +3,13 @@
 
 <head>
 
-<meta charset="UTF-8">
+    <meta charset="UTF-8">
 
-<meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
 
-<title>{{ title if title else "LAK Panel" }}</title>
+    <title>{{ title if title else "LAK Panel" }}</title>
 
-<link rel="stylesheet" href="/static/css/style.css">
+    <link rel="stylesheet" href="/static/css/style.css">
 
 </head>
 
@@ -17,14 +17,13 @@
 
 {% include "navbar.html" %}
 
-<div class="wrapper">
+<div class="layout">
 
     {% include "sidebar.html" %}
 
     <main class="content">
 
         {% block content %}
-
         {% endblock %}
 
     </main>
