@@ -2,47 +2,120 @@
 
 {% block content %}
 
-<h2>Admins</h2>
+<div class="page-header">
 
-<a href="/admins/create">
-    <button>Create Admin</button>
-</a>
+    <h1>Admins</h1>
 
-<br><br>
+    <p>Manage Panel Administrators</p>
 
-<table border="1" width="100%">
+</div>
 
-<tr>
+<div style="margin-bottom:20px;">
 
-<th>ID</th>
+    <a href="/admins/create">
 
-<th>Username</th>
+        <button>
 
-<th>Role</th>
+            + Add Admin
 
-<th>Status</th>
+        </button>
 
-<th>Actions</th>
+    </a>
 
-</tr>
+</div>
 
-{% for admin in admins %}
+<table>
 
-<tr>
+    <thead>
 
-<td>{{admin.id}}</td>
+        <tr>
 
-<td>{{admin.username}}</td>
+            <th>ID</th>
 
-<td>{{admin.role}}</td>
+            <th>Username</th>
 
-<td>{{admin.active}}</td>
+            <th>Full Name</th>
 
-<td>Edit Delete</td>
+            <th>Role</th>
 
-</tr>
+            <th>Status</th>
 
-{% endfor %}
+            <th>Created</th>
+
+            <th>Actions</th>
+
+        </tr>
+
+    </thead>
+
+    <tbody>
+
+    {% for admin in admins %}
+
+        <tr>
+
+            <td>{{ admin.id }}</td>
+
+            <td>{{ admin.username }}</td>
+
+            <td>{{ admin.fullname }}</td>
+
+            <td>
+
+                {% if admin.role %}
+
+                    {{ admin.role.name }}
+
+                {% else %}
+
+                    -
+
+                {% endif %}
+
+            </td>
+
+            <td>
+
+                {% if admin.active %}
+
+                    🟢 Active
+
+                {% else %}
+
+                    🔴 Disabled
+
+                {% endif %}
+
+            </td>
+
+            <td>
+
+                {{ admin.created_at.strftime('%Y-%m-%d') }}
+
+            </td>
+
+            <td>
+
+                <a href="/admins/edit/{{ admin.id }}">
+                    ✏ Edit
+                </a>
+
+                &nbsp; | &nbsp;
+
+                <a
+                    href="/admins/delete/{{ admin.id }}"
+                    onclick="return confirm('Delete this admin?')"
+                >
+                    🗑 Delete
+                </a>
+
+            </td>
+
+        </tr>
+
+    {% endfor %}
+
+    </tbody>
 
 </table>
 
