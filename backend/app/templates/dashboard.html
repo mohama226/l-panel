@@ -12,9 +12,19 @@
 
 window.dashboardSettings = {
 
-    autoRefresh: {{ "true" if dashboard.auto_refresh else "false" }},
+    autoRefresh:
+        {% if dashboard is defined %}
+            {{ "true" if dashboard.auto_refresh else "false" }}
+        {% else %}
+            true
+        {% endif %},
 
-    interval: {{ dashboard.refresh_interval }}
+    interval:
+        {% if dashboard is defined %}
+            {{ dashboard.refresh_interval }}
+        {% else %}
+            2
+        {% endif %}
 
 };
 
