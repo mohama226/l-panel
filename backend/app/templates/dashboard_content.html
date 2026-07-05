@@ -4,238 +4,72 @@
 
         <h1>Dashboard</h1>
 
-        <p>
-            Welcome to LAK Panel Management Center
-        </p>
-
-    </div>
-
-    <div class="page-actions">
-
-        <button class="btn-primary">
-
-            <i class="fa-solid fa-rotate"></i>
-
-            Refresh
-
-        </button>
+        <p>Welcome Admin #{{ admin_id }}</p>
 
     </div>
 
 </div>
-
 
 <div class="dashboard-grid">
 
-    <div class="stat-card blue">
-
-        <div class="stat-icon">
-            <i class="fa-solid fa-users"></i>
-        </div>
-
-        <div class="stat-info">
-
-            <h2>{{ users }}</h2>
-
-            <span>Total Users</span>
-
-        </div>
-
+    <div class="dashboard-card">
+        <span class="card-title">👥 Users</span>
+        <h2 id="users">{{ users }}</h2>
     </div>
 
-    <div class="stat-card green">
-
-        <div class="stat-icon">
-            <i class="fa-solid fa-user-shield"></i>
-        </div>
-
-        <div class="stat-info">
-
-            <h2>{{ admins }}</h2>
-
-            <span>Administrators</span>
-
-        </div>
-
+    <div class="dashboard-card">
+        <span class="card-title">👑 Admins</span>
+        <h2 id="admins">{{ admins }}</h2>
     </div>
 
-    <div class="stat-card orange">
-
-        <div class="stat-icon">
-            <i class="fa-solid fa-layer-group"></i>
-        </div>
-
-        <div class="stat-info">
-
-            <h2>{{ groups }}</h2>
-
-            <span>Groups</span>
-
-        </div>
-
+    <div class="dashboard-card">
+        <span class="card-title">🖥 Servers</span>
+        <h2 id="servers">{{ servers }}</h2>
     </div>
 
-    <div class="stat-card purple">
-
-        <div class="stat-icon">
-            <i class="fa-solid fa-server"></i>
-        </div>
-
-        <div class="stat-info">
-
-            <h2>{{ servers }}</h2>
-
-            <span>Servers</span>
-
-        </div>
-
+    <div class="dashboard-card">
+        <span class="card-title">🟢 Online</span>
+        <h2 id="online">{{ online }}</h2>
     </div>
 
-    <div class="stat-card cyan">
-
-        <div class="stat-icon">
-            <i class="fa-solid fa-wifi"></i>
-        </div>
-
-        <div class="stat-info">
-
-            <h2>{{ online }}</h2>
-
-            <span>Online Users</span>
-
-        </div>
-
+    <div class="dashboard-card">
+        <span class="card-title">🧠 CPU Usage</span>
+        <h2 id="cpu">{{ cpu }}%</h2>
     </div>
 
-    <div class="stat-card red">
-
-        <div class="stat-icon">
-            <i class="fa-solid fa-chart-line"></i>
-        </div>
-
-        <div class="stat-info">
-
-            <h2>{{ traffic }}</h2>
-
-            <span>Total Traffic</span>
-
-        </div>
-
+    <div class="dashboard-card">
+        <span class="card-title">💾 RAM Usage</span>
+        <h2 id="ram">{{ ram }}%</h2>
     </div>
 
-    <div class="stat-card teal">
-
-        <div class="stat-icon">
-            <i class="fa-solid fa-database"></i>
-        </div>
-
-        <div class="stat-info">
-
-            <h2>{{ backups }}</h2>
-
-            <span>Backups</span>
-
-        </div>
-
+    <div class="dashboard-card">
+        <span class="card-title">📀 Disk Usage</span>
+        <h2 id="disk">{{ disk }}%</h2>
     </div>
 
-    <div class="stat-card gray">
-
-        <div class="stat-icon">
-            <i class="fa-solid fa-file-lines"></i>
-        </div>
-
-        <div class="stat-info">
-
-            <h2>{{ logs }}</h2>
-
-            <span>Logs</span>
-
-        </div>
-
+    <div class="dashboard-card">
+        <span class="card-title">⏱ Uptime</span>
+        <h2 id="uptime">{{ uptime }}</h2>
     </div>
 
-</div>
-
-
-<div class="dashboard-row">
-
-    <div class="dashboard-box">
-
-        <div class="box-header">
-
-            <h3>
-
-                <i class="fa-solid fa-server"></i>
-
-                System Status
-
-            </h3>
-
-        </div>
-
-        <div class="box-content">
-
-            <table class="status-table">
-
-                <tr>
-                    <td>Panel Status</td>
-                    <td><span class="badge success">Running</span></td>
-                </tr>
-
-                <tr>
-                    <td>Database</td>
-                    <td><span class="badge success">Connected</span></td>
-                </tr>
-
-                <tr>
-                    <td>VPN Service</td>
-                    <td><span class="badge success">Active</span></td>
-                </tr>
-
-                <tr>
-                    <td>Last Backup</td>
-                    <td>Today</td>
-                </tr>
-
-            </table>
-
-        </div>
-
+    <div class="dashboard-card">
+        <span class="card-title">⚡ Load Avg</span>
+        <h2 id="load">{{ load }}</h2>
     </div>
 
+    <div class="dashboard-card">
+        <span class="card-title">⬆ Upload</span>
+        <h2 id="upload">{{ traffic_up }} MB</h2>
+    </div>
 
+    <div class="dashboard-card">
+        <span class="card-title">⬇ Download</span>
+        <h2 id="download">{{ traffic_down }} MB</h2>
+    </div>
 
-    <div class="dashboard-box">
-
-        <div class="box-header">
-
-            <h3>
-
-                <i class="fa-solid fa-clock-rotate-left"></i>
-
-                Recent Activity
-
-            </h3>
-
-        </div>
-
-        <div class="box-content">
-
-            <ul class="activity-list">
-
-                <li>User created</li>
-
-                <li>Admin logged in</li>
-
-                <li>Backup completed</li>
-
-                <li>Server online</li>
-
-            </ul>
-
-        </div>
-
+    <div class="dashboard-card">
+        <span class="card-title">📄 Logs</span>
+        <h2 id="logs">{{ logs }}</h2>
     </div>
 
 </div>
