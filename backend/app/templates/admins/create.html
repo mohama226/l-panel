@@ -2,42 +2,104 @@
 
 {% block content %}
 
-<h2>Create Admin</h2>
+<div class="page-header">
 
-<form method="post">
+    <h1>Create Admin</h1>
 
-<label>Username</label><br>
-<input type="text" name="username"><br><br>
+    <p>Add a new administrator</p>
 
-<label>Password</label><br>
-<input type="password" name="password"><br><br>
+</div>
 
-<label>Full Name</label><br>
-<input type="text" name="fullname"><br><br>
+{% if error %}
 
-<label>Role</label><br>
+<div class="error">
 
-<select name="role">
+    {{ error }}
 
-<option value="1">Super Admin</option>
+</div>
 
-<option value="2">Admin</option>
+<br>
 
-<option value="3">Operator</option>
+{% endif %}
 
-<option value="4">Support</option>
+<form method="post" action="/admins/create">
 
-<option value="5">Viewer</option>
+    <label>
 
-</select>
+        Username
 
-<br><br>
+    </label>
 
-<button type="submit">
+    <input
+        type="text"
+        name="username"
+        required
+    >
 
-Create Admin
+    <label>
 
-</button>
+        Full Name
+
+    </label>
+
+    <input
+        type="text"
+        name="fullname"
+        required
+    >
+
+    <label>
+
+        Password
+
+    </label>
+
+    <input
+        type="password"
+        name="password"
+        required
+    >
+
+    <label>
+
+        Role
+
+    </label>
+
+    <select
+        name="role_id"
+        required
+    >
+
+        {% for role in roles %}
+
+            <option value="{{ role.id }}">
+
+                {{ role.name }}
+
+            </option>
+
+        {% endfor %}
+
+    </select>
+
+    <br>
+
+    <button type="submit">
+
+        Create Admin
+
+    </button>
+
+    <a href="/admins">
+
+        <button type="button">
+
+            Cancel
+
+        </button>
+
+    </a>
 
 </form>
 
