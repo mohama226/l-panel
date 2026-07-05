@@ -28,6 +28,14 @@ class UserRepository:
         self.db.refresh(user)
         return user
 
+    def update(self, user: VPNUser):
+        self.db.commit()
+        self.db.refresh(user)
+        return user
+
     def delete(self, user: VPNUser):
         self.db.delete(user)
         self.db.commit()
+
+    def count(self):
+        return self.db.query(VPNUser).count()
