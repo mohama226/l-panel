@@ -6,7 +6,7 @@
         </div>
 
         <div class="stat-info">
-            <div class="stat-value">{{ users }}</div>
+            <div class="stat-value" id="users-value">{{ users }}</div>
             <div class="stat-title">Users</div>
         </div>
     </div>
@@ -17,7 +17,7 @@
         </div>
 
         <div class="stat-info">
-            <div class="stat-value">{{ admins }}</div>
+            <div class="stat-value" id="admins-value">{{ admins }}</div>
             <div class="stat-title">Admins</div>
         </div>
     </div>
@@ -28,7 +28,7 @@
         </div>
 
         <div class="stat-info">
-            <div class="stat-value">{{ servers }}</div>
+            <div class="stat-value" id="servers-value">{{ servers }}</div>
             <div class="stat-title">Servers</div>
         </div>
     </div>
@@ -39,13 +39,12 @@
         </div>
 
         <div class="stat-info">
-            <div class="stat-value">{{ online }}</div>
+            <div class="stat-value" id="online-value">{{ online }}</div>
             <div class="stat-title">Online Users</div>
         </div>
     </div>
 
 </div>
-
 
 <div class="dashboard-grid">
 
@@ -53,11 +52,11 @@
 
         <div class="progress-header">
             <span>CPU Usage</span>
-            <span>{{ cpu }}%</span>
+            <span id="cpu-text">{{ cpu }}%</span>
         </div>
 
         <div class="progress">
-            <div class="progress-bar" style="width:{{ cpu }}%"></div>
+            <div class="progress-bar" id="cpu-bar" style="width:{{ cpu }}%"></div>
         </div>
 
     </div>
@@ -66,11 +65,11 @@
 
         <div class="progress-header">
             <span>RAM Usage</span>
-            <span>{{ ram }}%</span>
+            <span id="ram-text">{{ ram }}%</span>
         </div>
 
         <div class="progress">
-            <div class="progress-bar green-bar" style="width:{{ ram }}%"></div>
+            <div class="progress-bar green-bar" id="ram-bar" style="width:{{ ram }}%"></div>
         </div>
 
     </div>
@@ -79,74 +78,49 @@
 
         <div class="progress-header">
             <span>Disk Usage</span>
-            <span>{{ disk }}%</span>
+            <span id="disk-text">{{ disk }}%</span>
         </div>
 
         <div class="progress">
-            <div class="progress-bar orange-bar" style="width:{{ disk }}%"></div>
+            <div class="progress-bar orange-bar" id="disk-bar" style="width:{{ disk }}%"></div>
         </div>
 
     </div>
 
 </div>
 
-
 <div class="dashboard-grid">
 
     <div class="info-card">
-
         <i class="fa-solid fa-gauge-high"></i>
-
         <div>
-
             <strong>Load Average</strong>
-
-            <p>{{ load }}</p>
-
+            <p id="load-value">{{ load }}</p>
         </div>
-
     </div>
 
     <div class="info-card">
-
         <i class="fa-solid fa-clock"></i>
-
         <div>
-
             <strong>Uptime</strong>
-
-            <p>{{ uptime }}</p>
-
+            <p id="uptime-value">{{ uptime }}</p>
         </div>
-
     </div>
 
     <div class="info-card">
-
         <i class="fa-solid fa-upload"></i>
-
         <div>
-
             <strong>Upload</strong>
-
-            <p>{{ traffic_up }} MB</p>
-
+            <p id="upload-value">{{ traffic_up }} MB</p>
         </div>
-
     </div>
 
     <div class="info-card">
-
         <i class="fa-solid fa-download"></i>
-
         <div>
-
             <strong>Download</strong>
-
-            <p>{{ traffic_down }} MB</p>
-
+            <p id="download-value">{{ traffic_down }} MB</p>
         </div>
-
     </div>
 
 </div>
