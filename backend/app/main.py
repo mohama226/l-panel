@@ -12,25 +12,19 @@ from app.db.database import Base, engine
 from app.routers.auth import router as auth_router
 from app.routers.dashboard import router as dashboard_router
 from app.routers.admins import router as admins_router
-
-from app.db.database import SessionLocal
-from app.db.init_roles import seed_roles
+from app.routers.settings import router as settings_router
 
 BASE_DIR = Path(__file__).resolve().parent
 
 # ساخت خودکار جداول
 Base.metadata.create_all(bind=engine)
-db = SessionLocal()
 
-seed_roles(db)
-
-db.close()
 app = FastAPI(
     title=settings.APP_NAME,
     version=settings.APP_VERSION,
 )
 
-# Static
+# Static Files
 app.mount(
     "/static",
     StaticFiles(directory=str(BASE_DIR / "static")),
@@ -46,6 +40,7 @@ templates = Jinja2Templates(
 app.include_router(auth_router)
 app.include_router(dashboard_router)
 app.include_router(admins_router)
+app.include_router(settings_router)
 
 
 @app.get("/")
