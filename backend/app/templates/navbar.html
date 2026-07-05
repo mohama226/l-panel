@@ -1,17 +1,40 @@
-<nav class="topbar">
+<header class="topbar">
 
-  <div class="logo">🛡 LAK PANEL</div>
+    <div class="topbar-left">
 
-  <div class="topbar-clock-box">
-    <span class="clock-time" id="clock-time">00:00:00</span>
-    <span class="clock-date" id="clock-date">در حال بارگذاری...</span>
-  </div>
+        <div class="logo">
+            🛡 LAK PANEL
+        </div>
 
-  <div class="topbar-right">
-    <span class="status-badge">🟢 OCServ Online</span>
-    <span class="status-badge">⚡ Agent Connected</span>
-    <span class="version-badge">v1.0 Alpha</span>
-    <a href="/logout" class="logout-btn">خروج</a>
-  </div>
+    </div>
 
-</nav>
+    <div class="topbar-center">
+
+        <span class="status online">
+            🟢 OCServ Online
+        </span>
+
+        <span class="status">
+            ⚡ Agent Connected
+        </span>
+
+        <!-- ساعت و تاریخ (نمایش زنده) -->
+        <span class="topbar-clock" id="topbar-clock">
+            <span id="datetime">--:--:--</span>
+        </span>
+
+    </div>
+
+    <div class="topbar-right">
+
+        <span class="version">
+            Version 1.0 Alpha
+        </span>
+
+        <a class="logout-btn" href="/logout">
+            Logout
+        </a>
+
+    </div>
+
+</header>
