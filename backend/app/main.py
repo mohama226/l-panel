@@ -13,6 +13,9 @@ from app.routers.auth import router as auth_router
 from app.routers.dashboard import router as dashboard_router
 from app.routers.admins import router as admins_router
 
+from app.db.database import SessionLocal
+from app.db.init_roles import seed_roles
+
 BASE_DIR = Path(__file__).resolve().parent
 
 # ساخت خودکار جداول
