@@ -1,19 +1,13 @@
-from fastapi import APIRouter
-from fastapi import Cookie
-from fastapi import Depends
-from fastapi import Form
-from fastapi import Request
+from fastapi import APIRouter, Cookie, Depends, Form, Request
 from fastapi.responses import RedirectResponse
-from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import Session
 
+from app.core.template import render
 from app.db.database import get_db
 from app.repositories.settings_repository import SettingsRepository
 from app.services.settings_service import SettingsService
 
 router = APIRouter(prefix="/settings", tags=["Settings"])
-
-templates = Jinja2Templates(directory="app/templates")
 
 
 @router.get("")
@@ -26,13 +20,14 @@ def settings_page(
     if lak_admin is None:
         return RedirectResponse("/login", status_code=302)
 
-    repository = SettingsRepository(db)
-    service = SettingsService(repository)
+    service = SettingsService(
+        SettingsRepository(db)
+    )
 
-    return templates.TemplateResponse(
+    return render(
+        request,
         "settings/index.html",
         {
-            "request": request,
             "settings": service.get_all(),
         },
     )
@@ -51,8 +46,9 @@ def save_settings(
     if lak_admin is None:
         return RedirectResponse("/login", status_code=302)
 
-    repository = SettingsRepository(db)
-    service = SettingsService(repository)
+    service = SettingsService(
+        SettingsRepository(db)
+    )
 
     service.save_localization(
         calendar,
