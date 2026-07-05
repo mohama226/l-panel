@@ -10,8 +10,10 @@
 
     <div class="topbar-center">
 
-        <span id="datetime">
-            Loading...
+        <span class="datetime">
+
+            {{ server_time.strftime("%Y-%m-%d %H:%M:%S") }}
+
         </span>
 
     </div>
@@ -29,5 +31,3 @@
     </div>
 
 </header>
-
-<script src="/static/js/clock.js"></script>
