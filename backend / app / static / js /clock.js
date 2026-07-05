@@ -1,36 +1,39 @@
-// clock.js
-// نمایش تاریخ و ساعت محلی به‌صورت زنده در عنصر با id="datetime"
+// clock.js — نمایش ساعت و تاریخ شمسی زنده
 
 (function () {
-    function pad(n) {
-        return n < 10 ? '0' + n : n;
-    }
 
-    function formatDateTime(date) {
-        // گزینه: از toLocaleString برای نمایش بومی استفاده می‌کنیم.
-        // اگر می‌خواهید فرمت خاصی (مثلاً فارسی) تحویل دهید، اینجا را تغییر دهید.
-        const opts = {
-            weekday: 'short',
-            year: 'numeric',
-            month: 'short',
-            day: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit',
-            second: '2-digit'
-        };
-        return date.toLocaleString(undefined, opts);
-    }
+  function updateClock() {
+    const timeEl = document.getElementById('clock-time');
+    const dateEl = document.getElementById('clock-date');
+    if (!timeEl || !dateEl) return;
 
-    function updateClock() {
-        const el = document.getElementById('datetime');
-        if (!el) return;
-        const now = new Date();
-        el.textContent = formatDateTime(now);
-    }
+    const now = new Date();
 
-    // اولین بار بلافاصله به‌روزرسانی کن، سپس هر ثانیه
-    document.addEventListener('DOMContentLoaded', function () {
-        updateClock();
-        setInterval(updateClock, 1000);
-    });
+    // ساعت (HH:MM:SS)
+    const hours   = String(now.getHours()).padStart(2, '0');
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+    const seconds = String(now.getSeconds()).padStart(2, '0');
+    timeEl.textContent = `${hours}:${minutes}:${seconds}`;
+
+    // تاریخ شمسی با Intl API
+    try {
+      const jalali = new Intl.DateTimeFormat('fa-IR', {
+        calendar: 'persian',
+        weekday: 'long',
+        year:    'numeric',
+        month:   'long',
+        day:     'numeric',
+      }).format(now);
+      dateEl.textContent = jalali;
+    } catch (e) {
+      // fallback اگر مرورگر پشتیبانی نکرد
+      dateEl.textContent = now.toLocaleDateString('fa-IR');
+    }
+  }
+
+  document.addEventListener('DOMContentLoaded', function () {
+    updateClock();
+    setInterval(updateClock, 1000);
+  });
+
 })();
