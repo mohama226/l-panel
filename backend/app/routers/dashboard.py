@@ -2,26 +2,72 @@ from fastapi import APIRouter, Cookie, Request
 from fastapi.responses import RedirectResponse, JSONResponse
 
 from app.core.template import render
-from app.core.settings import get_dashboard_settings
+
+import psutil
+import shutil
+import time
 
 router = APIRouter()
 
+BOOT_TIME = psutil.boot_time()
 
-def get_dashboard_stats():
-    """
-    فعلاً آمار ثابت است.
-    بعداً از دیتابیس و سرویس‌ها خوانده می‌شود.
-    """
+
+def get_stats():
+
+    vm = psutil.virtual_memory()
+
+    du = shutil.disk_usage("/")
+
+    cpu = psutil.cpu_percent(interval=0.2)
+
+    ram = vm.percent
+
+    disk = round((du.used / du.total) * 100)
+
+    uptime_seconds = int(time.time() - BOOT_TIME)
+
+    days = uptime_seconds // 86400
+    hours = (uptime_seconds % 86400) // 3600
+
+    uptime = f"{days}d {hours}h"
+
+    load = "0.00"
+
+    try:
+
+        load = "%.2f" % psutil.getloadavg()[0]
+
+    except:
+
+        pass
+
+    network = psutil.net_io_counters()
 
     return {
+
+        "cpu": cpu,
+
+        "ram": ram,
+
+        "disk": disk,
+
+        "uptime": uptime,
+
+        "load": load,
+
+        "traffic_up": round(network.bytes_sent / 1024 / 1024, 2),
+
+        "traffic_down": round(network.bytes_recv / 1024 / 1024, 2),
+
+        # بعدا از دیتابیس
         "users": 0,
         "admins": 1,
         "groups": 0,
         "servers": 0,
         "online": 0,
-        "traffic": "0 GB",
         "backups": 0,
         "logs": 0,
+
     }
 
 
@@ -32,24 +78,23 @@ async def dashboard(
 ):
 
     if lak_admin is None:
-        return RedirectResponse(
-            "/login",
-            status_code=302,
-        )
 
-    settings = get_dashboard_settings()
-
-    data = get_dashboard_stats()
-
-    data.update({
-        "admin_id": lak_admin,
-        "dashboard_settings": settings,
-    })
+        return RedirectResponse("/login")
 
     return render(
+
         request,
+
         "dashboard.html",
-        data,
+
+        {
+
+            "admin_id": lak_admin,
+
+            **get_stats()
+
+        },
+
     )
 
 
@@ -60,38 +105,27 @@ async def dashboard_content(
 ):
 
     if lak_admin is None:
-        return RedirectResponse(
-            "/login",
-            status_code=302,
-        )
 
-    data = get_dashboard_stats()
-
-    data.update({
-        "admin_id": lak_admin,
-    })
+        return RedirectResponse("/login")
 
     return render(
+
         request,
+
         "dashboard_content.html",
-        data,
+
+        {
+
+            "admin_id": lak_admin,
+
+            **get_stats()
+
+        },
+
     )
 
 
-@router.get("/dashboard/api")
-async def dashboard_api(
-    lak_admin: str | None = Cookie(default=None),
-):
+@router.get("/api/dashboard/stats")
+async def dashboard_api():
 
-    if lak_admin is None:
-
-        return JSONResponse(
-            {
-                "error": "Unauthorized"
-            },
-            status_code=401,
-        )
-
-    return JSONResponse(
-        get_dashboard_stats()
-    )
+    return JSONResponse(get_stats())
