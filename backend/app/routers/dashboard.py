@@ -1,12 +1,11 @@
-from datetime import datetime
-
-from fastapi import APIRouter, Cookie, Request
+from fastapi import APIRouter
+from fastapi import Cookie
+from fastapi import Request
 from fastapi.responses import RedirectResponse
-from fastapi.templating import Jinja2Templates
+
+from app.core.template import render
 
 router = APIRouter()
-
-templates = Jinja2Templates(directory="app/templates")
 
 
 @router.get("/dashboard")
@@ -16,13 +15,15 @@ async def dashboard(
 ):
 
     if lak_admin is None:
-        return RedirectResponse("/login", status_code=302)
+        return RedirectResponse(
+            "/login",
+            status_code=302,
+        )
 
-    return templates.TemplateResponse(
+    return render(
+        request,
         "dashboard.html",
         {
-            "request": request,
             "admin_id": lak_admin,
-            "server_time": datetime.now(),
         },
     )
