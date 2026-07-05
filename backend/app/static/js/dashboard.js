@@ -1,23 +1,85 @@
+// ==============================
+// LAK PANEL Dashboard Auto Refresh
+// ==============================
+
+let refreshTimer = null;
+
 async function refreshDashboard() {
-
-    const box = document.getElementById("dashboard-content");
-
-    if (!box) return;
 
     try {
 
-        const res = await fetch("/dashboard/content", {
+        const response = await fetch("/dashboard/content", {
             cache: "no-store"
         });
 
-        if (!res.ok) return;
+        if (!response.ok) {
+            return;
+        }
 
-        box.innerHTML = await res.text();
+        const html = await response.text();
 
-    } catch (e) {}
+        const target = document.getElementById("dashboard-content");
+
+        if (target) {
+
+            target.innerHTML = html;
+
+        }
+
+    } catch (err) {
+
+        console.error("Dashboard Refresh Error:", err);
+
+    }
 
 }
 
-refreshDashboard();
+function startDashboardRefresh() {
 
-setInterval(refreshDashboard, 2000);
+    if (typeof window.dashboardSettings === "undefined") {
+
+        return;
+
+    }
+
+    if (!window.dashboardSettings.autoRefresh) {
+
+        return;
+
+    }
+
+    let interval = parseInt(window.dashboardSettings.interval);
+
+    if (isNaN(interval) || interval < 1) {
+
+        interval = 2;
+
+    }
+
+    if (refreshTimer) {
+
+        clearInterval(refreshTimer);
+
+    }
+
+    refreshTimer = setInterval(
+
+        refreshDashboard,
+
+        interval * 1000
+
+    );
+
+}
+
+document.addEventListener(
+
+    "DOMContentLoaded",
+
+    function () {
+
+        startDashboardRefresh();
+
+    }
+
+);
