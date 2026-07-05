@@ -1,87 +1,100 @@
-let refreshTimer = null;
+let dashboardTimer = null;
 
-function updateDashboard() {
+function setText(id, value) {
 
-    fetch("/api/dashboard/stats")
-        .then(r => r.json())
-        .then(data => {
+    const el = document.getElementById(id);
 
-            const map = {
-                users: data.users,
-                admins: data.admins,
-                servers: data.servers,
-                online: data.online
-            };
+    if (el)
+        el.textContent = value;
 
-            document.querySelectorAll(".stat-card").forEach(card => {
-
-                const title = card.querySelector(".stat-title").innerText.toLowerCase();
-
-                const value = card.querySelector(".stat-value");
-
-                if (title.includes("users"))
-                    value.innerText = map.users;
-
-                else if (title.includes("admins"))
-                    value.innerText = map.admins;
-
-                else if (title.includes("servers"))
-                    value.innerText = map.servers;
-
-                else if (title.includes("online"))
-                    value.innerText = map.online;
-
-            });
-
-            const progressCards = document.querySelectorAll(".progress-card");
-
-            if (progressCards.length >= 3) {
-
-                // CPU
-                progressCards[0].querySelector(".progress-bar").style.width = data.cpu + "%";
-                progressCards[0].querySelector(".progress-header span:last-child").innerText = data.cpu + "%";
-
-                // RAM
-                progressCards[1].querySelector(".progress-bar").style.width = data.ram + "%";
-                progressCards[1].querySelector(".progress-header span:last-child").innerText = data.ram + "%";
-
-                // Disk
-                progressCards[2].querySelector(".progress-bar").style.width = data.disk + "%";
-                progressCards[2].querySelector(".progress-header span:last-child").innerText = data.disk + "%";
-            }
-
-            const info = document.querySelectorAll(".info-card");
-
-            if (info.length >= 4) {
-
-                info[0].querySelector("p").innerText = data.load;
-
-                info[1].querySelector("p").innerText = data.uptime;
-
-                info[2].querySelector("p").innerText = data.traffic_up + " MB";
-
-                info[3].querySelector("p").innerText = data.traffic_down + " MB";
-
-            }
-
-        })
-        .catch(() => {});
 }
 
-document.addEventListener("DOMContentLoaded", () => {
+function setBar(barId, textId, value) {
 
-    if (typeof window.dashboardSettings === "undefined")
-        return;
+    const bar = document.getElementById(barId);
 
-    if (!window.dashboardSettings.autoRefresh)
-        return;
+    const text = document.getElementById(textId);
 
-    refreshTimer = setInterval(
+    if (bar)
+        bar.style.width = value + "%";
+
+    if (text)
+        text.textContent = value + "%";
+
+}
+
+async function updateDashboard() {
+
+    try {
+
+        const response = await fetch("/api/dashboard/stats", {
+            cache: "no-store"
+        });
+
+        if (!response.ok)
+            return;
+
+        const data = await response.json();
+
+        setText("users-value", data.users);
+        setText("admins-value", data.admins);
+        setText("servers-value", data.servers);
+        setText("online-value", data.online);
+
+        setBar("cpu-bar", "cpu-text", data.cpu);
+        setBar("ram-bar", "ram-text", data.ram);
+        setBar("disk-bar", "disk-text", data.disk);
+
+        setText("load-value", data.load);
+        setText("uptime-value", data.uptime);
+
+        setText("upload-value", data.traffic_up + " MB");
+        setText("download-value", data.traffic_down + " MB");
+
+    }
+
+    catch (e) {
+
+        console.log("Dashboard refresh failed.", e);
+
+    }
+
+}
+
+function startDashboardRefresh() {
+
+    if (dashboardTimer)
+        clearInterval(dashboardTimer);
+
+    let interval = 2;
+
+    if (
+        window.dashboardSettings &&
+        window.dashboardSettings.autoRefresh
+    ) {
+
+        interval = parseInt(
+            window.dashboardSettings.interval
+        );
+
+    }
+
+    updateDashboard();
+
+    dashboardTimer = setInterval(
 
         updateDashboard,
 
-        window.dashboardSettings.interval * 1000
+        interval * 1000
 
     );
 
-});
+}
+
+document.addEventListener(
+
+    "DOMContentLoaded",
+
+    startDashboardRefresh
+
+);
