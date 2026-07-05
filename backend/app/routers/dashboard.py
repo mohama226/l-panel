@@ -1,4 +1,7 @@
-from fastapi import APIRouter, Request
+from fastapi import APIRouter
+from fastapi import Cookie
+from fastapi import Request
+
 from fastapi.responses import RedirectResponse
 from fastapi.templating import Jinja2Templates
 
@@ -10,17 +13,21 @@ templates = Jinja2Templates(
 
 
 @router.get("/dashboard")
-async def dashboard(request: Request):
+async def dashboard(
+    request: Request,
+    lak_admin: str | None = Cookie(default=None),
+):
 
-    admin = request.cookies.get("lak_admin")
-
-    if not admin:
-
-        return RedirectResponse("/login")
+    if lak_admin is None:
+        return RedirectResponse(
+            "/login",
+            status_code=302,
+        )
 
     return templates.TemplateResponse(
         "dashboard.html",
         {
-            "request": request
-        }
+            "request": request,
+            "admin_id": lak_admin,
+        },
     )
