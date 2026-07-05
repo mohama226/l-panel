@@ -8,6 +8,20 @@
 
 </div>
 
+<script>
+
+window.dashboardSettings = {
+
+    autoRefresh:
+        {{ "true" if dashboard_settings.auto_refresh else "false" }},
+
+    interval:
+        {{ dashboard_settings.refresh_interval }}
+
+};
+
+</script>
+
 <script src="/static/js/dashboard.js"></script>
 
 {% endblock %}
