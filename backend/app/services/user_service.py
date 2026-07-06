@@ -8,6 +8,7 @@ from app.services.ocserv_service import OcservService
 class UserService:
 
     def __init__(self, db: Session):
+        self.db = db
         self.repo = UserRepository(db)
 
     def list(self):
@@ -21,16 +22,15 @@ class UserService:
         username: str,
         password: str,
         expire=None,
-        traffic: int = 0,
+        traffic=0,
         group_id=None,
         server_id=None,
     ):
 
-        exists = self.repo.get(username)
+        if self.repo.get(username):
+            raise Exception("Username already exists.")
 
-        if exists:
-            raise ValueError("User already exists.")
-
+        # ایجاد در OCServ
         OcservService.add_user(
             username=username,
             password=password,
@@ -38,7 +38,7 @@ class UserService:
 
         user = VPNUser(
             username=username,
-            password="ocserv",
+            password="",
             expire=expire,
             traffic=traffic,
             enabled=True,
@@ -53,20 +53,21 @@ class UserService:
         user = self.repo.get(username)
 
         if not user:
-            raise ValueError("User not found.")
+            raise Exception("User not found.")
 
-        OcservService.delete_user(username)
+        try:
+            OcservService.delete_user(username)
+        except Exception:
+            pass
 
         self.repo.delete(user)
-
-        return True
 
     def enable(self, username: str):
 
         user = self.repo.get(username)
 
         if not user:
-            raise ValueError("User not found.")
+            raise Exception("User not found.")
 
         user.enabled = True
 
@@ -77,7 +78,7 @@ class UserService:
         user = self.repo.get(username)
 
         if not user:
-            raise ValueError("User not found.")
+            raise Exception("User not found.")
 
         user.enabled = False
 
@@ -92,13 +93,15 @@ class UserService:
         user = self.repo.get(username)
 
         if not user:
-            raise ValueError("User not found.")
+            raise Exception("User not found.")
 
-        OcservService.delete_user(username)
-
-        OcservService.add_user(
+        OcservService.change_password(
             username=username,
             password=password,
         )
 
         return user
+
+    def count(self):
+
+        return self.repo.count()
