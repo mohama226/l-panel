@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from fastapi.responses import RedirectResponse
 from fastapi.staticfiles import StaticFiles
 
 from app.routers.auth import router as auth_router
@@ -9,6 +10,12 @@ from app.routers.users import router as users_router
 app = FastAPI(
     title="LAK PANEL",
 )
+
+
+@app.get("/", include_in_schema=False)
+async def root():
+    return RedirectResponse("/login")
+
 
 app.mount(
     "/static",
