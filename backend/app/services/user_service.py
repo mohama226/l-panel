@@ -8,7 +8,6 @@ from app.services.ocserv_service import OcservService
 class UserService:
 
     def __init__(self, db: Session):
-        self.db = db
         self.repo = UserRepository(db)
 
     def list(self):
@@ -28,12 +27,11 @@ class UserService:
     ):
 
         if self.repo.get(username):
-            raise Exception("Username already exists.")
+            raise Exception("User already exists")
 
-        # ایجاد در OCServ
         OcservService.add_user(
-            username=username,
-            password=password,
+            username,
+            password,
         )
 
         user = VPNUser(
@@ -53,12 +51,9 @@ class UserService:
         user = self.repo.get(username)
 
         if not user:
-            raise Exception("User not found.")
+            raise Exception("User not found")
 
-        try:
-            OcservService.delete_user(username)
-        except Exception:
-            pass
+        OcservService.delete_user(username)
 
         self.repo.delete(user)
 
@@ -67,7 +62,7 @@ class UserService:
         user = self.repo.get(username)
 
         if not user:
-            raise Exception("User not found.")
+            raise Exception("User not found")
 
         user.enabled = True
 
@@ -78,7 +73,7 @@ class UserService:
         user = self.repo.get(username)
 
         if not user:
-            raise Exception("User not found.")
+            raise Exception("User not found")
 
         user.enabled = False
 
@@ -93,15 +88,11 @@ class UserService:
         user = self.repo.get(username)
 
         if not user:
-            raise Exception("User not found.")
+            raise Exception("User not found")
 
         OcservService.change_password(
-            username=username,
-            password=password,
+            username,
+            password,
         )
 
         return user
-
-    def count(self):
-
-        return self.repo.count()
