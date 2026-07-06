@@ -48,4 +48,3 @@ class UserRepository:
 
     def count(self):
         return self.db.query(VPNUser).count()
-}
