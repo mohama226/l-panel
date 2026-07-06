@@ -31,7 +31,6 @@ class UserOut(BaseModel):
     expire: Optional[datetime]
     traffic: int
     enabled: bool
-    created_at: datetime
     group_id: Optional[int]
     server_id: Optional[int]
 
