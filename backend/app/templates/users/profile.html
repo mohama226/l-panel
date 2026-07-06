@@ -14,6 +14,7 @@
 
 </div>
 
+
 <div class="dashboard-grid">
 
     <div class="stat-card blue">
@@ -37,13 +38,9 @@
             <h2>
 
             {% if user.enabled %}
-
                 Active
-
             {% else %}
-
                 Disabled
-
             {% endif %}
 
             </h2>
@@ -73,13 +70,9 @@
             <h2>
 
             {% if user.expire %}
-
                 {{ user.expire }}
-
             {% else %}
-
                 Unlimited
-
             {% endif %}
 
             </h2>
@@ -89,6 +82,7 @@
     </div>
 
 </div>
+
 
 
 <div class="dashboard-box">
@@ -109,36 +103,48 @@
             </tr>
 
             <tr>
-                <th>Group</th>
-                <td>
-                    {% if user.group %}
-                        {{ user.group.name }}
-                    {% else %}
-                        -
-                    {% endif %}
-                </td>
-            </tr>
-
-            <tr>
-                <th>Server</th>
-                <td>
-                    {% if user.server %}
-                        {{ user.server.name }}
-                    {% else %}
-                        Local
-                    {% endif %}
-                </td>
-            </tr>
-
-            <tr>
                 <th>Status</th>
+
                 <td>
+
                     {% if user.enabled %}
                         <span class="badge success">Enabled</span>
                     {% else %}
                         <span class="badge danger">Disabled</span>
                     {% endif %}
+
                 </td>
+
+            </tr>
+
+            <tr>
+                <th>Blocked</th>
+
+                <td>
+
+                    {% if user.blocked %}
+                        <span class="badge danger">YES</span>
+                    {% else %}
+                        <span class="badge success">NO</span>
+                    {% endif %}
+
+                </td>
+
+            </tr>
+
+            <tr>
+                <th>Suspended</th>
+
+                <td>
+
+                    {% if user.suspended %}
+                        <span class="badge danger">YES</span>
+                    {% else %}
+                        <span class="badge success">NO</span>
+                    {% endif %}
+
+                </td>
+
             </tr>
 
             <tr>
@@ -148,6 +154,7 @@
 
             <tr>
                 <th>Expire</th>
+
                 <td>
 
                     {% if user.expire %}
@@ -157,28 +164,93 @@
                     {% endif %}
 
                 </td>
+
             </tr>
 
         </table>
 
         <br>
 
-        <div style="display:flex;gap:12px;flex-wrap:wrap;">
+        <div style="display:flex;gap:10px;flex-wrap:wrap;">
 
-            <button class="btn-primary">
-                Change Password
+            {% if user.enabled %}
+
+            <button
+                class="btn-primary"
+                onclick="action('disable')">
+
+                Disable
+
             </button>
 
-            <button class="btn-primary">
-                Extend Account
+            {% else %}
+
+            <button
+                class="btn-primary"
+                onclick="action('enable')">
+
+                Enable
+
             </button>
 
-            <button class="btn-primary">
-                Reset Traffic
+            {% endif %}
+
+
+
+            {% if user.blocked %}
+
+            <button
+                class="btn-primary"
+                onclick="action('unblock')">
+
+                Unblock
+
             </button>
 
-            <button class="btn-danger">
+            {% else %}
+
+            <button
+                class="btn-primary"
+                onclick="action('block')">
+
+                Block
+
+            </button>
+
+            {% endif %}
+
+
+
+            {% if user.suspended %}
+
+            <button
+                class="btn-primary"
+                onclick="action('unsuspend')">
+
+                Unsuspend
+
+            </button>
+
+            {% else %}
+
+            <button
+                class="btn-primary"
+                onclick="action('suspend')">
+
+                Suspend
+
+            </button>
+
+            {% endif %}
+
+
+
+            <button
+                class="btn-danger"
+                onclick="deleteUser()">
+
                 Delete User
+
             </button>
 
         </div>
@@ -186,6 +258,7 @@
     </div>
 
 </div>
+
 
 
 <div class="dashboard-box">
@@ -242,7 +315,7 @@
 
                     <td colspan="4">
 
-                        No activity found.
+                        No activity.
 
                     </td>
 
@@ -257,5 +330,58 @@
     </div>
 
 </div>
+
+
+
+<script>
+
+const username="{{ user.username }}";
+
+
+async function action(name){
+
+    const r=await fetch("/users/"+username+"/"+name,{
+        method:"POST"
+    });
+
+    const j=await r.json();
+
+    alert(j.detail);
+
+    if(r.ok){
+
+        location.reload();
+
+    }
+
+}
+
+
+
+async function deleteUser(){
+
+    if(!confirm("Delete this user?")){
+
+        return;
+
+    }
+
+    const r=await fetch("/users/"+username,{
+        method:"DELETE"
+    });
+
+    const j=await r.json();
+
+    alert(j.detail);
+
+    if(r.ok){
+
+        window.location="/users";
+
+    }
+
+}
+
+</script>
 
 {% endblock %}
