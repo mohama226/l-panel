@@ -230,3 +230,101 @@
     }
 
 }
+
+
+
+/* ===========================
+   Live Dashboard Improvements
+=========================== */
+
+#cpu-text,
+#ram-text,
+#disk-text,
+#load-value,
+#uptime-value,
+#upload-value,
+#download-value,
+#upload-speed,
+#download-speed,
+#users-value,
+#admins-value,
+#servers-value,
+#online-value{
+
+    transition:all .25s ease;
+
+}
+
+.progress{
+
+    overflow:hidden;
+
+    border-radius:999px;
+
+}
+
+.progress-bar{
+
+    position:relative;
+
+}
+
+.progress-bar::after{
+
+    content:"";
+
+    position:absolute;
+
+    inset:0;
+
+    background:linear-gradient(
+        90deg,
+        rgba(255,255,255,.18),
+        rgba(255,255,255,0)
+    );
+
+}
+
+.info-card{
+
+    min-height:92px;
+
+}
+
+.info-card i{
+
+    transition:transform .25s ease;
+
+}
+
+.info-card:hover i{
+
+    transform:scale(1.08);
+
+}
+
+.stat-card:hover .stat-value{
+
+    transform:scale(1.05);
+
+}
+
+@media(max-width:1200px){
+
+    .dashboard-grid{
+
+        grid-template-columns:repeat(2,1fr);
+
+    }
+
+}
+
+@media(max-width:768px){
+
+    .dashboard-grid{
+
+        grid-template-columns:1fr;
+
+    }
+
+}
