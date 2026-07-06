@@ -8,13 +8,7 @@ class UserLogRepository:
     def __init__(self, db: Session):
         self.db = db
 
-    def create(
-        self,
-        username: str,
-        event: str,
-        ip: str = "",
-        details: str = "",
-    ):
+    def create(self, username, event, ip="", details=""):
 
         log = UserLog(
             username=username,
@@ -25,23 +19,25 @@ class UserLogRepository:
 
         self.db.add(log)
         self.db.commit()
-        self.db.refresh(log)
 
         return log
 
-    def list(self, username: str):
+    def get_user_logs(self, username, limit=200):
 
         return (
             self.db.query(UserLog)
             .filter(UserLog.username == username)
-            .order_by(UserLog.id.desc())
+            .order_by(UserLog.created_at.desc())
+            .limit(limit)
             .all()
         )
 
-    def clear(self, username: str):
+    def delete_user_logs(self, username):
 
-        self.db.query(UserLog).filter(
-            UserLog.username == username
-        ).delete()
+        (
+            self.db.query(UserLog)
+            .filter(UserLog.username == username)
+            .delete()
+        )
 
         self.db.commit()
