@@ -5,221 +5,198 @@
 <div class="page-header">
 
     <div>
+
         <h1>Users</h1>
+
         <p>Manage VPN Users</p>
+
     </div>
 
-    <button class="btn-primary" onclick="openCreateUser()">
+    <a href="/users/new" class="btn-primary">
+
         ➕ New User
-    </button>
+
+    </a>
 
 </div>
 
 <div class="dashboard-box">
 
-<table>
+    <div class="box-content">
 
-<thead>
+        <table>
 
-<tr>
+            <thead>
 
-<th>Username</th>
-<th>Status</th>
-<th>Traffic</th>
-<th>Expire</th>
-<th>Actions</th>
+                <tr>
 
-</tr>
+                    <th>Username</th>
+                    <th>Status</th>
+                    <th>Traffic</th>
+                    <th>Expire</th>
+                    <th>Group</th>
+                    <th width="320">Actions</th>
 
-</thead>
+                </tr>
 
-<tbody>
+            </thead>
 
-{% for user in users %}
+            <tbody>
 
-<tr>
+            {% for user in users %}
 
-<td>
+                <tr id="user-{{ user.username }}">
 
-<b>{{ user.username }}</b>
+                    <td>
 
-</td>
+                        <strong>{{ user.username }}</strong>
 
-<td>
+                    </td>
 
-{% if user.enabled %}
+                    <td>
 
-<span class="badge success">
-Active
-</span>
+                        {% if user.status == "Active" %}
 
-{% else %}
+                            <span class="badge success">
 
-<span class="badge danger">
-Disabled
-</span>
+                                Active
 
-{% endif %}
+                            </span>
 
-</td>
+                        {% else %}
 
-<td>
+                            <span class="badge danger">
 
-{{ user.traffic }}
+                                Disabled
 
-</td>
+                            </span>
 
-<td>
+                        {% endif %}
 
-{{ user.expire or "-" }}
+                    </td>
 
-</td>
+                    <td>
 
-<td>
+                        {{ user.traffic }}
 
-<button onclick="profile('{{user.username}}')">
-Profile
-</button>
+                    </td>
 
-<button onclick="changePassword('{{user.username}}')">
-Password
-</button>
+                    <td>
 
-<button onclick="removeUser('{{user.username}}')">
-Delete
-</button>
+                        {{ user.expire }}
 
-</td>
+                    </td>
 
-</tr>
+                    <td>
 
-{% endfor %}
+                        {{ user.group }}
 
-</tbody>
+                    </td>
 
-</table>
+                    <td>
 
-</div>
+                        <a
+                            href="/users/{{ user.username }}"
+                            class="btn-primary"
+                        >
 
-<!-- ========================= -->
+                            Profile
 
-<div id="createModal" class="modal">
+                        </a>
 
-<div class="modal-box">
+                        <button
+                            class="btn-primary"
+                            onclick="changePassword('{{ user.username }}')"
+                        >
 
-<h2>Create User</h2>
+                            Password
 
-<input id="username" placeholder="Username">
+                        </button>
 
-<input id="password" placeholder="Password">
+                        <button
+                            class="logout-btn"
+                            onclick="deleteUser('{{ user.username }}')"
+                        >
 
-<input id="traffic" type="number" placeholder="Traffic GB">
+                            Delete
 
-<input id="expire" type="datetime-local">
+                        </button>
 
-<button class="btn-primary" onclick="createUser()">
+                    </td>
 
-Create
+                </tr>
 
-</button>
+            {% endfor %}
 
-<button onclick="closeModal()">
+            </tbody>
 
-Cancel
+        </table>
 
-</button>
-
-</div>
+    </div>
 
 </div>
 
 <script>
 
-function openCreateUser(){
+async function deleteUser(username){
 
-document.getElementById("createModal").style.display="flex";
+    if(!confirm("Delete "+username+" ?"))
+        return;
 
-}
+    const r = await fetch("/users/"+username,{
+        method:"DELETE"
+    });
 
-function closeModal(){
+    if(r.ok){
 
-document.getElementById("createModal").style.display="none";
+        document
+            .getElementById("user-"+username)
+            .remove();
 
-}
+    }else{
 
-async function createUser(){
+        alert("Delete failed");
 
-let body={
-
-username:document.getElementById("username").value,
-
-password:document.getElementById("password").value,
-
-traffic:parseInt(document.getElementById("traffic").value)||0,
-
-expire:document.getElementById("expire").value||null
-
-};
-
-await fetch("/users",{
-
-method:"POST",
-
-headers:{
-
-"Content-Type":"application/json"
-
-},
-
-body:JSON.stringify(body)
-
-});
-
-location.reload();
+    }
 
 }
 
-function profile(username){
+async function changePassword(username){
 
-location.href="/users/"+username;
+    const password = prompt("New password");
 
-}
+    if(!password)
+        return;
 
-function changePassword(username){
+    const r = await fetch(
+        "/users/"+username+"/password",
+        {
 
-let p=prompt("New Password");
+            method:"PATCH",
 
-if(!p)return;
+            headers:{
+                "Content-Type":"application/json"
+            },
 
-fetch("/users/"+username+"/password",{
+            body:JSON.stringify({
 
-method:"PATCH",
+                password:password
 
-headers:{
+            })
 
-"Content-Type":"application/json"
+        }
 
-},
+    );
 
-body:JSON.stringify({
+    if(r.ok){
 
-password:p
+        alert("Password changed");
 
-})
+    }else{
 
-}).then(()=>location.reload());
+        alert("Failed");
 
-}
-
-function removeUser(username){
-
-if(!confirm("Delete user?"))return;
-
-fetch("/users/"+username,{
-
-method:"DELETE"
-
-}).then(()=>location.reload());
+    }
 
 }
 
