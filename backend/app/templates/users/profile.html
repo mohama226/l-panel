@@ -3,54 +3,89 @@
 {% block content %}
 
 <div class="page-header">
+
     <div>
+
         <h1>{{ user.username }}</h1>
+
         <p>User Profile</p>
+
     </div>
 
-    <a href="/users" class="btn btn-secondary">
-        ← Back
-    </a>
 </div>
 
 <div class="dashboard-grid">
 
     <div class="stat-card blue">
-        <div class="stat-info">
-            <span>Username</span>
+
+        <div>
+
+            <h3>Username</h3>
+
             <h2>{{ user.username }}</h2>
+
         </div>
+
     </div>
 
     <div class="stat-card green">
-        <div class="stat-info">
-            <span>Status</span>
+
+        <div>
+
+            <h3>Status</h3>
+
+            <h2>
 
             {% if user.enabled %}
-                <h2>Active</h2>
+
+                Active
+
             {% else %}
-                <h2>Disabled</h2>
+
+                Disabled
+
             {% endif %}
+
+            </h2>
+
         </div>
+
     </div>
 
     <div class="stat-card orange">
-        <div class="stat-info">
-            <span>Traffic</span>
+
+        <div>
+
+            <h3>Traffic</h3>
+
             <h2>{{ user.traffic }} GB</h2>
+
         </div>
+
     </div>
 
     <div class="stat-card purple">
-        <div class="stat-info">
-            <span>Expire</span>
+
+        <div>
+
+            <h3>Expire</h3>
+
+            <h2>
 
             {% if user.expire %}
-                <h2>{{ user.expire.strftime("%Y-%m-%d") }}</h2>
+
+                {{ user.expire }}
+
             {% else %}
-                <h2>Unlimited</h2>
+
+                Unlimited
+
             {% endif %}
+
+            </h2>
+
         </div>
+
     </div>
 
 </div>
@@ -58,7 +93,9 @@
 <div class="dashboard-box">
 
     <div class="box-header">
+
         <h3>User Information</h3>
+
     </div>
 
     <div class="box-content">
@@ -66,65 +103,140 @@
         <table class="table">
 
             <tr>
-                <th>ID</th>
-                <td>{{ user.id }}</td>
-            </tr>
 
-            <tr>
                 <th>Username</th>
+
                 <td>{{ user.username }}</td>
+
             </tr>
 
             <tr>
-                <th>Server</th>
-                <td>
-                    {% if user.server %}
-                        {{ user.server.name }}
-                    {% else %}
-                        -
-                    {% endif %}
-                </td>
-            </tr>
 
-            <tr>
                 <th>Group</th>
+
                 <td>
-                    {% if user.group %}
-                        {{ user.group.name }}
-                    {% else %}
-                        -
-                    {% endif %}
+
+                {% if user.group %}
+
+                    {{ user.group.name }}
+
+                {% else %}
+
+                    -
+
+                {% endif %}
+
                 </td>
+
             </tr>
 
             <tr>
+
+                <th>Server</th>
+
+                <td>
+
+                {% if user.server %}
+
+                    {{ user.server.name }}
+
+                {% else %}
+
+                    Local
+
+                {% endif %}
+
+                </td>
+
+            </tr>
+
+            <tr>
+
                 <th>Status</th>
+
                 <td>
-                    {% if user.enabled %}
-                        Active
-                    {% else %}
+
+                {% if user.enabled %}
+
+                    <span class="badge success">
+
+                        Enabled
+
+                    </span>
+
+                {% else %}
+
+                    <span class="badge danger">
+
                         Disabled
-                    {% endif %}
+
+                    </span>
+
+                {% endif %}
+
                 </td>
+
             </tr>
 
             <tr>
+
                 <th>Traffic</th>
+
                 <td>{{ user.traffic }} GB</td>
+
             </tr>
 
             <tr>
+
                 <th>Expire</th>
+
                 <td>
-                    {% if user.expire %}
-                        {{ user.expire }}
-                    {% else %}
-                        Unlimited
-                    {% endif %}
+
+                {% if user.expire %}
+
+                    {{ user.expire }}
+
+                {% else %}
+
+                    Unlimited
+
+                {% endif %}
+
                 </td>
+
             </tr>
 
         </table>
+
+        <br>
+
+        <div style="display:flex;gap:12px;flex-wrap:wrap;">
+
+            <button class="btn-primary">
+
+                Change Password
+
+            </button>
+
+            <button class="btn-primary">
+
+                Extend Account
+
+            </button>
+
+            <button class="btn-primary">
+
+                Reset Traffic
+
+            </button>
+
+            <button class="btn-danger">
+
+                Delete User
+
+            </button>
+
+        </div>
 
     </div>
 
