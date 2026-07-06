@@ -108,3 +108,23 @@ class Setting(Base):
     key = Column(String(100), unique=True)
 
     value = Column(String(500))
+
+
+# ===========================
+# User Activity Logs
+# ===========================
+
+class UserLog(Base):
+    __tablename__ = "user_logs"
+
+    id = Column(Integer, primary_key=True, index=True)
+
+    username = Column(String(100), index=True, nullable=False)
+
+    event = Column(String(100), nullable=False)
+
+    ip = Column(String(100), default="")
+
+    details = Column(String(500), default="")
+
+    created_at = Column(DateTime, default=datetime.utcnow)
