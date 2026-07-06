@@ -3,22 +3,56 @@ from fastapi.responses import RedirectResponse, JSONResponse
 
 from app.core.template import render, get_setting
 
-import psutil
 import shutil
 import time
 
+try:
+    import psutil
+except ImportError:
+    psutil = None
+
 router = APIRouter()
 
-BOOT_TIME = psutil.boot_time()
+BOOT_TIME = time.time()
+
+if psutil is not None:
+    BOOT_TIME = psutil.boot_time()
+
+LAST_NETWORK = {
+    "sent": 0,
+    "recv": 0,
+    "time": time.time(),
+}
 
 
 def get_stats():
+
+    if psutil is None:
+
+        return {
+            "cpu": 0,
+            "ram": 0,
+            "disk": 0,
+            "uptime": "-",
+            "load": "0.00",
+            "traffic_up": 0,
+            "traffic_down": 0,
+            "upload_speed": 0,
+            "download_speed": 0,
+            "users": 0,
+            "admins": 1,
+            "groups": 0,
+            "servers": 0,
+            "online": 0,
+            "backups": 0,
+            "logs": 0,
+        }
 
     vm = psutil.virtual_memory()
 
     du = shutil.disk_usage("/")
 
-    cpu = psutil.cpu_percent(interval=0.2)
+    cpu = round(psutil.cpu_percent(interval=0.2), 1)
 
     ram = vm.percent
 
@@ -27,9 +61,12 @@ def get_stats():
     uptime_seconds = int(time.time() - BOOT_TIME)
 
     days = uptime_seconds // 86400
+
     hours = (uptime_seconds % 86400) // 3600
 
-    uptime = f"{days}d {hours}h"
+    minutes = (uptime_seconds % 3600) // 60
+
+    uptime = f"{days}d {hours}h {minutes}m"
 
     try:
         load = "%.2f" % psutil.getloadavg()[0]
@@ -38,63 +75,58 @@ def get_stats():
 
     network = psutil.net_io_counters()
 
-global LAST_NETWORK
+    global LAST_NETWORK
 
-try:
+    now = time.time()
 
-    LAST_NETWORK
+    elapsed = max(now - LAST_NETWORK["time"], 1)
 
-except NameError:
+    upload_speed = (
+        network.bytes_sent - LAST_NETWORK["sent"]
+    ) / elapsed
+
+    download_speed = (
+        network.bytes_recv - LAST_NETWORK["recv"]
+    ) / elapsed
 
     LAST_NETWORK = {
-
         "sent": network.bytes_sent,
-
         "recv": network.bytes_recv,
-
-        "time": time.time(),
-
+        "time": now,
     }
 
-now = time.time()
-
-elapsed = max(
-    now - LAST_NETWORK["time"],
-    1,
-)
-
-upload_speed = (
-    network.bytes_sent - LAST_NETWORK["sent"]
-) / elapsed
-
-download_speed = (
-    network.bytes_recv - LAST_NETWORK["recv"]
-) / elapsed
-
-LAST_NETWORK = {
-
-    "sent": network.bytes_sent,
-
-    "recv": network.bytes_recv,
-
-    "time": now,
-
-}
-
     return {
+
         "cpu": cpu,
+
         "ram": ram,
+
         "disk": disk,
+
         "uptime": uptime,
+
         "load": load,
-"traffic_up": round(network.bytes_sent / 1024 / 1024, 2),
 
-"traffic_down": round(network.bytes_recv / 1024 / 1024, 2),
+        "traffic_up": round(
+            network.bytes_sent / 1024 / 1024,
+            2,
+        ),
 
-"upload_speed": round(upload_speed / 1024, 2),
+        "traffic_down": round(
+            network.bytes_recv / 1024 / 1024,
+            2,
+        ),
 
-"download_speed": round(download_speed / 1024, 2),
-    
+        "upload_speed": round(
+            upload_speed / 1024,
+            2,
+        ),
+
+        "download_speed": round(
+            download_speed / 1024,
+            2,
+        ),
+
         "users": 0,
         "admins": 1,
         "groups": 0,
@@ -102,16 +134,18 @@ LAST_NETWORK = {
         "online": 0,
         "backups": 0,
         "logs": 0,
+
     }
 
 
 def get_dashboard_settings():
 
     return {
+
         "auto_refresh": get_setting(
             "dashboard_auto_refresh",
             "true",
-        ) == "true",
+        ).lower() == "true",
 
         "refresh_interval": int(
             get_setting(
@@ -119,6 +153,7 @@ def get_dashboard_settings():
                 "2",
             )
         ),
+
     }
 
 
