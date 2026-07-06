@@ -1659,3 +1659,34 @@ margin-top:10px;
 width:100%;
 
 }
+
+
+.settings-card{
+
+    max-width:700px;
+
+    margin:auto;
+
+}
+
+.settings-card form{
+
+    display:flex;
+
+    flex-direction:column;
+
+    gap:18px;
+
+}
+
+.settings-card input{
+
+    margin-bottom:0;
+
+}
+
+.settings-card button{
+
+    width:220px;
+
+}
