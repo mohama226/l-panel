@@ -4,6 +4,10 @@ from typing import Optional
 from pydantic import BaseModel, Field
 
 
+# ---------------------------------
+# Create User
+# ---------------------------------
+
 class UserCreate(BaseModel):
 
     username: str = Field(
@@ -24,29 +28,62 @@ class UserCreate(BaseModel):
     server_id: Optional[int] = None
 
 
+# ---------------------------------
+# Change Password
+# ---------------------------------
+
 class UserPassword(BaseModel):
 
     password: str = Field(
         min_length=4,
+        max_length=255,
     )
 
 
-class UserUpdate(BaseModel):
+# ---------------------------------
+# Extend Account
+# ---------------------------------
+
+class UserExpire(BaseModel):
+
+    expire: datetime
+
+
+# ---------------------------------
+# Traffic
+# ---------------------------------
+
+class UserTraffic(BaseModel):
+
+    traffic: int = Field(
+        ge=0,
+    )
+
+
+# ---------------------------------
+# Edit User
+# ---------------------------------
+
+class UserEdit(BaseModel):
 
     expire: Optional[datetime] = None
 
-    traffic: int
+    traffic: Optional[int] = None
 
-    enabled: bool
+    enabled: Optional[bool] = None
 
-    blocked: bool
+    suspended: Optional[bool] = None
 
-    suspended: bool
+    blocked: Optional[bool] = None
 
     group_id: Optional[int] = None
 
     server_id: Optional[int] = None
 
+
+# ---------------------------------
+# Output
+# ---------------------------------
 
 class UserOut(BaseModel):
 
@@ -56,18 +93,17 @@ class UserOut(BaseModel):
 
     enabled: bool
 
-    blocked: bool
-
     suspended: bool
 
-    expire: Optional[datetime]
+    blocked: bool
 
     traffic: int
+
+    expire: Optional[datetime]
 
     group_id: Optional[int]
 
     server_id: Optional[int]
 
     class Config:
-
         from_attributes = True
