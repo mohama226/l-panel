@@ -1,91 +1,68 @@
-<header class="topbar">
+<nav class="navbar">
 
-    <div class="topbar-left">
+    <div class="navbar-left">
 
-        <a href="/dashboard" class="brand">
+        <h2>{{ panel_name }}</h2>
 
-            <div class="brand-icon">
-                🛡
-            </div>
-
-            <div class="brand-text">
-
-                <div class="brand-title">
-                    {{ panel_name }}
-                </div>
-
-                <div class="brand-subtitle">
-                    VPN Management Panel
-                </div>
-
-            </div>
-
-        </a>
+        <span class="version">
+            v{{ panel_version }}
+        </span>
 
     </div>
 
-    <div class="topbar-center">
+    <div class="navbar-right">
 
         <div class="server-clock">
 
-            <div class="clock-label">
-                SERVER TIME
-            </div>
+            <i class="fa-solid fa-clock"></i>
 
-            <div class="clock-value">
-
+            <span id="server-time">
                 {{ server_time.strftime("%Y-%m-%d %H:%M:%S") }}
-
-            </div>
-
-        </div>
-
-    </div>
-
-    <div class="topbar-right">
-
-        <div class="server-status">
-
-            <span class="status-dot"></span>
-
-            <span>
-                Online
             </span>
 
         </div>
 
-        <div class="panel-version">
+        <div class="service-status">
 
-            v{{ panel_version }}
+            {% if ocserv_status == "active" %}
 
-        </div>
-
-        <div class="admin-menu">
-
-            <div class="admin-avatar">
-
-                A
-
-            </div>
-
-            <div class="admin-info">
-
-                <span class="admin-name">
-
-                    Administrator
-
+                <span class="badge success">
+                    <i class="fa-solid fa-circle"></i>
+                    OCServ Online
                 </span>
 
-            </div>
+            {% else %}
+
+                <span class="badge danger">
+                    <i class="fa-solid fa-circle"></i>
+                    OCServ Offline
+                </span>
+
+            {% endif %}
 
         </div>
-
-        <a href="/logout" class="logout-btn">
-
-            Logout
-
-        </a>
 
     </div>
 
-</header>
+</nav>
+
+<script>
+
+setInterval(function(){
+
+    const e=document.getElementById("server-time");
+
+    if(!e) return;
+
+    const d=new Date();
+
+    e.innerHTML=d.getFullYear()+"-"+
+        String(d.getMonth()+1).padStart(2,"0")+"-"+
+        String(d.getDate()).padStart(2,"0")+" "+
+        String(d.getHours()).padStart(2,"0")+":"+
+        String(d.getMinutes()).padStart(2,"0")+":"+
+        String(d.getSeconds()).padStart(2,"0");
+
+},1000);
+
+</script>
