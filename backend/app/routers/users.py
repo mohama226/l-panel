@@ -1,125 +1,106 @@
-from fastapi import (
-    APIRouter,
-    Depends,
-    HTTPException,
-    Cookie,
-    Request,
-)
+from fastapi import APIRouter, Request, Cookie, Form, HTTPException
 from fastapi.responses import RedirectResponse
 from sqlalchemy.orm import Session
 
 from app.core.template import render
-from app.db.database import get_db
-from app.schemas.user import (
-    UserCreate,
-    UserPassword,
-)
+from app.db.database import SessionLocal
+from app.schemas.user import UserCreate
 from app.services.user_service import UserService
 
 router = APIRouter()
 
 
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+
+
 @router.get("/users")
-def users_page(
+async def users_page(
     request: Request,
-    db: Session = Depends(get_db),
     lak_admin: str | None = Cookie(default=None),
 ):
 
     if lak_admin is None:
         return RedirectResponse("/login")
 
-    service = UserService(db)
+    db: Session = SessionLocal()
 
-    rows = service.list()
+    try:
 
-    users = []
+        service = UserService(db)
 
-    for user in rows:
+        rows = service.list()
 
-        users.append(
+        users = []
+
+        for row in rows:
+
+            users.append(
+                {
+                    "username": row.username,
+                    "status": "Active" if row.enabled else "Disabled",
+                    "online": False,
+                    "traffic": row.traffic,
+                    "expire": row.expire or "-",
+                    "group": row.group.name if row.group else "-",
+                }
+            )
+
+        return render(
+            request,
+            "users/index.html",
             {
-                "id": user.id,
-                "username": user.username,
-                "status": "Active" if user.enabled else "Disabled",
-                "enabled": user.enabled,
-                "online": False,
-                "traffic": user.traffic,
-                "expire": user.expire,
-                "group": user.group.name if user.group else "-",
-                "server": user.server.name if user.server else "-",
-            }
+                "title": "Users",
+                "users": users,
+            },
         )
+
+    finally:
+        db.close()
+
+
+@router.get("/users/new")
+async def new_user_page(
+    request: Request,
+    lak_admin: str | None = Cookie(default=None),
+):
+
+    if lak_admin is None:
+        return RedirectResponse("/login")
 
     return render(
         request,
-        "users/index.html",
+        "users/create.html",
         {
-            "title": "Users",
-            "users": users,
+            "title": "Create User",
         },
     )
 
 
-@router.get("/api/users")
-def list_users(
-    db: Session = Depends(get_db),
+@router.post("/users/new")
+async def create_user_form(
+    username: str = Form(...),
+    password: str = Form(...),
 ):
 
-    service = UserService(db)
-
-    rows = service.list()
-
-    result = []
-
-    for user in rows:
-
-        result.append(
-            {
-                "id": user.id,
-                "username": user.username,
-                "enabled": user.enabled,
-                "traffic": user.traffic,
-                "expire": user.expire,
-                "online": False,
-                "group": user.group.name if user.group else None,
-                "server": user.server.name if user.server else None,
-            }
-        )
-
-    return result
-
-
-@router.post("/users")
-def create_user(
-    payload: UserCreate,
-    db: Session = Depends(get_db),
-):
-
-    service = UserService(db)
+    db = SessionLocal()
 
     try:
 
-        user = service.create(
-            username=payload.username,
-            password=payload.password,
-            expire=payload.expire,
-            traffic=payload.traffic,
-            group_id=payload.group_id,
-            server_id=payload.server_id,
+        service = UserService(db)
+
+        service.create(
+            username=username,
+            password=password,
         )
 
-        return {
-            "success": True,
-            "message": "User created successfully.",
-            "id": user.id,
-        }
-
-    except ValueError as e:
-
-        raise HTTPException(
-            status_code=400,
-            detail=str(e),
+        return RedirectResponse(
+            "/users",
+            status_code=302,
         )
 
     except Exception as e:
@@ -129,84 +110,105 @@ def create_user(
             detail=str(e),
         )
 
+    finally:
 
-@router.delete("/users/{username}")
-def delete_user(
-    username: str,
-    db: Session = Depends(get_db),
-):
+        db.close()
 
-    service = UserService(db)
+
+@router.post("/users")
+async def create_user(user: UserCreate):
+
+    db = SessionLocal()
 
     try:
+
+        service = UserService(db)
+
+        service.create(
+            username=user.username,
+            password=user.password,
+            expire=user.expire,
+            traffic=user.traffic,
+            group_id=user.group_id,
+            server_id=user.server_id,
+        )
+
+        return {
+            "message": "User created",
+        }
+
+    finally:
+
+        db.close()
+
+
+@router.delete("/users/{username}")
+async def delete_user(username: str):
+
+    db = SessionLocal()
+
+    try:
+
+        service = UserService(db)
 
         service.delete(username)
 
         return {
-            "success": True,
-            "message": "User deleted successfully.",
+            "message": "User deleted",
         }
 
-    except ValueError as e:
+    finally:
 
-        raise HTTPException(
-            status_code=404,
-            detail=str(e),
-        )
-
-    except Exception as e:
-
-        raise HTTPException(
-            status_code=500,
-            detail=str(e),
-        )
+        db.close()
 
 
 @router.patch("/users/{username}/enable")
-def enable_user(
-    username: str,
-    db: Session = Depends(get_db),
-):
+async def enable_user(username: str):
 
-    service = UserService(db)
+    db = SessionLocal()
 
-    service.enable(username)
+    try:
 
-    return {
-        "success": True,
-    }
+        UserService(db).enable(username)
+
+        return {
+            "message": "enabled",
+        }
+
+    finally:
+
+        db.close()
 
 
 @router.patch("/users/{username}/disable")
-def disable_user(
-    username: str,
-    db: Session = Depends(get_db),
-):
+async def disable_user(username: str):
 
-    service = UserService(db)
+    db = SessionLocal()
 
-    service.disable(username)
+    try:
 
-    return {
-        "success": True,
-    }
+        UserService(db).disable(username)
+
+        return {
+            "message": "disabled",
+        }
+
+    finally:
+
+        db.close()
 
 
-@router.patch("/users/{username}/password")
-def change_password(
-    username: str,
-    payload: UserPassword,
-    db: Session = Depends(get_db),
-):
+@router.get("/api/users")
+async def api_users():
 
-    service = UserService(db)
+    db = SessionLocal()
 
-    service.change_password(
-        username=username,
-        password=payload.password,
-    )
+    try:
 
-    return {
-        "success": True,
-        "message": "Password updated.",
-    }
+        rows = UserService(db).list()
+
+        return rows
+
+    finally:
+
+        db.close()
