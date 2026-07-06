@@ -9,6 +9,16 @@ from app.db.database import SessionLocal
 from app.db.models import Admin
 from app.core.security import verify_password
 
+
+from fastapi.responses import RedirectResponse
+
+
+@router.get("/")
+def root():
+    return RedirectResponse(url="/login")
+
+
+
 router = APIRouter()
 
 templates = Jinja2Templates(
