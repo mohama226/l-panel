@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="page-header">
+
+    <div>
+
+        <h1>Create User</h1>
+
+        <p>Create a new VPN account</p>
+
+    </div>
+
+</div>
+
+<div class="settings-card">
+
+    <form method="post" action="/users/new">
+
+        <label>Username</label>
+
+        <input
+            type="text"
+            name="username"
+            required
+            minlength="3"
+        >
+
+        <label>Password</label>
+
+        <input
+            type="password"
+            name="password"
+            required
+            minlength="4"
+        >
+
+        <button
+            type="submit"
+            class="btn-primary"
+        >
+
+            Create User
+
+        </button>
+
+    </form>
+
+</div>
+
+{% endblock %}
