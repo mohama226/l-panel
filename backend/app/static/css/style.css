@@ -1429,3 +1429,85 @@ tbody tr:hover{
 }
 
 }
+
+
+/* ===========================
+   Dashboard Live Refresh
+=========================== */
+
+.progress-bar{
+
+    transition:
+        width .45s ease,
+        background-color .25s ease;
+
+}
+
+.stat-value{
+
+    transition:
+        color .25s ease,
+        transform .25s ease;
+
+}
+
+.info-card p{
+
+    transition:
+        color .25s ease;
+
+}
+
+#cpu-bar.green-bar,
+#ram-bar.green-bar,
+#disk-bar.green-bar{
+
+    background:#22c55e;
+
+}
+
+#cpu-bar.yellow-bar,
+#ram-bar.yellow-bar,
+#disk-bar.yellow-bar{
+
+    background:#facc15;
+
+}
+
+#cpu-bar.orange-bar,
+#ram-bar.orange-bar,
+#disk-bar.orange-bar{
+
+    background:#f97316;
+
+}
+
+#cpu-bar.red-bar,
+#ram-bar.red-bar,
+#disk-bar.red-bar{
+
+    background:#ef4444;
+
+}
+
+.dashboard-grid{
+
+    animation:fadeDashboard .25s ease;
+
+}
+
+@keyframes fadeDashboard{
+
+    from{
+
+        opacity:.96;
+
+    }
+
+    to{
+
+        opacity:1;
+
+    }
+
+}
