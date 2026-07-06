@@ -1511,3 +1511,97 @@ tbody tr:hover{
     }
 
 }
+
+
+/* ===========================
+   Navbar
+=========================== */
+
+.server-clock{
+
+    font-variant-numeric:tabular-nums;
+
+    letter-spacing:.5px;
+
+    user-select:none;
+
+}
+
+.badge{
+
+    transition:
+        background .25s ease,
+        color .25s ease,
+        border-color .25s ease;
+
+}
+
+.badge.success{
+
+    border:1px solid rgba(34,197,94,.35);
+
+}
+
+.badge.danger{
+
+    border:1px solid rgba(239,68,68,.35);
+
+}
+
+.badge i{
+
+    animation:pulseStatus 1.8s infinite;
+
+}
+
+@keyframes pulseStatus{
+
+    0%{
+
+        opacity:1;
+
+        transform:scale(1);
+
+    }
+
+    50%{
+
+        opacity:.45;
+
+        transform:scale(.82);
+
+    }
+
+    100%{
+
+        opacity:1;
+
+        transform:scale(1);
+
+    }
+
+}
+
+/* ===========================
+   Dashboard Smooth Update
+=========================== */
+
+.stat-value,
+.info-card p,
+.progress-header span{
+
+    font-variant-numeric:tabular-nums;
+
+}
+
+.progress-bar{
+
+    will-change:width;
+
+}
+
+.dashboard-grid{
+
+    contain:layout;
+
+}
