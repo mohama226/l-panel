@@ -31,30 +31,17 @@ class UserPassword(BaseModel):
     )
 
 
-class UserUpdate(BaseModel):
-
-    expire: Optional[datetime] = None
-
-    traffic: Optional[int] = None
-
-    enabled: Optional[bool] = None
-
-    group_id: Optional[int] = None
-
-    server_id: Optional[int] = None
-
-
 class UserOut(BaseModel):
 
     id: int
 
     username: str
 
+    enabled: bool
+
     expire: Optional[datetime]
 
     traffic: int
-
-    enabled: bool
 
     group_id: Optional[int]
 
