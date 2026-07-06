@@ -1,110 +1,118 @@
-from datetime import datetime
-
-from sqlalchemy import (
-    Boolean,
-    Column,
-    DateTime,
-    ForeignKey,
-    Integer,
-    String,
-)
-
+from sqlalchemy import Boolean
+from sqlalchemy import Column
+from sqlalchemy import DateTime
+from sqlalchemy import ForeignKey
+from sqlalchemy import Integer
+from sqlalchemy import String
 from sqlalchemy.orm import relationship
 
 from app.db.database import Base
 
-
-class Role(Base):
-    __tablename__ = "roles"
-
-    id = Column(Integer, primary_key=True, index=True)
-    name = Column(String(50), unique=True, nullable=False)
-    description = Column(String(255))
-
-    admins = relationship("Admin", back_populates="role")
+from datetime import datetime
 
 
-class Admin(Base):
-    __tablename__ = "admins"
+class VPNServer(Base):
+    __tablename__ = "vpn_servers"
 
     id = Column(Integer, primary_key=True, index=True)
-
-    username = Column(String(100), unique=True)
-
-    password = Column(String(255))
-
-    fullname = Column(String(100))
-
-    active = Column(Boolean, default=True)
-
-    created_at = Column(DateTime, default=datetime.utcnow)
-
-    role_id = Column(Integer, ForeignKey("roles.id"))
-
-    role = relationship("Role", back_populates="admins")
-
-
-class Server(Base):
-    __tablename__ = "servers"
-
-    id = Column(Integer, primary_key=True)
-
-    name = Column(String(100), unique=True)
-
-    host = Column(String(100))
-
-    port = Column(Integer, default=22)
-
-    username = Column(String(100))
-
-    password = Column(String(255))
-
+    name = Column(String, unique=True)
+    host = Column(String)
+    port = Column(Integer, default=443)
     enabled = Column(Boolean, default=True)
 
     users = relationship("VPNUser", back_populates="server")
 
 
-class Group(Base):
-    __tablename__ = "groups"
+class UserGroup(Base):
+    __tablename__ = "user_groups"
 
-    id = Column(Integer, primary_key=True)
-
-    name = Column(String(100), unique=True)
-
-    description = Column(String(255))
+    id = Column(Integer, primary_key=True, index=True)
+    name = Column(String, unique=True)
+    description = Column(String, default="")
 
     users = relationship("VPNUser", back_populates="group")
 
 
 class VPNUser(Base):
-    __tablename__ = "users"
+    __tablename__ = "vpn_users"
 
-    id = Column(Integer, primary_key=True)
+    id = Column(Integer, primary_key=True, index=True)
 
-    username = Column(String(100), unique=True)
+    username = Column(String, unique=True, index=True)
 
-    password = Column(String(255))
+    password = Column(String)
 
-    expire = Column(DateTime)
+    email = Column(String, default="")
 
-    traffic = Column(Integer, default=0)
+    mobile = Column(String, default="")
+
+    fullname = Column(String, default="")
 
     enabled = Column(Boolean, default=True)
 
-    server_id = Column(Integer, ForeignKey("servers.id"))
+    suspended = Column(Boolean, default=False)
 
-    group_id = Column(Integer, ForeignKey("groups.id"))
+    blocked = Column(Boolean, default=False)
 
-    server = relationship("Server", back_populates="users")
+    created_at = Column(DateTime, default=datetime.utcnow)
 
-    group = relationship("Group", back_populates="users")
+    expire_at = Column(DateTime, nullable=True)
+
+    last_login = Column(DateTime, nullable=True)
+
+    last_ip = Column(String, nullable=True)
+
+    server_id = Column(
+        Integer,
+        ForeignKey("vpn_servers.id"),
+        nullable=True,
+    )
+
+    group_id = Column(
+        Integer,
+        ForeignKey("user_groups.id"),
+        nullable=True,
+    )
+
+    server = relationship(
+        "VPNServer",
+        back_populates="users",
+    )
+
+    group = relationship(
+        "UserGroup",
+        back_populates="users",
+    )
+
+    logs = relationship(
+        "UserLog",
+        back_populates="user",
+        cascade="all, delete-orphan",
+    )
 
 
-class Setting(Base):
-    __tablename__ = "settings"
+class UserLog(Base):
+    __tablename__ = "user_logs"
 
-    id = Column(Integer, primary_key=True)
+    id = Column(Integer, primary_key=True, index=True)
 
-    key = Column(String(100), unique=True)
+    username = Column(
+        String,
+        ForeignKey("vpn_users.username"),
+    )
 
-    value = Column(String(500))
+    event = Column(String)
+
+    ip = Column(String)
+
+    details = Column(String, default="")
+
+    created_at = Column(
+        DateTime,
+        default=datetime.utcnow,
+    )
+
+    user = relationship(
+        "VPNUser",
+        back_populates="logs",
+    )
