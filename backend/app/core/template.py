@@ -6,6 +6,8 @@ from zoneinfo import ZoneInfo
 from app.db.database import SessionLocal
 from app.db.models import Setting
 
+import subprocess
+
 templates = Jinja2Templates(directory="app/templates")
 
 
@@ -29,6 +31,24 @@ def get_setting(key: str, default: str):
     finally:
 
         db.close()
+
+
+def get_ocserv_status():
+
+    try:
+
+        result = subprocess.run(
+            ["systemctl", "is-active", "ocserv"],
+            capture_output=True,
+            text=True,
+            timeout=2,
+        )
+
+        return result.stdout.strip()
+
+    except Exception:
+
+        return "unknown"
 
 
 def render(
@@ -58,9 +78,14 @@ def render(
     base = {
 
         "request": request,
+
         "server_time": now,
+
         "panel_name": "LAK PANEL",
+
         "panel_version": "1.0.0",
+
+        "ocserv_status": get_ocserv_status(),
 
     }
 
