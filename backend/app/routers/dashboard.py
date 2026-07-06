@@ -38,14 +38,63 @@ def get_stats():
 
     network = psutil.net_io_counters()
 
+global LAST_NETWORK
+
+try:
+
+    LAST_NETWORK
+
+except NameError:
+
+    LAST_NETWORK = {
+
+        "sent": network.bytes_sent,
+
+        "recv": network.bytes_recv,
+
+        "time": time.time(),
+
+    }
+
+now = time.time()
+
+elapsed = max(
+    now - LAST_NETWORK["time"],
+    1,
+)
+
+upload_speed = (
+    network.bytes_sent - LAST_NETWORK["sent"]
+) / elapsed
+
+download_speed = (
+    network.bytes_recv - LAST_NETWORK["recv"]
+) / elapsed
+
+LAST_NETWORK = {
+
+    "sent": network.bytes_sent,
+
+    "recv": network.bytes_recv,
+
+    "time": now,
+
+}
+
     return {
         "cpu": cpu,
         "ram": ram,
         "disk": disk,
         "uptime": uptime,
         "load": load,
-        "traffic_up": round(network.bytes_sent / 1024 / 1024, 2),
-        "traffic_down": round(network.bytes_recv / 1024 / 1024, 2),
+"traffic_up": round(network.bytes_sent / 1024 / 1024, 2),
+
+"traffic_down": round(network.bytes_recv / 1024 / 1024, 2),
+
+"upload_speed": round(upload_speed / 1024, 2),
+
+"download_speed": round(download_speed / 1024, 2),
+    
         "users": 0,
         "admins": 1,
         "groups": 0,
