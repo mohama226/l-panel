@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Request, Cookie, Form, HTTPException
+from fastapi import APIRouter, Request, Cookie, HTTPException, Depends
 from fastapi.responses import RedirectResponse
 from sqlalchemy.orm import Session
 
@@ -10,100 +10,63 @@ from app.services.user_service import UserService
 router = APIRouter()
 
 
-def db():
-    return SessionLocal()
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
 
 
 @router.get("/users")
 async def users_page(
     request: Request,
     lak_admin: str | None = Cookie(default=None),
+    db: Session = Depends(get_db),
 ):
+
     if lak_admin is None:
         return RedirectResponse("/login")
 
-    session = db()
+    service = UserService(db)
 
-    try:
+    rows = service.list()
 
-        service = UserService(session)
+    users = []
 
-        users = []
-
-        for row in service.list():
-
-            users.append(
-                {
-                    "username": row.username,
-                    "status": "Active" if row.enabled else "Disabled",
-                    "traffic": row.traffic,
-                    "expire": row.expire or "-",
-                    "group": row.group.name if row.group else "-",
-                }
-            )
-
-        return render(
-            request,
-            "users/index.html",
+    for u in rows:
+        users.append(
             {
-                "title": "Users",
-                "users": users,
-            },
+                "username": u.username,
+                "status": "Active" if u.enabled else "Disabled",
+                "online": False,
+                "traffic": f"{u.traffic} MB",
+                "expire": u.expire or "-",
+                "group": u.group.name if u.group else "-",
+            }
         )
-
-    finally:
-        session.close()
-
-
-@router.get("/users/new")
-async def new_user_page(
-    request: Request,
-    lak_admin: str | None = Cookie(default=None),
-):
-    if lak_admin is None:
-        return RedirectResponse("/login")
 
     return render(
         request,
-        "users/create.html",
+        "users/index.html",
         {
-            "title": "Create User",
+            "title": "Users",
+            "users": users,
         },
     )
 
 
-@router.post("/users/new")
-async def create_user_form(
-    username: str = Form(...),
-    password: str = Form(...),
+@router.post("/users")
+def create_user(
+    user: UserCreate,
+    db: Session = Depends(get_db),
 ):
 
-    session = db()
-
     try:
 
-        UserService(session).create(
-            username=username,
-            password=password,
-        )
+        service = UserService(db)
 
-        return RedirectResponse(
-            "/users",
-            status_code=302,
-        )
-
-    finally:
-        session.close()
-
-
-@router.post("/users")
-async def create_user(user: UserCreate):
-
-    session = db()
-
-    try:
-
-        UserService(session).create(
+        obj = service.create(
             username=user.username,
             password=user.password,
             expire=user.expire,
@@ -113,127 +76,83 @@ async def create_user(user: UserCreate):
         )
 
         return {
-            "message": "ok",
+            "message": "User created",
+            "user": obj.username,
         }
 
-    finally:
-        session.close()
-
-
-@router.get("/users/{username}")
-async def profile(
-    request: Request,
-    username: str,
-    lak_admin: str | None = Cookie(default=None),
-):
-
-    if lak_admin is None:
-        return RedirectResponse("/login")
-
-    session = db()
-
-    try:
-
-        user = UserService(session).get(username)
-
-        if not user:
-            raise HTTPException(404)
-
-        return render(
-            request,
-            "users/profile.html",
-            {
-                "title": username,
-                "user": user,
-            },
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=str(e),
         )
-
-    finally:
-        session.close()
-
-
-@router.patch("/users/{username}/password")
-async def password(
-    username: str,
-    body: UserPassword,
-):
-
-    session = db()
-
-    try:
-
-        UserService(session).change_password(
-            username,
-            body.password,
-        )
-
-        return {
-            "message": "Password changed",
-        }
-
-    finally:
-        session.close()
-
-
-@router.patch("/users/{username}/enable")
-async def enable(username: str):
-
-    session = db()
-
-    try:
-
-        UserService(session).enable(username)
-
-        return {
-            "message": "enabled",
-        }
-
-    finally:
-        session.close()
-
-
-@router.patch("/users/{username}/disable")
-async def disable(username: str):
-
-    session = db()
-
-    try:
-
-        UserService(session).disable(username)
-
-        return {
-            "message": "disabled",
-        }
-
-    finally:
-        session.close()
 
 
 @router.delete("/users/{username}")
-async def delete(username: str):
-
-    session = db()
+def delete_user(
+    username: str,
+    db: Session = Depends(get_db),
+):
 
     try:
 
-        UserService(session).delete(username)
+        UserService(db).delete(username)
 
         return {
-            "message": "deleted",
+            "message": "User deleted",
         }
 
-    finally:
-        session.close()
+    except Exception as e:
+        raise HTTPException(
+            status_code=500,
+            detail=str(e),
+        )
+
+
+@router.patch("/users/{username}/enable")
+def enable_user(
+    username: str,
+    db: Session = Depends(get_db),
+):
+    UserService(db).enable(username)
+    return {"message": "enabled"}
+
+
+@router.patch("/users/{username}/disable")
+def disable_user(
+    username: str,
+    db: Session = Depends(get_db),
+):
+    UserService(db).disable(username)
+    return {"message": "disabled"}
+
+
+@router.patch("/users/{username}/password")
+def change_password(
+    username: str,
+    body: UserPassword,
+    db: Session = Depends(get_db),
+):
+    UserService(db).change_password(
+        username,
+        body.password,
+    )
+    return {"message": "password changed"}
 
 
 @router.get("/api/users")
-async def api_users():
+def api_users(
+    db: Session = Depends(get_db),
+):
 
-    session = db()
+    rows = UserService(db).list()
 
-    try:
-
-        return UserService(session).list()
-
-    finally:
-        session.close()
+    return [
+        {
+            "username": u.username,
+            "enabled": u.enabled,
+            "traffic": u.traffic,
+            "expire": u.expire,
+            "group": u.group.name if u.group else None,
+        }
+        for u in rows
+    ]
