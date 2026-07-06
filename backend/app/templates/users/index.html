@@ -4,83 +4,96 @@
 
 <div class="page-header">
 
-    <h1>Users</h1>
+    <div>
+        <h1>Users</h1>
+        <p>Manage VPN Users</p>
+    </div>
 
-    <button class="btn btn-primary" onclick="openCreateUser()">
-        <i class="fa-solid fa-plus"></i>
-        New User
+    <button class="btn-primary" onclick="openCreateUser()">
+        ➕ New User
     </button>
 
 </div>
 
-<div class="table-card">
+<div class="dashboard-box">
 
-<table class="table">
+<table>
 
 <thead>
+
 <tr>
-    <th>Username</th>
-    <th>Group</th>
-    <th>Status</th>
-    <th>Online</th>
-    <th>Traffic</th>
-    <th>Expire</th>
+
+<th>Username</th>
+<th>Status</th>
+<th>Traffic</th>
+<th>Expire</th>
+<th>Actions</th>
+
 </tr>
+
 </thead>
 
 <tbody>
-
-{% if users %}
 
 {% for user in users %}
 
 <tr>
 
-<td>{{ user.username }}</td>
+<td>
 
-<td>{{ user.group }}</td>
+<b>{{ user.username }}</b>
+
+</td>
 
 <td>
 
 {% if user.enabled %}
-<span class="badge success">Enabled</span>
+
+<span class="badge success">
+Active
+</span>
+
 {% else %}
-<span class="badge danger">Disabled</span>
+
+<span class="badge danger">
+Disabled
+</span>
+
 {% endif %}
 
 </td>
 
 <td>
 
-{% if user.online %}
-🟢
-{% else %}
-⚪
-{% endif %}
+{{ user.traffic }}
 
 </td>
 
-<td>{{ user.traffic }}</td>
+<td>
 
-<td>{{ user.expire }}</td>
+{{ user.expire or "-" }}
+
+</td>
+
+<td>
+
+<button onclick="profile('{{user.username}}')">
+Profile
+</button>
+
+<button onclick="changePassword('{{user.username}}')">
+Password
+</button>
+
+<button onclick="removeUser('{{user.username}}')">
+Delete
+</button>
+
+</td>
 
 </tr>
 
 {% endfor %}
-
-{% else %}
-
-<tr>
-
-<td colspan="6" style="text-align:center;padding:40px">
-
-No users found.
-
-</td>
-
-</tr>
-
-{% endif %}
 
 </tbody>
 
@@ -88,52 +101,33 @@ No users found.
 
 </div>
 
-<div id="userModal" class="modal" style="display:none">
+<!-- ========================= -->
 
-<div class="modal-content">
+<div id="createModal" class="modal">
 
-<h3>Create User</h3>
+<div class="modal-box">
 
-<form id="userForm">
+<h2>Create User</h2>
 
-<label>Username</label>
+<input id="username" placeholder="Username">
 
-<input
-type="text"
-id="username"
-required
->
+<input id="password" placeholder="Password">
 
-<label>Password</label>
+<input id="traffic" type="number" placeholder="Traffic GB">
 
-<input
-type="password"
-id="password"
-required
->
+<input id="expire" type="datetime-local">
 
-<br><br>
-
-<button
-type="submit"
-class="btn btn-primary"
->
+<button class="btn-primary" onclick="createUser()">
 
 Create
 
 </button>
 
-<button
-type="button"
-class="btn"
-onclick="closeCreateUser()"
->
+<button onclick="closeModal()">
 
 Cancel
 
 </button>
-
-</form>
 
 </div>
 
@@ -143,29 +137,31 @@ Cancel
 
 function openCreateUser(){
 
-document.getElementById("userModal").style.display="block";
+document.getElementById("createModal").style.display="flex";
 
 }
 
-function closeCreateUser(){
+function closeModal(){
 
-document.getElementById("userModal").style.display="none";
+document.getElementById("createModal").style.display="none";
 
 }
 
-document.getElementById("userForm").onsubmit = async function(e){
+async function createUser(){
 
-e.preventDefault();
-
-const body={
+let body={
 
 username:document.getElementById("username").value,
 
-password:document.getElementById("password").value
+password:document.getElementById("password").value,
+
+traffic:parseInt(document.getElementById("traffic").value)||0,
+
+expire:document.getElementById("expire").value||null
 
 };
 
-const r=await fetch("/users",{
+await fetch("/users",{
 
 method:"POST",
 
@@ -179,19 +175,53 @@ body:JSON.stringify(body)
 
 });
 
-if(r.ok){
-
 location.reload();
-
-}else{
-
-const j=await r.json();
-
-alert(j.detail);
 
 }
 
-};
+function profile(username){
+
+location.href="/users/"+username;
+
+}
+
+function changePassword(username){
+
+let p=prompt("New Password");
+
+if(!p)return;
+
+fetch("/users/"+username+"/password",{
+
+method:"PATCH",
+
+headers:{
+
+"Content-Type":"application/json"
+
+},
+
+body:JSON.stringify({
+
+password:p
+
+})
+
+}).then(()=>location.reload());
+
+}
+
+function removeUser(username){
+
+if(!confirm("Delete user?"))return;
+
+fetch("/users/"+username,{
+
+method:"DELETE"
+
+}).then(()=>location.reload());
+
+}
 
 </script>
 
