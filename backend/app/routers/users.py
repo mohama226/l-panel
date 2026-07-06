@@ -1,81 +1,128 @@
-from fastapi import APIRouter, Request, Cookie, HTTPException
+from fastapi import (
+    APIRouter,
+    Depends,
+    HTTPException,
+    Cookie,
+    Request,
+)
 from fastapi.responses import RedirectResponse
+from sqlalchemy.orm import Session
 
 from app.core.template import render
-from app.schemas.user import UserCreate
-from app.services.ocserv_service import OcservService
+from app.db.database import get_db
+from app.schemas.user import (
+    UserCreate,
+    UserPassword,
+)
+from app.services.user_service import UserService
 
 router = APIRouter()
 
-fake_db = []
-
 
 @router.get("/users")
-async def users_page(
+def users_page(
     request: Request,
+    db: Session = Depends(get_db),
     lak_admin: str | None = Cookie(default=None),
 ):
 
     if lak_admin is None:
-
         return RedirectResponse("/login")
+
+    service = UserService(db)
+
+    rows = service.list()
 
     users = []
 
-    for username in fake_db:
+    for user in rows:
 
-        users.append({
-
-            "username": username,
-
-            "status": "Active",
-
-            "online": False,
-
-            "traffic": "0 MB",
-
-            "expire": "-",
-
-            "group": "Default",
-
-        })
+        users.append(
+            {
+                "id": user.id,
+                "username": user.username,
+                "status": "Active" if user.enabled else "Disabled",
+                "enabled": user.enabled,
+                "online": False,
+                "traffic": user.traffic,
+                "expire": user.expire,
+                "group": user.group.name if user.group else "-",
+                "server": user.server.name if user.server else "-",
+                "created_at": user.created_at,
+            }
+        )
 
     return render(
-
         request,
-
         "users/index.html",
-
         {
-
             "title": "Users",
-
             "users": users,
-
         },
-
     )
 
 
+@router.get("/api/users")
+def list_users(
+    db: Session = Depends(get_db),
+):
+
+    service = UserService(db)
+
+    rows = service.list()
+
+    result = []
+
+    for user in rows:
+
+        result.append(
+            {
+                "id": user.id,
+                "username": user.username,
+                "enabled": user.enabled,
+                "traffic": user.traffic,
+                "expire": user.expire,
+                "online": False,
+                "group": user.group.name if user.group else None,
+                "server": user.server.name if user.server else None,
+                "created_at": user.created_at,
+            }
+        )
+
+    return result
+
+
 @router.post("/users")
-def create_user(user: UserCreate):
+def create_user(
+    payload: UserCreate,
+    db: Session = Depends(get_db),
+):
+
+    service = UserService(db)
 
     try:
 
-        OcservService.add_user(
-            user.username,
-            user.password,
+        user = service.create(
+            username=payload.username,
+            password=payload.password,
+            expire=payload.expire,
+            traffic=payload.traffic,
+            group_id=payload.group_id,
+            server_id=payload.server_id,
         )
 
-        fake_db.append(user.username)
-
         return {
-
-            "message": "User created",
-
-            "user": user.username,
-
+            "success": True,
+            "message": "User created successfully.",
+            "id": user.id,
         }
+
+    except ValueError as e:
+
+        raise HTTPException(
+            status_code=400,
+            detail=str(e),
+        )
 
     except Exception as e:
 
@@ -86,23 +133,28 @@ def create_user(user: UserCreate):
 
 
 @router.delete("/users/{username}")
-def delete_user(username: str):
+def delete_user(
+    username: str,
+    db: Session = Depends(get_db),
+):
+
+    service = UserService(db)
 
     try:
 
-        OcservService.delete_user(username)
-
-        if username in fake_db:
-
-            fake_db.remove(username)
+        service.delete(username)
 
         return {
-
-            "message": "User deleted",
-
-            "user": username,
-
+            "success": True,
+            "message": "User deleted successfully.",
         }
+
+    except ValueError as e:
+
+        raise HTTPException(
+            status_code=404,
+            detail=str(e),
+        )
 
     except Exception as e:
 
@@ -112,27 +164,51 @@ def delete_user(username: str):
         )
 
 
-@router.get("/api/users")
-def list_users():
+@router.patch("/users/{username}/enable")
+def enable_user(
+    username: str,
+    db: Session = Depends(get_db),
+):
 
-    users = []
+    service = UserService(db)
 
-    for username in fake_db:
+    service.enable(username)
 
-        users.append({
+    return {
+        "success": True,
+    }
 
-            "username": username,
 
-            "status": "Active",
+@router.patch("/users/{username}/disable")
+def disable_user(
+    username: str,
+    db: Session = Depends(get_db),
+):
 
-            "online": False,
+    service = UserService(db)
 
-            "traffic": "0 MB",
+    service.disable(username)
 
-            "expire": "-",
+    return {
+        "success": True,
+    }
 
-            "group": "Default",
 
-        })
+@router.patch("/users/{username}/password")
+def change_password(
+    username: str,
+    payload: UserPassword,
+    db: Session = Depends(get_db),
+):
 
-    return users
+    service = UserService(db)
+
+    service.change_password(
+        username=username,
+        password=payload.password,
+    )
+
+    return {
+        "success": True,
+        "message": "Password updated.",
+    }
