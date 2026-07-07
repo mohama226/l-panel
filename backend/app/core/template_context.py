@@ -1,3 +1,4 @@
+from contextlib import closing
 from datetime import datetime
 from zoneinfo import ZoneInfo
 
@@ -7,9 +8,7 @@ from app.db.models import Setting
 
 def get_setting(key: str, default: str):
 
-    db = SessionLocal()
-
-    try:
+    with closing(SessionLocal()) as db:
 
         item = (
             db.query(Setting)
@@ -20,11 +19,7 @@ def get_setting(key: str, default: str):
         if item:
             return item.value
 
-        return default
-
-    finally:
-
-        db.close()
+    return default
 
 
 def template_context():
