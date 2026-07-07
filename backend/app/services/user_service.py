@@ -21,8 +21,41 @@ class UserService:
     def logs(self, username):
         return self.log_repo.list(username)
 
+    # =====================================================
+    # Online
+    # =====================================================
+
+    def online_users(self):
+        return OcservService.online_users()
+
+    def is_online(self, username):
+
+        users = OcservService.online_users()
+
+        for user in users:
+
+            name = (
+                user.get("Username")
+                or user.get("username")
+                or user.get("User")
+                or user.get("user")
+            )
+
+            if name == username:
+                return True
+
+        return False
+
+    # =====================================================
+    # Sessions
+    # =====================================================
+
     def sessions(self, username):
         return OcservService.sessions(username)
+
+    # =====================================================
+    # Traffic
+    # =====================================================
 
     def traffic(self, username):
         return OcservService.traffic(username)
@@ -35,6 +68,10 @@ class UserService:
             raise Exception("User not found")
 
         return OcservService.traffic(username)
+
+    # =====================================================
+    # Disconnect
+    # =====================================================
 
     def disconnect(self, username):
 
@@ -280,7 +317,7 @@ class UserService:
         )
 
     # =====================================================
-    # Traffic
+    # Traffic Reset
     # =====================================================
 
     def reset_traffic(self, username):
