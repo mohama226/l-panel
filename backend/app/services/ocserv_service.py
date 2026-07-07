@@ -1,11 +1,16 @@
 import json
 import subprocess
-from typing import List, Dict
+import time
+from typing import Dict, List
 
 
 class OcservService:
 
     PASSWD_FILE = "/etc/ocserv/ocpasswd"
+
+    _cache = []
+    _cache_time = 0
+    _cache_ttl = 2
 
     # =====================================================
     # Users
@@ -79,14 +84,10 @@ class OcservService:
     def user_exists(cls, username: str):
 
         try:
-
             with open(cls.PASSWD_FILE) as f:
-
                 for line in f:
-
                     if line.startswith(username + ":"):
                         return True
-
         except Exception:
             return False
 
@@ -133,11 +134,16 @@ class OcservService:
         )
 
     # =====================================================
-    # Online Users
+    # Online Cache
     # =====================================================
 
     @classmethod
     def online_users(cls) -> List[Dict]:
+
+        now = time.time()
+
+        if now - cls._cache_time < cls._cache_ttl:
+            return cls._cache
 
         result = subprocess.run(
             [
@@ -148,22 +154,27 @@ class OcservService:
             ],
             capture_output=True,
             text=True,
+            timeout=3,
         )
 
         if result.returncode != 0:
-            return []
+            return cls._cache
 
         try:
 
             data = json.loads(result.stdout)
 
             if isinstance(data, list):
+
+                cls._cache = data
+                cls._cache_time = now
+
                 return data
 
-            return []
-
         except Exception:
-            return []
+            pass
+
+        return cls._cache
 
     # =====================================================
     # Sessions
@@ -172,21 +183,20 @@ class OcservService:
     @classmethod
     def sessions(cls, username: str) -> List[Dict]:
 
-        sessions = []
+        return [
 
-        for user in cls.online_users():
+            u
 
-            name = (
-                user.get("Username")
-                or user.get("username")
-                or user.get("User")
-                or user.get("user")
-            )
+            for u in cls.online_users()
 
-            if name == username:
-                sessions.append(user)
+            if (
+                u.get("Username")
+                or u.get("username")
+                or u.get("User")
+                or u.get("user")
+            ) == username
 
-        return sessions
+        ]
 
     # =====================================================
     # Disconnect
@@ -204,7 +214,10 @@ class OcservService:
             ],
             capture_output=True,
             text=True,
+            timeout=5,
         )
+
+        cls._cache_time = 0
 
         if result.returncode != 0:
             raise Exception(result.stderr.strip())
