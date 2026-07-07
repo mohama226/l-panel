@@ -1,6 +1,6 @@
 import json
 import subprocess
-from typing import List, Dict
+from typing import Dict, List
 
 
 class OcservService:
@@ -160,6 +160,16 @@ class OcservService:
             if isinstance(data, list):
                 return data
 
+            if isinstance(data, dict):
+
+                if "users" in data:
+                    return data["users"]
+
+                if "Users" in data:
+                    return data["Users"]
+
+                return [data]
+
             return []
 
         except Exception:
@@ -188,7 +198,17 @@ class OcservService:
             return {}
 
         try:
-            return json.loads(result.stdout)
+
+            data = json.loads(result.stdout)
+
+            if isinstance(data, list):
+                return data[0] if data else {}
+
+            if isinstance(data, dict):
+                return data
+
+            return {}
+
         except Exception:
             return {}
 
@@ -210,12 +230,12 @@ class OcservService:
                 or user.get("username")
                 or user.get("User")
                 or user.get("user")
+                or user.get("Name")
+                or user.get("name")
             )
 
-            if name != username:
-                continue
-
-            sessions.append(user)
+            if name == username:
+                sessions.append(user)
 
         return sessions
 
@@ -238,20 +258,36 @@ class OcservService:
         )
 
         if result.returncode != 0:
-            raise Exception(result.stderr.strip())
+            raise Exception(
+                result.stderr.strip() or "Failed to disconnect user"
+            )
 
         return True
 
     # =====================================================
-    # Traffic / Live Stats
+    # Traffic / Live Statistics
     # =====================================================
 
     @classmethod
     def traffic(cls, username: str) -> Dict:
 
-        info = cls.user_info(username)
+        return cls.user_info(username)
 
-        if not info:
-            return {}
+    # =====================================================
+    # Generic Command
+    # =====================================================
 
-        return info
+    @classmethod
+    def run(cls, *args):
+
+        result = subprocess.run(
+            list(args),
+            capture_output=True,
+            text=True,
+        )
+
+        return {
+            "returncode": result.returncode,
+            "stdout": result.stdout,
+            "stderr": result.stderr,
+        }
