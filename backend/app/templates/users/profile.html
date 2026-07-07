@@ -113,26 +113,55 @@
         <hr>
 
 
-        <div style="display:flex;flex-wrap:wrap;gap:10px;">
+<div style="display:flex;flex-wrap:wrap;gap:10px;">
 
+    {% if user.enabled %}
+    <button class="btn-warning" onclick="disableUser()">
+        Disable
+    </button>
+    {% else %}
+    <button class="btn-success" onclick="enableUser()">
+        Enable
+    </button>
+    {% endif %}
 
-            <button class="btn-primary" onclick="changePassword()">
-                Change Password
-            </button>
+    {% if user.blocked %}
+    <button class="btn-success" onclick="unblockUser()">
+        Unblock
+    </button>
+    {% else %}
+    <button class="btn-warning" onclick="blockUser()">
+        Block
+    </button>
+    {% endif %}
 
-            <button class="btn-primary" onclick="extendUser()">
-                Extend Account
-            </button>
+    {% if user.suspended %}
+    <button class="btn-success" onclick="unsuspendUser()">
+        Unsuspend
+    </button>
+    {% else %}
+    <button class="btn-warning" onclick="suspendUser()">
+        Suspend
+    </button>
+    {% endif %}
 
-            <button class="btn-primary" onclick="resetTraffic()">
-                Reset Traffic
-            </button>
+    <button class="btn-primary" onclick="changePassword()">
+        Change Password
+    </button>
 
-            <button class="btn-danger" onclick="deleteUser()">
-                Delete User
-            </button>
+    <button class="btn-primary" onclick="extendUser()">
+        Extend Account
+    </button>
 
-        </div>
+    <button class="btn-primary" onclick="resetTraffic()">
+        Reset Traffic
+    </button>
+
+    <button class="btn-danger" onclick="deleteUser()">
+        Delete User
+    </button>
+
+</div>
 
     </div>
 
