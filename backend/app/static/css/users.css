@@ -1,155 +1,56 @@
-/* ===========================
-   USER PROFILE
-=========================== */
-
-.profile-actions{
-    display:flex;
-    flex-wrap:wrap;
-    gap:12px;
-    margin-top:25px;
-}
-
-.profile-actions .btn{
-    border:none;
-    border-radius:10px;
-    padding:12px 20px;
-    cursor:pointer;
-    font-size:14px;
-    font-weight:600;
-    transition:.2s;
-    color:#fff;
-}
-
-.profile-actions .btn:hover{
-    transform:translateY(-2px);
-    opacity:.9;
-}
-
-.btn-blue{
-    background:#3b82f6;
-}
-
-.btn-green{
-    background:#10b981;
-}
-
-.btn-orange{
-    background:#f59e0b;
-}
-
-.btn-red{
-    background:#ef4444;
-}
-
-.btn-purple{
-    background:#8b5cf6;
-}
-
-.btn-gray{
-    background:#64748b;
-}
-
-.user-info-table{
-    width:100%;
-    border-collapse:collapse;
-}
-
-.user-info-table th{
-    width:260px;
-    background:#2e55d7;
-    color:#fff;
-    padding:16px;
-    text-align:left;
-    font-weight:600;
-}
-
-.user-info-table td{
-    padding:16px;
-    background:#1b2434;
-    color:#fff;
-    border-bottom:1px solid rgba(255,255,255,.08);
-}
-
-.user-info-table tr:last-child td,
-.user-info-table tr:last-child th{
-    border-bottom:none;
-}
-
-.user-info-table .badge{
+.actions-menu{
+    position:relative;
     display:inline-block;
-    padding:7px 14px;
-    border-radius:8px;
-    font-size:13px;
 }
 
-.badge.success{
-    background:#0f5132;
-    color:#4ade80;
-}
-
-.badge.danger{
-    background:#5a1d25;
-    color:#ff6b6b;
-}
-
-.badge.warning{
-    background:#5a4200;
-    color:#ffd43b;
-}
-
-.user-profile-box{
-    margin-top:20px;
-}
-
-.user-profile-box hr{
+.menu-btn{
+    width:34px;
+    height:34px;
     border:none;
-    border-top:1px solid rgba(255,255,255,.08);
-    margin:25px 0;
+    border-radius:8px;
+    background:#20252f;
+    color:#fff;
+    cursor:pointer;
+    font-size:20px;
 }
 
-@media(max-width:900px){
-
-    .user-info-table th,
-    .user-info-table td{
-        display:block;
-        width:100%;
-    }
-
-    .profile-actions{
-        flex-direction:column;
-    }
-
-    .profile-actions .btn{
-        width:100%;
-    }
-
+.menu-btn:hover{
+    background:#2f3643;
 }
 
+.dropdown{
+    position:absolute;
+    right:0;
+    top:42px;
+    min-width:210px;
+    background:#1f2430;
+    border:1px solid #343b49;
+    border-radius:10px;
+    display:none;
+    z-index:9999;
+    overflow:hidden;
+    box-shadow:0 10px 30px rgba(0,0,0,.35);
+}
 
+.dropdown.show{
+    display:block;
+}
 
-/* =====================================
-   LAK PANEL
-   Users Module
-===================================== */
+.dropdown a{
+    display:block;
+    color:#fff;
+    text-decoration:none;
+    padding:11px 15px;
+    transition:.2s;
+    font-size:14px;
+}
 
-/* Variables */
+.dropdown a:hover{
+    background:#2f3643;
+}
 
-/* Page Header */
-
-/* Dashboard Cards */
-
-/* User Profile Cards */
-
-/* User Information Table */
-
-/* Status Badges */
-
-/* Action Buttons */
-
-/* Forms */
-
-/* Modal */
-
-/* Activity Table */
-
-/* Responsive */
+.dropdown hr{
+    margin:0;
+    border:none;
+    border-top:1px solid #363d4b;
+}
