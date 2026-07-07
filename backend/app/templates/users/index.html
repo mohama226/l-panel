@@ -110,6 +110,9 @@
 
                         <div class="dropdown">
 
+
+                            <div class="dropdown">
+
     <a href="/users/{{ user.username }}">
         <i class="fa-regular fa-user"></i>
         Profile
@@ -118,6 +121,11 @@
     <a href="/users/{{ user.username }}/edit">
         <i class="fa-solid fa-pen"></i>
         Edit User
+    </a>
+
+    <a href="#">
+        <i class="fa-solid fa-key"></i>
+        Change Password
     </a>
 
     <hr>
@@ -162,6 +170,28 @@
     </a>
 
     {% endif %}
+
+    <a href="#">
+        <i class="fa-solid fa-plug-circle-xmark"></i>
+        Disconnect User
+    </a>
+
+    <hr>
+
+    <a href="#">
+        <i class="fa-solid fa-clock-rotate-left"></i>
+        Session Logs
+    </a>
+
+    <a href="#">
+        <i class="fa-solid fa-chart-column"></i>
+        Traffic Usage
+    </a>
+
+    <a href="#">
+        <i class="fa-solid fa-arrows-rotate"></i>
+        Reset Traffic
+    </a>
 
     <hr>
 
