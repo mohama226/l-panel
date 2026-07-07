@@ -157,125 +157,141 @@
 
 <script>
 
-function api(url,method="POST"){
+function api(url, method="POST") {
 
-    fetch(url,{method:method})
-    .then(r=>r.json())
-    .then(j=>{
-        alert(j.detail);
+    fetch(url, {method})
+    .then(r => r.json())
+    .then(j => {
+        alert(j.detail || "Done");
         location.reload();
     });
 
 }
 
-// ---------------- Password ----------------
+/* ------------------------------
+   Dropdown
+------------------------------ */
 
-document.querySelectorAll(".change-password").forEach(btn=>{
+document.querySelectorAll(".menu-btn").forEach(btn => {
 
-    btn.onclick=()=>{
+    btn.onclick = function(e){
 
-        const p=prompt("New password");
+        e.stopPropagation();
+
+        document.querySelectorAll(".actions-menu")
+            .forEach(m=>{
+                if(m!==btn.parentElement){
+                    m.classList.remove("open");
+                }
+            });
+
+        btn.parentElement.classList.toggle("open");
+
+    };
+
+});
+
+document.addEventListener("click", ()=>{
+
+    document.querySelectorAll(".actions-menu")
+        .forEach(m=>m.classList.remove("open"));
+
+});
+
+
+/* ------------------------------
+   Event Delegation
+------------------------------ */
+
+document.addEventListener("click", async function(e){
+
+    const btn = e.target.closest("a");
+
+    if(!btn) return;
+
+    const user = btn.dataset.user;
+
+    if(btn.classList.contains("change-password")){
+
+        e.preventDefault();
+
+        const p = prompt("New password");
 
         if(!p) return;
 
-        fetch("/users/"+btn.dataset.user+"/password",{
-
+        fetch("/users/"+user+"/password",{
             method:"POST",
-
             headers:{
                 "Content-Type":"application/json"
             },
-
             body:JSON.stringify({
                 password:p
             })
-
         })
         .then(r=>r.json())
-        .then(j=>{
-            alert(j.detail);
-        });
+        .then(j=>alert(j.detail));
 
-    };
+        return;
+    }
 
-});
+    if(btn.classList.contains("enable-user")){
+        e.preventDefault();
+        api("/users/"+user+"/enable");
+        return;
+    }
 
-// ---------------- Enable ----------------
+    if(btn.classList.contains("disable-user")){
+        e.preventDefault();
+        api("/users/"+user+"/disable");
+        return;
+    }
 
-document.querySelectorAll(".enable-user").forEach(btn=>{
+    if(btn.classList.contains("block-user")){
+        e.preventDefault();
+        api("/users/"+user+"/block");
+        return;
+    }
 
-    btn.onclick=()=>api("/users/"+btn.dataset.user+"/enable");
+    if(btn.classList.contains("unblock-user")){
+        e.preventDefault();
+        api("/users/"+user+"/unblock");
+        return;
+    }
 
-});
+    if(btn.classList.contains("disconnect-user")){
+        e.preventDefault();
+        api("/users/"+user+"/disconnect");
+        return;
+    }
 
-// ---------------- Disable ----------------
+    if(btn.classList.contains("reset-traffic")){
 
-document.querySelectorAll(".disable-user").forEach(btn=>{
-
-    btn.onclick=()=>api("/users/"+btn.dataset.user+"/disable");
-
-});
-
-// ---------------- Block ----------------
-
-document.querySelectorAll(".block-user").forEach(btn=>{
-
-    btn.onclick=()=>api("/users/"+btn.dataset.user+"/block");
-
-});
-
-// ---------------- Unblock ----------------
-
-document.querySelectorAll(".unblock-user").forEach(btn=>{
-
-    btn.onclick=()=>api("/users/"+btn.dataset.user+"/unblock");
-
-});
-
-// ---------------- Disconnect ----------------
-
-document.querySelectorAll(".disconnect-user").forEach(btn=>{
-
-    btn.onclick=()=>api("/users/"+btn.dataset.user+"/disconnect");
-
-});
-
-// ---------------- Reset ----------------
-
-document.querySelectorAll(".reset-traffic").forEach(btn=>{
-
-    btn.onclick=()=>{
+        e.preventDefault();
 
         if(confirm("Reset traffic?")){
-
-            api("/users/"+btn.dataset.user+"/traffic/reset");
-
+            api("/users/"+user+"/traffic/reset");
         }
 
-    };
+        return;
+    }
 
-});
+    if(btn.classList.contains("delete-user")){
 
-// ---------------- Delete ----------------
-
-document.querySelectorAll(".delete-user").forEach(btn=>{
-
-    btn.onclick=()=>{
+        e.preventDefault();
 
         if(confirm("Delete user?")){
-
-            api("/users/"+btn.dataset.user,"DELETE");
-
+            api("/users/"+user,"DELETE");
         }
 
-    };
+        return;
+    }
 
 });
 
 document.querySelectorAll(".traffic-value").forEach(el=>{
     el.innerHTML="-";
 });
-    
+
 </script>
 
 {% endblock %}
