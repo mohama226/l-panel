@@ -54,3 +54,36 @@
     border:none;
     border-top:1px solid #363d4b;
 }
+
+
+
+
+.box-content{
+    overflow: visible !important;
+}
+
+table{
+    overflow: visible !important;
+}
+
+.actions-menu{
+    position: relative;
+    display: inline-block;
+}
+
+.dropdown{
+    position:absolute;
+    right:0;
+    top:42px;
+    min-width:220px;
+    background:#202634;
+    border:1px solid #31384d;
+    border-radius:12px;
+    box-shadow:0 15px 35px rgba(0,0,0,.45);
+    display:none;
+    z-index:99999;
+}
+
+.dropdown.show{
+    display:block;
+}
