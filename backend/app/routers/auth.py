@@ -37,45 +37,51 @@ async def login(
 
     db = SessionLocal()
 
-    admin = (
-        db.query(Admin)
-        .filter(Admin.username == username)
-        .first()
-    )
+    try:
 
-    if admin is None:
-
-        return templates.TemplateResponse(
-            "login.html",
-            {
-                "request": request,
-                "error": "Invalid username",
-            },
+        admin = (
+            db.query(Admin)
+            .filter(Admin.username == username)
+            .first()
         )
 
-    if not verify_password(password, admin.password):
+        if admin is None:
 
-        return templates.TemplateResponse(
-            "login.html",
-            {
-                "request": request,
-                "error": "Invalid password",
-            },
+            return templates.TemplateResponse(
+                "login.html",
+                {
+                    "request": request,
+                    "error": "Invalid username",
+                },
+            )
+
+        if not verify_password(password, admin.password):
+
+            return templates.TemplateResponse(
+                "login.html",
+                {
+                    "request": request,
+                    "error": "Invalid password",
+                },
+            )
+
+        response = RedirectResponse(
+            "/dashboard",
+            status_code=302,
         )
 
-    response = RedirectResponse(
-        "/dashboard",
-        status_code=302,
-    )
+        response.set_cookie(
+            key="lak_admin",
+            value=str(admin.id),
+            httponly=True,
+            samesite="lax",
+        )
 
-    response.set_cookie(
-        key="lak_admin",
-        value=str(admin.id),
-        httponly=True,
-        samesite="lax",
-    )
+        return response
 
-    return response
+    finally:
+
+        db.close()
 
 
 @router.get("/logout")
