@@ -9,223 +9,255 @@
         <p>User Profile</p>
     </div>
 
-    <div class="page-actions">
+</div>
 
-        <a href="/users" class="btn-primary">
-            ← Back
-        </a>
+<!-- =======================
+Hero
+======================== -->
+
+<div class="profile-hero">
+
+    <div class="hero-left">
+
+        <div class="avatar">
+            {{ user.username[:1]|upper }}
+        </div>
+
+        <div>
+
+            <h2>{{ user.username }}</h2>
+
+            <div id="hero-status">
+
+                {% if user.online %}
+
+                    <span class="status-dot online"></span>
+                    <span class="status-text online">Online</span>
+
+                {% else %}
+
+                    <span class="status-dot offline"></span>
+                    <span class="status-text offline">Offline</span>
+
+                {% endif %}
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="hero-right">
+
+        <button class="btn-primary"
+                onclick="location.href='/users/{{ user.username }}/traffic'">
+            Live Traffic
+        </button>
 
     </div>
 
 </div>
 
-<div class="dashboard-grid">
+<!-- =======================
+Stats
+======================== -->
 
-    <!-- User Information -->
+<div class="profile-stats">
 
-    <div class="dashboard-box">
+    <div class="stat-card">
 
-        <div class="box-header">
-            <h3>User Information</h3>
-        </div>
+        <div class="stat-title">Download</div>
 
-        <div class="box-content">
+        <div class="stat-value"
+             id="download-value">
 
-            <table>
-
-                <tr>
-                    <td><strong>Username</strong></td>
-                    <td>{{ user.username }}</td>
-                </tr>
-
-                <tr>
-                    <td><strong>Status</strong></td>
-                    <td>
-
-                        {% if user.enabled %}
-                            <span class="badge success">Enabled</span>
-                        {% else %}
-                            <span class="badge danger">Disabled</span>
-                        {% endif %}
-
-                    </td>
-                </tr>
-
-                <tr>
-                    <td><strong>Blocked</strong></td>
-                    <td>
-
-                        {% if user.blocked %}
-                            <span class="badge danger">Blocked</span>
-                        {% else %}
-                            <span class="badge success">No</span>
-                        {% endif %}
-
-                    </td>
-                </tr>
-
-                <tr>
-                    <td><strong>Traffic</strong></td>
-                    <td>{{ user.traffic }} GB</td>
-                </tr>
-
-                <tr>
-                    <td><strong>Expire</strong></td>
-                    <td>
-
-                        {% if user.expire %}
-                            {{ user.expire.strftime("%Y-%m-%d") }}
-                        {% else %}
-                            Unlimited
-                        {% endif %}
-
-                    </td>
-                </tr>
-
-                <tr>
-                    <td><strong>Server</strong></td>
-                    <td>
-
-                        {% if user.server %}
-                            {{ user.server.name }}
-                        {% else %}
-                            Local
-                        {% endif %}
-
-                    </td>
-                </tr>
-
-                <tr>
-                    <td><strong>Group</strong></td>
-                    <td>
-
-                        {% if user.group %}
-                            {{ user.group.name }}
-                        {% else %}
-                            -
-                        {% endif %}
-
-                    </td>
-                </tr>
-
-            </table>
+            --
 
         </div>
 
     </div>
 
+    <div class="stat-card">
 
-    <!-- Live Sessions -->
+        <div class="stat-title">Upload</div>
 
-    <div class="dashboard-box">
+        <div class="stat-value"
+             id="upload-value">
 
-        <div class="box-header">
-            <h3>Active Sessions</h3>
-        </div>
-
-        <div class="box-content">
-
-            <table id="sessions-table">
-
-                <thead>
-
-                <tr>
-
-                    <th>Remote IP</th>
-                    <th>VPN IP</th>
-                    <th>Device</th>
-                    <th>Connected</th>
-
-                </tr>
-
-                </thead>
-
-                <tbody>
-
-                <tr>
-
-                    <td colspan="4">
-
-                        Loading...
-
-                    </td>
-
-                </tr>
-
-                </tbody>
-
-            </table>
+            --
 
         </div>
 
     </div>
 
+    <div class="stat-card">
 
-    <!-- History -->
+        <div class="stat-title">Total Usage</div>
 
-    <div class="dashboard-box">
+        <div class="stat-value"
+             id="total-value">
 
-        <div class="box-header">
-            <h3>History</h3>
-        </div>
-
-        <div class="box-content">
-
-            <table>
-
-                <thead>
-
-                <tr>
-
-                    <th>Action</th>
-                    <th>Details</th>
-                    <th>Date</th>
-
-                </tr>
-
-                </thead>
-
-                <tbody>
-
-                {% for log in logs %}
-
-                <tr>
-
-                    <td>{{ log.action }}</td>
-
-                    <td>
-
-                        {% if log.details %}
-                            {{ log.details }}
-                        {% else %}
-                            -
-                        {% endif %}
-
-                    </td>
-
-                    <td>{{ log.created_at }}</td>
-
-                </tr>
-
-                {% else %}
-
-                <tr>
-
-                    <td colspan="3" style="text-align:center;">
-
-                        No history found
-
-                    </td>
-
-                </tr>
-
-                {% endfor %}
-
-                </tbody>
-
-            </table>
+            --
 
         </div>
+
+    </div>
+
+    <div class="stat-card">
+
+        <div class="stat-title">Expire</div>
+
+        <div class="stat-value">
+
+            {% if user.expire %}
+                {{ user.expire.strftime("%Y-%m-%d") }}
+            {% else %}
+                Unlimited
+            {% endif %}
+
+        </div>
+
+    </div>
+
+</div>
+
+<!-- =======================
+Connection
+======================== -->
+
+<div class="dashboard-box">
+
+    <div class="box-header">
+
+        <h3>Connection Information</h3>
+
+    </div>
+
+    <div class="box-content">
+
+        <table>
+
+            <tr>
+                <td><strong>Status</strong></td>
+                <td id="status-cell">Loading...</td>
+            </tr>
+
+            <tr>
+                <td><strong>Public IP</strong></td>
+                <td id="ip-cell">-</td>
+            </tr>
+
+            <tr>
+                <td><strong>Device</strong></td>
+                <td id="device-cell">-</td>
+            </tr>
+
+            <tr>
+                <td><strong>Connected</strong></td>
+                <td id="connected-cell">-</td>
+            </tr>
+
+        </table>
+
+    </div>
+
+</div>
+
+<!-- =======================
+Sessions
+======================== -->
+
+<div class="dashboard-box">
+
+    <div class="box-header">
+
+        <h3>Active Sessions</h3>
+
+    </div>
+
+    <div class="box-content">
+
+        <table id="sessions-table">
+
+            <thead>
+
+            <tr>
+
+                <th>IP</th>
+                <th>Device</th>
+                <th>Connected</th>
+
+            </tr>
+
+            </thead>
+
+            <tbody>
+
+            <tr>
+
+                <td colspan="3">
+
+                    Loading...
+
+                </td>
+
+            </tr>
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</div>
+
+<!-- =======================
+History
+======================== -->
+
+<div class="dashboard-box">
+
+    <div class="box-header">
+
+        <h3>History</h3>
+
+    </div>
+
+    <div class="box-content">
+
+        <table>
+
+            <thead>
+
+            <tr>
+
+                <th>Action</th>
+                <th>Details</th>
+                <th>Date</th>
+
+            </tr>
+
+            </thead>
+
+            <tbody>
+
+            {% for log in logs %}
+
+            <tr>
+
+                <td>{{ log.action }}</td>
+
+                <td>{{ log.details }}</td>
+
+                <td>{{ log.created_at }}</td>
+
+            </tr>
+
+            {% endfor %}
+
+            </tbody>
+
+        </table>
 
     </div>
 
@@ -233,32 +265,46 @@
 
 <script>
 
-fetch("/users/{{ user.username }}/sessions")
+function refreshProfile(){
+
+fetch("/api/users/{{ user.username }}/traffic")
+
 .then(r=>r.json())
+
 .then(data=>{
+
+document.getElementById("status-cell").innerText=data.status||"-";
+document.getElementById("ip-cell").innerText=data.ip||"-";
+document.getElementById("device-cell").innerText=data.device||"-";
+document.getElementById("connected-cell").innerText=data.connected||"-";
+
+document.getElementById("download-value").innerText=data.rx||"--";
+document.getElementById("upload-value").innerText=data.tx||"--";
+document.getElementById("total-value").innerText=data.total||"--";
+
+});
+
+fetch("/users/{{ user.username }}/sessions")
+
+.then(r=>r.json())
+
+.then(list=>{
 
 let html="";
 
-if(data.length===0){
+if(list.length==0){
 
-html=`
-<tr>
-<td colspan="4" style="text-align:center;">
-No active session
-</td>
-</tr>
-`;
+html="<tr><td colspan='3'>No active session</td></tr>";
 
 }else{
 
-data.forEach(s=>{
+list.forEach(s=>{
 
 html+=`
 <tr>
-<td>${s["Remote IP"] || "-"}</td>
-<td>${s["VPN IP"] || "-"}</td>
-<td>${s["Device"] || "-"}</td>
-<td>${s["Connected at"] || "-"}</td>
+<td>${s["Remote IP"]||"-"}</td>
+<td>${s["Device"]||"-"}</td>
+<td>${s["Connected at"]||"-"}</td>
 </tr>
 `;
 
@@ -268,18 +314,13 @@ html+=`
 
 document.querySelector("#sessions-table tbody").innerHTML=html;
 
-})
-.catch(()=>{
-
-document.querySelector("#sessions-table tbody").innerHTML=`
-<tr>
-<td colspan="4" style="text-align:center;color:#ff6666;">
-Cannot load active sessions
-</td>
-</tr>
-`;
-
 });
+
+}
+
+refreshProfile();
+
+setInterval(refreshProfile,3000);
 
 </script>
 
