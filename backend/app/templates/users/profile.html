@@ -9,10 +9,19 @@
         <p>User Profile</p>
     </div>
 
+    <div class="page-actions">
+
+        <a href="/users" class="btn-primary">
+            ← Back
+        </a>
+
+    </div>
+
 </div>
 
-
 <div class="dashboard-grid">
+
+    <!-- User Information -->
 
     <div class="dashboard-box">
 
@@ -32,22 +41,26 @@
                 <tr>
                     <td><strong>Status</strong></td>
                     <td>
+
                         {% if user.enabled %}
                             <span class="badge success">Enabled</span>
                         {% else %}
                             <span class="badge danger">Disabled</span>
                         {% endif %}
+
                     </td>
                 </tr>
 
                 <tr>
                     <td><strong>Blocked</strong></td>
                     <td>
+
                         {% if user.blocked %}
-                            Yes
+                            <span class="badge danger">Blocked</span>
                         {% else %}
-                            No
+                            <span class="badge success">No</span>
                         {% endif %}
+
                     </td>
                 </tr>
 
@@ -69,6 +82,32 @@
                     </td>
                 </tr>
 
+                <tr>
+                    <td><strong>Server</strong></td>
+                    <td>
+
+                        {% if user.server %}
+                            {{ user.server.name }}
+                        {% else %}
+                            Local
+                        {% endif %}
+
+                    </td>
+                </tr>
+
+                <tr>
+                    <td><strong>Group</strong></td>
+                    <td>
+
+                        {% if user.group %}
+                            {{ user.group.name }}
+                        {% else %}
+                            -
+                        {% endif %}
+
+                    </td>
+                </tr>
+
             </table>
 
         </div>
@@ -76,11 +115,12 @@
     </div>
 
 
+    <!-- Live Sessions -->
 
     <div class="dashboard-box">
 
         <div class="box-header">
-            <h3>Session Logs</h3>
+            <h3>Active Sessions</h3>
         </div>
 
         <div class="box-content">
@@ -89,27 +129,28 @@
 
                 <thead>
 
-                    <tr>
+                <tr>
 
-                        <th>IP</th>
-                        <th>Device</th>
-                        <th>Connected</th>
+                    <th>Remote IP</th>
+                    <th>VPN IP</th>
+                    <th>Device</th>
+                    <th>Connected</th>
 
-                    </tr>
+                </tr>
 
                 </thead>
 
                 <tbody>
 
-                    <tr>
+                <tr>
 
-                        <td colspan="3">
+                    <td colspan="4">
 
-                            Loading...
+                        Loading...
 
-                        </td>
+                    </td>
 
-                    </tr>
+                </tr>
 
                 </tbody>
 
@@ -120,6 +161,7 @@
     </div>
 
 
+    <!-- History -->
 
     <div class="dashboard-box">
 
@@ -133,13 +175,13 @@
 
                 <thead>
 
-                    <tr>
+                <tr>
 
-                        <th>Action</th>
-                        <th>Details</th>
-                        <th>Date</th>
+                    <th>Action</th>
+                    <th>Details</th>
+                    <th>Date</th>
 
-                    </tr>
+                </tr>
 
                 </thead>
 
@@ -151,9 +193,29 @@
 
                     <td>{{ log.action }}</td>
 
-                    <td>{{ log.details }}</td>
+                    <td>
+
+                        {% if log.details %}
+                            {{ log.details }}
+                        {% else %}
+                            -
+                        {% endif %}
+
+                    </td>
 
                     <td>{{ log.created_at }}</td>
+
+                </tr>
+
+                {% else %}
+
+                <tr>
+
+                    <td colspan="3" style="text-align:center;">
+
+                        No history found
+
+                    </td>
 
                 </tr>
 
@@ -169,7 +231,6 @@
 
 </div>
 
-
 <script>
 
 fetch("/users/{{ user.username }}/sessions")
@@ -180,7 +241,13 @@ let html="";
 
 if(data.length===0){
 
-html="<tr><td colspan='3'>No active session</td></tr>";
+html=`
+<tr>
+<td colspan="4" style="text-align:center;">
+No active session
+</td>
+</tr>
+`;
 
 }else{
 
@@ -188,9 +255,10 @@ data.forEach(s=>{
 
 html+=`
 <tr>
-<td>${s["Remote IP"]||"-"}</td>
-<td>${s["Device"]||"-"}</td>
-<td>${s["Connected at"]||"-"}</td>
+<td>${s["Remote IP"] || "-"}</td>
+<td>${s["VPN IP"] || "-"}</td>
+<td>${s["Device"] || "-"}</td>
+<td>${s["Connected at"] || "-"}</td>
 </tr>
 `;
 
@@ -199,6 +267,17 @@ html+=`
 }
 
 document.querySelector("#sessions-table tbody").innerHTML=html;
+
+})
+.catch(()=>{
+
+document.querySelector("#sessions-table tbody").innerHTML=`
+<tr>
+<td colspan="4" style="text-align:center;color:#ff6666;">
+Cannot load active sessions
+</td>
+</tr>
+`;
 
 });
 
