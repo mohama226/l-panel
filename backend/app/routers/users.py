@@ -154,7 +154,7 @@ def change_password(
 
 @router.post("/users/{username}/extend")
 def extend_user(
-    username,
+    username: str,
     data: UserExpire,
     admin=Depends(require_login),
     db: Session = Depends(get_db),
@@ -172,7 +172,7 @@ def extend_user(
 
 @router.post("/users/{username}/traffic/reset")
 def reset_traffic(
-    username,
+    username: str,
     admin=Depends(require_login),
     db: Session = Depends(get_db),
 ):
@@ -186,7 +186,7 @@ def reset_traffic(
 
 @router.post("/users/{username}/disconnect")
 def disconnect_user(
-    username,
+    username: str,
     admin=Depends(require_login),
     db: Session = Depends(get_db),
 ):
@@ -200,7 +200,7 @@ def disconnect_user(
 
 @router.post("/users/{username}/enable")
 def enable_user(
-    username,
+    username: str,
     admin=Depends(require_login),
     db: Session = Depends(get_db),
 ):
@@ -214,7 +214,7 @@ def enable_user(
 
 @router.post("/users/{username}/disable")
 def disable_user(
-    username,
+    username: str,
     admin=Depends(require_login),
     db: Session = Depends(get_db),
 ):
@@ -228,7 +228,7 @@ def disable_user(
 
 @router.post("/users/{username}/block")
 def block_user(
-    username,
+    username: str,
     admin=Depends(require_login),
     db: Session = Depends(get_db),
 ):
@@ -242,7 +242,7 @@ def block_user(
 
 @router.post("/users/{username}/unblock")
 def unblock_user(
-    username,
+    username: str,
     admin=Depends(require_login),
     db: Session = Depends(get_db),
 ):
@@ -256,7 +256,7 @@ def unblock_user(
 
 @router.post("/users/{username}/suspend")
 def suspend_user(
-    username,
+    username: str,
     admin=Depends(require_login),
     db: Session = Depends(get_db),
 ):
@@ -270,7 +270,7 @@ def suspend_user(
 
 @router.post("/users/{username}/unsuspend")
 def unsuspend_user(
-    username,
+    username: str,
     admin=Depends(require_login),
     db: Session = Depends(get_db),
 ):
@@ -284,7 +284,7 @@ def unsuspend_user(
 
 @router.delete("/users/{username}")
 def delete_user(
-    username,
+    username: str,
     admin=Depends(require_login),
     db: Session = Depends(get_db),
 ):
@@ -302,7 +302,7 @@ def delete_user(
 
 @router.get("/users/{username}/sessions")
 def user_sessions(
-    username,
+    username: str,
     admin=Depends(require_login),
     db: Session = Depends(get_db),
 ):
@@ -312,9 +312,29 @@ def user_sessions(
 
 @router.get("/users/{username}/traffic/live")
 def user_live_traffic(
-    username,
+    username: str,
     admin=Depends(require_login),
     db: Session = Depends(get_db),
 ):
 
-    return get_service(db).traffic_usage(username)
+    return get_service(db).traffic(username)
+
+
+@router.get("/api/users/{username}/traffic")
+def user_traffic_api(
+    username: str,
+    admin=Depends(require_login),
+    db: Session = Depends(get_db),
+):
+
+    service = get_service(db)
+
+    user = service.get(username)
+
+    if not user:
+        raise HTTPException(
+            status_code=404,
+            detail="User not found",
+        )
+
+    return service.traffic(username)
