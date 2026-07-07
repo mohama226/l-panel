@@ -8,6 +8,10 @@ class UserService:
         self.repo = repo
         self.log_repo = log_repo
 
+    # -------------------------
+    # Users
+    # -------------------------
+
     def list(self):
         return self.repo.get_all()
 
@@ -16,6 +20,28 @@ class UserService:
 
     def logs(self, username):
         return self.log_repo.list(username)
+
+    def sessions(self, username):
+        return OcservService.user_sessions(username)
+
+    def disconnect(self, username):
+
+        user = self.repo.get(username)
+
+        if not user:
+            raise Exception("User not found")
+
+        OcservService.disconnect_user(username)
+
+        self.log_repo.create(
+            username,
+            "DISCONNECT",
+            details="Disconnected active session",
+        )
+
+    # -------------------------
+    # Create
+    # -------------------------
 
     def create(self, data):
 
@@ -49,6 +75,10 @@ class UserService:
 
         return user
 
+    # -------------------------
+    # Delete
+    # -------------------------
+
     def delete(self, username):
 
         user = self.repo.get(username)
@@ -67,26 +97,7 @@ class UserService:
         self.repo.delete(user)
 
     # -------------------------
-    # Disconnect
-    # -------------------------
-
-    def disconnect(self, username):
-
-        user = self.repo.get(username)
-
-        if not user:
-            raise Exception("User not found")
-
-        OcservService.disconnect_user(username)
-
-        self.log_repo.create(
-            username,
-            "DISCONNECT",
-            details="User disconnected",
-        )
-
-    # -------------------------
-    # Enable / Disable
+    # Enable
     # -------------------------
 
     def enable(self, username):
@@ -106,6 +117,10 @@ class UserService:
         )
 
         return user
+
+    # -------------------------
+    # Disable
+    # -------------------------
 
     def disable(self, username):
 
