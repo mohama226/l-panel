@@ -380,34 +380,43 @@ location.reload();
 
 
 
-// dropdown fix
-
-document.querySelectorAll(".menu-btn").forEach(btn=>{
 
 
-btn.addEventListener("click",function(e){
+  // dropdown fix
+
+document.querySelectorAll(".menu-btn").forEach(btn => {
+
+    btn.addEventListener("click", function(e){
+
+        e.preventDefault();
+        e.stopPropagation();
+
+        const dropdown = this.nextElementSibling;
+
+        document.querySelectorAll(".dropdown").forEach(d => {
+            if(d !== dropdown){
+                d.style.display = "none";
+            }
+        });
 
 
-e.stopPropagation();
+        if(dropdown.style.display === "block"){
+            dropdown.style.display = "none";
+        }
+        else{
+            dropdown.style.display = "block";
+        }
 
-
-let parent=this.parentElement;
-
-
-document.querySelectorAll(".actions-menu")
-.forEach(x=>{
-
-if(x!==parent)
-x.classList.remove("open");
+    });
 
 });
 
 
-parent.classList.toggle("open");
+document.addEventListener("click",function(){
 
-
-});
-
+    document.querySelectorAll(".dropdown").forEach(d=>{
+        d.style.display="none";
+    });
 
 });
 
