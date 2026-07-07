@@ -40,11 +40,18 @@ def users_page(
     db: Session = Depends(get_db),
 ):
 
+    service = get_service(db)
+
+    users = service.list()
+
+    for user in users:
+        user.online = service.is_online(user.username)
+
     return render(
         request,
         "users/index.html",
         {
-            "users": get_service(db).list(),
+            "users": users,
         },
     )
 
