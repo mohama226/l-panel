@@ -1,3 +1,4 @@
+from app.core.ocserv_cache import OcservCache
 from fastapi import APIRouter, Cookie, Request
 from fastapi.responses import RedirectResponse, JSONResponse
 
