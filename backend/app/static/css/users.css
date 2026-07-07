@@ -6,87 +6,121 @@
     display:flex;
     flex-wrap:wrap;
     gap:12px;
-    margin-top:20px;
+    margin-top:25px;
 }
 
 .profile-actions .btn{
-    min-width:170px;
     border:none;
     border-radius:10px;
-    padding:12px 18px;
+    padding:12px 20px;
     cursor:pointer;
     font-size:14px;
     font-weight:600;
-    transition:.25s;
+    transition:.2s;
+    color:#fff;
 }
 
 .profile-actions .btn:hover{
     transform:translateY(-2px);
+    opacity:.9;
 }
 
 .btn-blue{
-    background:#2f6fed;
-    color:#fff;
-}
-
-.btn-blue:hover{
-    background:#2257c7;
+    background:#3b82f6;
 }
 
 .btn-green{
-    background:#18a058;
-    color:#fff;
-}
-
-.btn-green:hover{
-    background:#128347;
+    background:#10b981;
 }
 
 .btn-orange{
     background:#f59e0b;
-    color:#fff;
-}
-
-.btn-orange:hover{
-    background:#d88900;
 }
 
 .btn-red{
-    background:#dc3545;
+    background:#ef4444;
+}
+
+.btn-purple{
+    background:#8b5cf6;
+}
+
+.btn-gray{
+    background:#64748b;
+}
+
+.user-info-table{
+    width:100%;
+    border-collapse:collapse;
+}
+
+.user-info-table th{
+    width:260px;
+    background:#2e55d7;
     color:#fff;
-}
-
-.btn-red:hover{
-    background:#bb2d3b;
-}
-
-.table th{
-    width:240px;
-}
-
-.badge{
-    display:inline-block;
-    padding:6px 12px;
-    border-radius:30px;
-    font-size:13px;
+    padding:16px;
+    text-align:left;
     font-weight:600;
 }
 
+.user-info-table td{
+    padding:16px;
+    background:#1b2434;
+    color:#fff;
+    border-bottom:1px solid rgba(255,255,255,.08);
+}
+
+.user-info-table tr:last-child td,
+.user-info-table tr:last-child th{
+    border-bottom:none;
+}
+
+.user-info-table .badge{
+    display:inline-block;
+    padding:7px 14px;
+    border-radius:8px;
+    font-size:13px;
+}
+
 .badge.success{
-    background:#174d34;
-    color:#63ffb5;
+    background:#0f5132;
+    color:#4ade80;
 }
 
 .badge.danger{
-    background:#571a1a;
-    color:#ff8d8d;
+    background:#5a1d25;
+    color:#ff6b6b;
 }
 
-.dashboard-box{
-    margin-bottom:30px;
+.badge.warning{
+    background:#5a4200;
+    color:#ffd43b;
 }
 
-.dashboard-box .table tr td,
-.dashboard-box .table tr th{
-    padding:16px;
+.user-profile-box{
+    margin-top:20px;
+}
+
+.user-profile-box hr{
+    border:none;
+    border-top:1px solid rgba(255,255,255,.08);
+    margin:25px 0;
+}
+
+@media(max-width:900px){
+
+    .user-info-table th,
+    .user-info-table td{
+        display:block;
+        width:100%;
+    }
+
+    .profile-actions{
+        flex-direction:column;
+    }
+
+    .profile-actions .btn{
+        width:100%;
+    }
+
 }
