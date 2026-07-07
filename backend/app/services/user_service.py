@@ -1,5 +1,3 @@
-from datetime import datetime
-
 from app.db.models import VPNUser
 from app.services.ocserv_service import OcservService
 
@@ -10,10 +8,6 @@ class UserService:
         self.repo = repo
         self.log_repo = log_repo
 
-    # --------------------------------
-    # Users
-    # --------------------------------
-
     def list(self):
         return self.repo.get_all()
 
@@ -22,10 +16,6 @@ class UserService:
 
     def logs(self, username):
         return self.log_repo.list(username)
-
-    # --------------------------------
-    # Create
-    # --------------------------------
 
     def create(self, data):
 
@@ -59,10 +49,6 @@ class UserService:
 
         return user
 
-    # --------------------------------
-    # Delete
-    # --------------------------------
-
     def delete(self, username):
 
         user = self.repo.get(username)
@@ -72,17 +58,125 @@ class UserService:
 
         OcservService.delete_user(username)
 
-        self.repo.delete(user)
-
         self.log_repo.create(
             username,
             "DELETE",
             details="User deleted",
         )
 
-    # --------------------------------
+        self.repo.delete(user)
+
+    def enable(self, username):
+
+        user = self.repo.get(username)
+
+        if not user:
+            raise Exception("User not found")
+
+        user.enabled = True
+
+        self.repo.update(user)
+
+        self.log_repo.create(
+            username,
+            "ENABLE",
+        )
+
+        return user
+
+    def disable(self, username):
+
+        user = self.repo.get(username)
+
+        if not user:
+            raise Exception("User not found")
+
+        user.enabled = False
+
+        self.repo.update(user)
+
+        self.log_repo.create(
+            username,
+            "DISABLE",
+        )
+
+        return user
+
+    def suspend(self, username):
+
+        user = self.repo.get(username)
+
+        if not user:
+            raise Exception("User not found")
+
+        user.suspended = True
+
+        self.repo.update(user)
+
+        self.log_repo.create(
+            username,
+            "SUSPEND",
+        )
+
+        return user
+
+    def unsuspend(self, username):
+
+        user = self.repo.get(username)
+
+        if not user:
+            raise Exception("User not found")
+
+        user.suspended = False
+
+        self.repo.update(user)
+
+        self.log_repo.create(
+            username,
+            "UNSUSPEND",
+        )
+
+        return user
+
+    def block(self, username):
+
+        user = self.repo.get(username)
+
+        if not user:
+            raise Exception("User not found")
+
+        user.blocked = True
+
+        self.repo.update(user)
+
+        self.log_repo.create(
+            username,
+            "BLOCK",
+        )
+
+        return user
+
+    def unblock(self, username):
+
+        user = self.repo.get(username)
+
+        if not user:
+            raise Exception("User not found")
+
+        user.blocked = False
+
+        self.repo.update(user)
+
+        self.log_repo.create(
+            username,
+            "UNBLOCK",
+        )
+
+        return user
+
+    # -------------------------
     # Password
-    # --------------------------------
+    # -------------------------
 
     def change_password(
         self,
@@ -111,16 +205,14 @@ class UserService:
             details="Password changed",
         )
 
-        return True
-
-    # --------------------------------
+    # -------------------------
     # Expire
-    # --------------------------------
+    # -------------------------
 
     def extend(
         self,
         username,
-        expire: datetime,
+        expire,
     ):
 
         user = self.repo.get(username)
@@ -136,14 +228,12 @@ class UserService:
         self.log_repo.create(
             username,
             "EXTEND",
-            details=f"Expire changed to {expire}",
+            details=f"Expire -> {expire}",
         )
 
-        return True
-
-    # --------------------------------
+    # -------------------------
     # Traffic
-    # --------------------------------
+    # -------------------------
 
     def reset_traffic(
         self,
@@ -164,78 +254,4 @@ class UserService:
             username,
             "RESET_TRAFFIC",
             details="Traffic reset",
-        )
-
-        return True
-
-    # --------------------------------
-    # Enable / Disable
-    # --------------------------------
-
-    def enable(self, username):
-
-        if not self.repo.set_enabled(username, True):
-            raise Exception("User not found")
-
-        self.log_repo.create(
-            username,
-            "ENABLE",
-        )
-
-    def disable(self, username):
-
-        if not self.repo.set_enabled(username, False):
-            raise Exception("User not found")
-
-        self.log_repo.create(
-            username,
-            "DISABLE",
-        )
-
-    # --------------------------------
-    # Suspend
-    # --------------------------------
-
-    def suspend(self, username):
-
-        if not self.repo.set_suspended(username, True):
-            raise Exception("User not found")
-
-        self.log_repo.create(
-            username,
-            "SUSPEND",
-        )
-
-    def unsuspend(self, username):
-
-        if not self.repo.set_suspended(username, False):
-            raise Exception("User not found")
-
-        self.log_repo.create(
-            username,
-            "UNSUSPEND",
-        )
-
-    # --------------------------------
-    # Block
-    # --------------------------------
-
-    def block(self, username):
-
-        if not self.repo.set_blocked(username, True):
-            raise Exception("User not found")
-
-        self.log_repo.create(
-            username,
-            "BLOCK",
-        )
-
-    def unblock(self, username):
-
-        if not self.repo.set_blocked(username, False):
-            raise Exception("User not found")
-
-        self.log_repo.create(
-            username,
-            "UNBLOCK",
         )
