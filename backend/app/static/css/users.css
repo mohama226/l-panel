@@ -59,7 +59,7 @@
 
 
 .box-content{
-    overflow: overflow:visible;
+    overflow: visible !important;
 }
 
 table{
