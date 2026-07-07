@@ -13,53 +13,10 @@ class UserService:
     # =====================================================
 
     def list(self):
-
-        users = self.repo.get_all()
-
-        online = OcservService.online_users()
-
-        online_names = set()
-
-        for item in online:
-
-            name = (
-                item.get("Username")
-                or item.get("username")
-                or item.get("User")
-                or item.get("user")
-            )
-
-            if name:
-                online_names.add(name)
-
-        for user in users:
-            user.online = user.username in online_names
-
-        return users
+        return self.repo.get_all()
 
     def get(self, username):
-
-        user = self.repo.get(username)
-
-        if not user:
-            return None
-
-        user.online = False
-
-        for item in OcservService.online_users():
-
-            name = (
-                item.get("Username")
-                or item.get("username")
-                or item.get("User")
-                or item.get("user")
-            )
-
-            if name == username:
-                user.online = True
-                break
-
-        return user
+        return self.repo.get(username)
 
     def logs(self, username):
         return self.log_repo.list(username)
@@ -71,10 +28,43 @@ class UserService:
     def online_users(self):
         return OcservService.online_users()
 
+    def is_online(self, username):
+
+        try:
+            users = self.online_users()
+
+            for user in users:
+
+                name = (
+                    user.get("Username")
+                    or user.get("username")
+                    or user.get("User")
+                    or user.get("user")
+                )
+
+                if name == username:
+                    return True
+
+        except Exception:
+            pass
+
+        return False
+
+    # =====================================================
+    # Sessions
+    # =====================================================
+
     def sessions(self, username):
         return OcservService.sessions(username)
 
+    # =====================================================
+    # Traffic
+    # =====================================================
+
     def traffic(self, username):
+        return OcservService.traffic(username)
+
+    def traffic_usage(self, username):
 
         user = self.repo.get(username)
 
@@ -82,9 +72,6 @@ class UserService:
             raise Exception("User not found")
 
         return OcservService.traffic(username)
-
-    def traffic_usage(self, username):
-        return self.traffic(username)
 
     # =====================================================
     # Disconnect
@@ -179,7 +166,10 @@ class UserService:
 
         self.repo.update(user)
 
-        self.log_repo.create(username, "ENABLE")
+        self.log_repo.create(
+            username,
+            "ENABLE",
+        )
 
         return user
 
@@ -194,7 +184,10 @@ class UserService:
 
         self.repo.update(user)
 
-        self.log_repo.create(username, "DISABLE")
+        self.log_repo.create(
+            username,
+            "DISABLE",
+        )
 
         return user
 
@@ -213,7 +206,10 @@ class UserService:
 
         self.repo.update(user)
 
-        self.log_repo.create(username, "SUSPEND")
+        self.log_repo.create(
+            username,
+            "SUSPEND",
+        )
 
         return user
 
@@ -228,7 +224,10 @@ class UserService:
 
         self.repo.update(user)
 
-        self.log_repo.create(username, "UNSUSPEND")
+        self.log_repo.create(
+            username,
+            "UNSUSPEND",
+        )
 
         return user
 
@@ -247,7 +246,10 @@ class UserService:
 
         self.repo.update(user)
 
-        self.log_repo.create(username, "BLOCK")
+        self.log_repo.create(
+            username,
+            "BLOCK",
+        )
 
         return user
 
@@ -262,7 +264,10 @@ class UserService:
 
         self.repo.update(user)
 
-        self.log_repo.create(username, "UNBLOCK")
+        self.log_repo.create(
+            username,
+            "UNBLOCK",
+        )
 
         return user
 
@@ -277,9 +282,15 @@ class UserService:
         if not user:
             raise Exception("User not found")
 
-        OcservService.change_password(username, password)
+        OcservService.change_password(
+            username,
+            password,
+        )
 
-        self.repo.set_password(username, "")
+        self.repo.set_password(
+            username,
+            "",
+        )
 
         self.log_repo.create(
             username,
@@ -298,7 +309,10 @@ class UserService:
         if not user:
             raise Exception("User not found")
 
-        self.repo.set_expire(username, expire)
+        self.repo.set_expire(
+            username,
+            expire,
+        )
 
         self.log_repo.create(
             username,
@@ -317,7 +331,10 @@ class UserService:
         if not user:
             raise Exception("User not found")
 
-        self.repo.set_traffic(username, 0)
+        self.repo.set_traffic(
+            username,
+            0,
+        )
 
         self.log_repo.create(
             username,
