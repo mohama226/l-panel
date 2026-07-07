@@ -30,6 +30,7 @@
             <thead>
             <tr>
                 <th>Username</th>
+                <th class="online-cell">Online</th>
                 <th>Group</th>
                 <th>Server</th>
                 <th>Status</th>
@@ -50,6 +51,21 @@
                         <strong>{{ user.username }}</strong>
                     </a>
                 </td>
+
+
+
+                <td class="online-cell">
+
+    {% if user.online %}
+        <span class="online-dot"></span>
+    {% else %}
+        <span class="offline-dot"></span>
+    {% endif %}
+
+                 </td>
+
+
+                
 
                 <td>
                     {% if user.group %}
