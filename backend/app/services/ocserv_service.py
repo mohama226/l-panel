@@ -1,16 +1,12 @@
-import json
 import subprocess
-import time
-from typing import Dict, List
+from typing import List, Dict
+
+from app.core.ocserv_cache import OcservCache
 
 
 class OcservService:
 
     PASSWD_FILE = "/etc/ocserv/ocpasswd"
-
-    _cache = []
-    _cache_time = 0
-    _cache_ttl = 2
 
     # =====================================================
     # Users
@@ -84,10 +80,14 @@ class OcservService:
     def user_exists(cls, username: str):
 
         try:
+
             with open(cls.PASSWD_FILE) as f:
+
                 for line in f:
+
                     if line.startswith(username + ":"):
                         return True
+
         except Exception:
             return False
 
@@ -134,73 +134,23 @@ class OcservService:
         )
 
     # =====================================================
-    # Online Cache
+    # Cache
     # =====================================================
 
     @classmethod
     def online_users(cls) -> List[Dict]:
 
-        now = time.time()
-
-        if now - cls._cache_time < cls._cache_ttl:
-            return cls._cache
-
-        result = subprocess.run(
-            [
-                "occtl",
-                "--json",
-                "show",
-                "users",
-            ],
-            capture_output=True,
-            text=True,
-            timeout=3,
-        )
-
-        if result.returncode != 0:
-            return cls._cache
-
-        try:
-
-            data = json.loads(result.stdout)
-
-            if isinstance(data, list):
-
-                cls._cache = data
-                cls._cache_time = now
-
-                return data
-
-        except Exception:
-            pass
-
-        return cls._cache
-
-    # =====================================================
-    # Sessions
-    # =====================================================
+        return OcservCache.users()
 
     @classmethod
     def sessions(cls, username: str) -> List[Dict]:
 
-        return [
+        user = OcservCache.user(username)
 
-            u
+        if user:
+            return [user]
 
-            for u in cls.online_users()
-
-            if (
-                u.get("Username")
-                or u.get("username")
-                or u.get("User")
-                or u.get("user")
-            ) == username
-
-        ]
-
-    # =====================================================
-    # Disconnect
-    # =====================================================
+        return []
 
     @classmethod
     def disconnect_user(cls, username: str):
@@ -214,26 +164,19 @@ class OcservService:
             ],
             capture_output=True,
             text=True,
-            timeout=5,
         )
-
-        cls._cache_time = 0
 
         if result.returncode != 0:
             raise Exception(result.stderr.strip())
 
         return True
 
-    # =====================================================
-    # Live Traffic
-    # =====================================================
-
     @classmethod
     def traffic(cls, username: str):
 
-        sessions = cls.sessions(username)
+        s = OcservCache.user(username)
 
-        if not sessions:
+        if s is None:
 
             return {
                 "status": "Offline",
@@ -244,8 +187,6 @@ class OcservService:
                 "tx": "0 B",
                 "total": "0 B",
             }
-
-        s = sessions[0]
 
         rx = (
             s.get("RX")
@@ -262,27 +203,16 @@ class OcservService:
         )
 
         return {
-
             "status": "Online",
-
-            "ip":
-                s.get("Remote IP")
-                or s.get("IP")
-                or "-",
-
-            "device":
-                s.get("Device")
-                or s.get("User Agent")
-                or "-",
-
-            "connected":
-                s.get("Connected at")
-                or s.get("Connected")
-                or "-",
-
+            "ip": s.get("Remote IP") or s.get("IP") or "-",
+            "device": s.get("Device") or s.get("User Agent") or "-",
+            "connected": s.get("Connected at") or s.get("Connected") or "-",
             "rx": rx,
-
             "tx": tx,
-
             "total": f"{rx} / {tx}",
         }
+
+    @classmethod
+    def online_count(cls):
+
+        return OcservCache.online_count()
