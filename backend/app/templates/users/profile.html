@@ -5,11 +5,8 @@
 <div class="page-header">
 
     <div>
-
         <h1>{{ user.username }}</h1>
-
         <p>User Profile</p>
-
     </div>
 
 </div>
@@ -18,79 +15,39 @@
 <div class="dashboard-grid">
 
     <div class="stat-card blue">
-
-        <div>
-
-            <h3>Username</h3>
-
-            <h2>{{ user.username }}</h2>
-
-        </div>
-
-    </div>
-
-    <div class="stat-card green">
-
-        <div>
-
-            <h3>Status</h3>
-
-            <h2>
-
+        <h3>Status</h3>
+        <h2>
             {% if user.enabled %}
                 Active
             {% else %}
                 Disabled
             {% endif %}
+        </h2>
+    </div>
 
-            </h2>
-
-        </div>
-
+    <div class="stat-card green">
+        <h3>Traffic</h3>
+        <h2>{{ user.traffic }} GB</h2>
     </div>
 
     <div class="stat-card orange">
-
-        <div>
-
-            <h3>Traffic</h3>
-
-            <h2>{{ user.traffic }} GB</h2>
-
-        </div>
-
-    </div>
-
-    <div class="stat-card purple">
-
-        <div>
-
-            <h3>Expire</h3>
-
-            <h2>
-
-            {% if user.expire %}
-                {{ user.expire }}
-            {% else %}
-                Unlimited
-            {% endif %}
-
-            </h2>
-
-        </div>
-
+        <h3>Expire</h3>
+        <h2>
+        {% if user.expire %}
+            {{ user.expire.strftime("%Y-%m-%d") }}
+        {% else %}
+            Unlimited
+        {% endif %}
+        </h2>
     </div>
 
 </div>
 
 
-
 <div class="dashboard-box">
 
     <div class="box-header">
-
         <h3>User Information</h3>
-
     </div>
 
     <div class="box-content">
@@ -104,47 +61,35 @@
 
             <tr>
                 <th>Status</th>
-
                 <td>
-
                     {% if user.enabled %}
                         <span class="badge success">Enabled</span>
                     {% else %}
                         <span class="badge danger">Disabled</span>
                     {% endif %}
-
                 </td>
-
             </tr>
 
             <tr>
                 <th>Blocked</th>
-
                 <td>
-
                     {% if user.blocked %}
-                        <span class="badge danger">YES</span>
+                        Yes
                     {% else %}
-                        <span class="badge success">NO</span>
+                        No
                     {% endif %}
-
                 </td>
-
             </tr>
 
             <tr>
                 <th>Suspended</th>
-
                 <td>
-
                     {% if user.suspended %}
-                        <span class="badge danger">YES</span>
+                        Yes
                     {% else %}
-                        <span class="badge success">NO</span>
+                        No
                     {% endif %}
-
                 </td>
-
             </tr>
 
             <tr>
@@ -154,103 +99,37 @@
 
             <tr>
                 <th>Expire</th>
-
                 <td>
-
                     {% if user.expire %}
                         {{ user.expire }}
                     {% else %}
                         Unlimited
                     {% endif %}
-
                 </td>
-
             </tr>
 
         </table>
 
-        <br>
+        <hr>
 
-        <div style="display:flex;gap:10px;flex-wrap:wrap;">
 
-            {% if user.enabled %}
+        <div style="display:flex;flex-wrap:wrap;gap:10px;">
 
-            <button
-                class="btn-primary"
-                onclick="action('disable')">
 
-                Disable
-
+            <button class="btn-primary" onclick="changePassword()">
+                Change Password
             </button>
 
-            {% else %}
-
-            <button
-                class="btn-primary"
-                onclick="action('enable')">
-
-                Enable
-
+            <button class="btn-primary" onclick="extendUser()">
+                Extend Account
             </button>
 
-            {% endif %}
-
-
-
-            {% if user.blocked %}
-
-            <button
-                class="btn-primary"
-                onclick="action('unblock')">
-
-                Unblock
-
+            <button class="btn-primary" onclick="resetTraffic()">
+                Reset Traffic
             </button>
 
-            {% else %}
-
-            <button
-                class="btn-primary"
-                onclick="action('block')">
-
-                Block
-
-            </button>
-
-            {% endif %}
-
-
-
-            {% if user.suspended %}
-
-            <button
-                class="btn-primary"
-                onclick="action('unsuspend')">
-
-                Unsuspend
-
-            </button>
-
-            {% else %}
-
-            <button
-                class="btn-primary"
-                onclick="action('suspend')">
-
-                Suspend
-
-            </button>
-
-            {% endif %}
-
-
-
-            <button
-                class="btn-danger"
-                onclick="deleteUser()">
-
+            <button class="btn-danger" onclick="deleteUser()">
                 Delete User
-
             </button>
 
         </div>
@@ -260,13 +139,10 @@
 </div>
 
 
-
 <div class="dashboard-box">
 
     <div class="box-header">
-
         <h3>User Activity</h3>
-
     </div>
 
     <div class="box-content">
@@ -278,11 +154,8 @@
             <tr>
 
                 <th>Time</th>
-
                 <th>Event</th>
-
                 <th>IP</th>
-
                 <th>Details</th>
 
             </tr>
@@ -291,37 +164,18 @@
 
             <tbody>
 
-            {% if logs %}
+            {% for log in logs %}
 
-                {% for log in logs %}
+            <tr>
 
-                <tr>
+                <td>{{ log.created_at }}</td>
+                <td>{{ log.event }}</td>
+                <td>{{ log.ip }}</td>
+                <td>{{ log.details }}</td>
 
-                    <td>{{ log.created_at }}</td>
+            </tr>
 
-                    <td>{{ log.event }}</td>
-
-                    <td>{{ log.ip }}</td>
-
-                    <td>{{ log.details }}</td>
-
-                </tr>
-
-                {% endfor %}
-
-            {% else %}
-
-                <tr>
-
-                    <td colspan="4">
-
-                        No activity.
-
-                    </td>
-
-                </tr>
-
-            {% endif %}
+            {% endfor %}
 
             </tbody>
 
@@ -332,53 +186,91 @@
 </div>
 
 
-
 <script>
 
 const username="{{ user.username }}";
 
+async function changePassword(){
 
-async function action(name){
+    const password=prompt("New Password");
 
-    const r=await fetch("/users/"+username+"/"+name,{
-        method:"POST"
+    if(!password) return;
+
+    const r=await fetch(`/users/${username}/password`,{
+
+        method:"POST",
+
+        headers:{
+            "Content-Type":"application/json"
+        },
+
+        body:JSON.stringify({
+            password:password
+        })
+
     });
 
-    const j=await r.json();
-
-    alert(j.detail);
-
-    if(r.ok){
-
-        location.reload();
-
-    }
+    alert((await r.json()).detail);
 
 }
 
+async function extendUser(){
 
+    const expire=prompt("Expire (YYYY-MM-DD HH:MM:SS)");
+
+    if(!expire) return;
+
+    const r=await fetch(`/users/${username}/extend`,{
+
+        method:"POST",
+
+        headers:{
+            "Content-Type":"application/json"
+        },
+
+        body:JSON.stringify({
+            expire:expire
+        })
+
+    });
+
+    alert((await r.json()).detail);
+
+    location.reload();
+
+}
+
+async function resetTraffic(){
+
+    if(!confirm("Reset traffic?"))
+        return;
+
+    const r=await fetch(`/users/${username}/traffic/reset`,{
+
+        method:"POST"
+
+    });
+
+    alert((await r.json()).detail);
+
+    location.reload();
+
+}
 
 async function deleteUser(){
 
-    if(!confirm("Delete this user?")){
-
+    if(!confirm("Delete user?"))
         return;
 
-    }
+    const r=await fetch(`/users/${username}`,{
 
-    const r=await fetch("/users/"+username,{
         method:"DELETE"
+
     });
 
-    const j=await r.json();
+    alert((await r.json()).detail);
 
-    alert(j.detail);
-
-    if(r.ok){
-
-        window.location="/users";
-
-    }
+    location.href="/users";
 
 }
 
