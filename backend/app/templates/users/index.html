@@ -4,294 +4,576 @@
 
 <div class="page-header">
 
-    <div>
-        <h1>Users</h1>
-        <p>Manage VPN users</p>
-    </div>
+<div>
+<h1>Users</h1>
+<p>Manage VPN users</p>
+</div>
 
-    <div class="page-actions">
-        <a href="/users/new" class="btn-primary">
-            ➕ Create User
-        </a>
-    </div>
+<div class="page-actions">
+<a href="/users/new" class="btn-primary">
+➕ Create User
+</a>
+</div>
 
 </div>
+
 
 <div class="dashboard-box">
 
-    <div class="box-header">
-        <h3>Users List</h3>
-    </div>
-
-    <div class="box-content">
-
-        <table>
-
-            <thead>
-            <tr>
-                <th>Username</th>
-                <th class="online-cell">Online</th>
-                <th>Group</th>
-                <th>Server</th>
-                <th>Status</th>
-                <th>Traffic</th>
-                <th>Expire</th>
-                <th style="width:70px;text-align:center;">Actions</th>
-            </tr>
-            </thead>
-
-            <tbody>
-
-            {% for user in users %}
-
-            <tr>
-
-                <td>
-                    <a href="/users/{{ user.username }}">
-                        <strong>{{ user.username }}</strong>
-                    </a>
-                </td>
+<div class="box-header">
+<h3>Users List</h3>
+</div>
 
 
+<div class="box-content">
 
-                
+<table>
+
+<thead>
+<tr>
+<th>Username</th>
+<th class="online-cell">Online</th>
+<th>Group</th>
+<th>Server</th>
+<th>Status</th>
+<th>Traffic</th>
+<th>Expire</th>
+<th style="width:70px;text-align:center;">Actions</th>
+</tr>
+</thead>
+
+
+<tbody>
+
+
+{% for user in users %}
+
+<tr>
+
+
+<td>
+<a href="/users/{{ user.username }}">
+<strong>{{ user.username }}</strong>
+</a>
+</td>
+
+
+
 <td class="online-cell">
-    <div class="online-status">
 
-    {% if user.online %}
+<div class="online-status">
 
-        <span class="status-dot online"></span>
-        <span class="status-text online">Online</span>
+{% if user.online %}
 
-    {% else %}
+<span class="status-dot online"></span>
+<span class="status-text online">Online</span>
 
-        <span class="status-dot offline"></span>
-        <span class="status-text offline">Offline</span>
+{% else %}
 
-    {% endif %}
+<span class="status-dot offline"></span>
+<span class="status-text offline">Offline</span>
 
-    </div>
-</td>
-
-
-
-                
-
-                <td>
-                    {% if user.group %}
-                        {{ user.group.name }}
-                    {% else %}
-                        -
-                    {% endif %}
-                </td>
-
-                <td>
-                    {% if user.server %}
-                        {{ user.server.name }}
-                    {% else %}
-                        Local
-                    {% endif %}
-                </td>
-
-                <td>
-
-                    {% if user.enabled %}
-                        <span class="badge success">Enabled</span>
-                    {% else %}
-                        <span class="badge danger">Disabled</span>
-                    {% endif %}
-
-                </td>
-
-                <td>
-
-    <span
-        id="traffic-{{ user.username }}"
-        class="traffic-value">
-
-        Loading...
-
-    </span>
-
-</td>
-
-                <td>
-
-                    {% if user.expire %}
-                        {{ user.expire.strftime("%Y-%m-%d") }}
-                    {% else %}
-                        Unlimited
-                    {% endif %}
-
-                </td>
-
-                <td style="text-align:center;">
-
-
-                    <td style="text-align:center;">
-
-    <button
-        type="button"
-        class="menu-btn action-menu-button"
-        onclick="openUserMenu(this,'{{ user.username }}')">
-
-        <i class="fa-solid fa-ellipsis-vertical"></i>
-
-    </button>
-
-</td>
-
-                </td>
-
-            </tr>
-
-            {% endfor %}
-
-            </tbody>
-
-        </table>
-
-    </div>
+{% endif %}
 
 </div>
 
+</td>
+
+
+
+<td>
+{% if user.group %}
+{{ user.group.name }}
+{% else %}
+-
+{% endif %}
+</td>
+
+
+
+<td>
+
+{% if user.server %}
+{{ user.server.name }}
+{% else %}
+Local
+{% endif %}
+
+</td>
+
+
+
+<td>
+
+{% if user.enabled %}
+
+<span class="badge success">
+Enabled
+</span>
+
+{% else %}
+
+<span class="badge danger">
+Disabled
+</span>
+
+{% endif %}
+
+</td>
+
+
+
+<td>
+
+<span
+id="traffic-{{user.username}}"
+class="traffic-value">
+-
+</span>
+
+</td>
+
+
+
+<td>
+
+{% if user.expire %}
+
+{{ user.expire.strftime("%Y-%m-%d") }}
+
+{% else %}
+
+Unlimited
+
+{% endif %}
+
+</td>
+
+
+
+<td style="text-align:center;">
+
+
+<div class="actions-menu">
+
+
+<button
+type="button"
+class="menu-btn">
+
+<i class="fa-solid fa-ellipsis-vertical"></i>
+
+</button>
+
+
+
+<div class="dropdown">
+
+
+<a href="/users/{{user.username}}">
+<i class="fa-regular fa-user"></i>
+Profile
+</a>
+
+
+
+<a href="/users/{{user.username}}/edit">
+
+<i class="fa-solid fa-pen"></i>
+
+Edit User
+
+</a>
+
+
+
+<a href="javascript:void(0)"
+class="change-password"
+data-user="{{user.username}}">
+
+<i class="fa-solid fa-key"></i>
+
+Change Password
+
+</a>
+
+
+
+<hr>
+
+
+
+{% if user.enabled %}
+
+<a href="#"
+class="disable-user"
+data-user="{{user.username}}">
+
+<i class="fa-solid fa-circle-xmark"></i>
+
+Disable User
+
+</a>
+
+
+{% else %}
+
+
+<a href="#"
+class="enable-user"
+data-user="{{user.username}}">
+
+<i class="fa-solid fa-circle-check"></i>
+
+Enable User
+
+</a>
+
+
+{% endif %}
+
+
+
+{% if user.blocked %}
+
+<a href="#"
+class="unblock-user"
+data-user="{{user.username}}">
+
+<i class="fa-solid fa-lock-open"></i>
+
+Unblock User
+
+</a>
+
+
+{% else %}
+
+
+<a href="#"
+class="block-user"
+data-user="{{user.username}}">
+
+<i class="fa-solid fa-ban"></i>
+
+Block User
+
+</a>
+
+
+{% endif %}
+
+
+
+<a href="#"
+class="disconnect-user"
+data-user="{{user.username}}">
+
+<i class="fa-solid fa-plug-circle-xmark"></i>
+
+Disconnect User
+
+</a>
+
+
+
+<hr>
+
+
+
+<a href="/users/{{user.username}}">
+
+<i class="fa-solid fa-clock-rotate-left"></i>
+
+Session Logs
+
+</a>
+
+
+
+<a href="/users/{{user.username}}/traffic">
+
+<i class="fa-solid fa-chart-column"></i>
+
+Traffic Usage
+
+</a>
+
+
+
+<a href="#"
+class="reset-traffic"
+data-user="{{user.username}}">
+
+<i class="fa-solid fa-arrows-rotate"></i>
+
+Reset Traffic
+
+</a>
+
+
+
+<hr>
+
+
+
+<a href="#"
+class="delete-user"
+data-user="{{user.username}}"
+style="color:#ff6666;">
+
+<i class="fa-solid fa-trash"></i>
+
+Delete User
+
+</a>
+
+
+
+</div>
+
+</div>
+
+
+</td>
+
+
+</tr>
+
+
+{% endfor %}
+
+
+</tbody>
+
+</table>
+
+</div>
+
+</div>
+
+
+
+
+
 <script>
 
-function api(url, method="POST") {
 
-    fetch(url, {method})
-    .then(r => r.json())
-    .then(j => {
-        alert(j.detail || "Done");
-        location.reload();
-    });
+function api(url,method="POST"){
+
+fetch(url,{method:method})
+
+.then(r=>r.json())
+
+.then(j=>{
+
+alert(j.detail || "Done");
+
+location.reload();
+
+});
+
 
 }
 
-/* ------------------------------
-   Dropdown
------------------------------- */
 
-document.querySelectorAll(".menu-btn").forEach(btn => {
 
-    btn.onclick = function(e){
 
-        e.stopPropagation();
 
-        document.querySelectorAll(".actions-menu")
-            .forEach(m=>{
-                if(m!==btn.parentElement){
-                    m.classList.remove("open");
-                }
-            });
+// dropdown fix
 
-        btn.parentElement.classList.toggle("open");
+document.querySelectorAll(".menu-btn").forEach(btn=>{
 
-    };
 
-});
+btn.addEventListener("click",function(e){
 
-document.addEventListener("click", ()=>{
 
-    document.querySelectorAll(".actions-menu")
-        .forEach(m=>m.classList.remove("open"));
+e.stopPropagation();
+
+
+let parent=this.parentElement;
+
+
+document.querySelectorAll(".actions-menu")
+.forEach(x=>{
+
+if(x!==parent)
+x.classList.remove("open");
 
 });
 
 
-/* ------------------------------
-   Event Delegation
------------------------------- */
+parent.classList.toggle("open");
 
-document.addEventListener("click", async function(e){
-
-    const btn = e.target.closest("a");
-
-    if(!btn) return;
-
-    const user = btn.dataset.user;
-
-    if(btn.classList.contains("change-password")){
-
-        e.preventDefault();
-
-        const p = prompt("New password");
-
-        if(!p) return;
-
-        fetch("/users/"+user+"/password",{
-            method:"POST",
-            headers:{
-                "Content-Type":"application/json"
-            },
-            body:JSON.stringify({
-                password:p
-            })
-        })
-        .then(r=>r.json())
-        .then(j=>alert(j.detail));
-
-        return;
-    }
-
-    if(btn.classList.contains("enable-user")){
-        e.preventDefault();
-        api("/users/"+user+"/enable");
-        return;
-    }
-
-    if(btn.classList.contains("disable-user")){
-        e.preventDefault();
-        api("/users/"+user+"/disable");
-        return;
-    }
-
-    if(btn.classList.contains("block-user")){
-        e.preventDefault();
-        api("/users/"+user+"/block");
-        return;
-    }
-
-    if(btn.classList.contains("unblock-user")){
-        e.preventDefault();
-        api("/users/"+user+"/unblock");
-        return;
-    }
-
-    if(btn.classList.contains("disconnect-user")){
-        e.preventDefault();
-        api("/users/"+user+"/disconnect");
-        return;
-    }
-
-    if(btn.classList.contains("reset-traffic")){
-
-        e.preventDefault();
-
-        if(confirm("Reset traffic?")){
-            api("/users/"+user+"/traffic/reset");
-        }
-
-        return;
-    }
-
-    if(btn.classList.contains("delete-user")){
-
-        e.preventDefault();
-
-        if(confirm("Delete user?")){
-            api("/users/"+user,"DELETE");
-        }
-
-        return;
-    }
 
 });
 
-document.querySelectorAll(".traffic-value").forEach(el=>{
-    el.innerHTML="-";
+
 });
+
+
+
+document.addEventListener("click",()=>{
+
+
+document.querySelectorAll(".actions-menu")
+.forEach(x=>{
+
+x.classList.remove("open");
+
+});
+
+
+});
+
+
+
+
+
+
+
+document.addEventListener("click",function(e){
+
+
+
+let btn=e.target.closest("a");
+
+
+if(!btn)
+return;
+
+
+
+let user=btn.dataset.user;
+
+
+
+if(btn.classList.contains("change-password")){
+
+
+e.preventDefault();
+
+
+let p=prompt("New password");
+
+
+if(!p)
+return;
+
+
+fetch(
+"/users/"+user+"/password",
+{
+
+method:"POST",
+
+headers:{
+"Content-Type":"application/json"
+},
+
+body:JSON.stringify({
+password:p
+})
+
+})
+.then(r=>r.json())
+.then(j=>alert(j.detail));
+
+
+}
+
+
+
+
+if(btn.classList.contains("enable-user")){
+
+e.preventDefault();
+
+api("/users/"+user+"/enable");
+
+}
+
+
+
+
+if(btn.classList.contains("disable-user")){
+
+e.preventDefault();
+
+api("/users/"+user+"/disable");
+
+}
+
+
+
+
+if(btn.classList.contains("block-user")){
+
+e.preventDefault();
+
+api("/users/"+user+"/block");
+
+}
+
+
+
+
+if(btn.classList.contains("unblock-user")){
+
+e.preventDefault();
+
+api("/users/"+user+"/unblock");
+
+}
+
+
+
+
+if(btn.classList.contains("disconnect-user")){
+
+e.preventDefault();
+
+api("/users/"+user+"/disconnect");
+
+}
+
+
+
+
+if(btn.classList.contains("reset-traffic")){
+
+e.preventDefault();
+
+
+if(confirm("Reset traffic?"))
+
+api("/users/"+user+"/traffic/reset");
+
+
+}
+
+
+
+
+if(btn.classList.contains("delete-user")){
+
+
+e.preventDefault();
+
+
+if(confirm("Delete user?"))
+
+api("/users/"+user,"DELETE");
+
+
+}
+
+
+});
+
+
 
 </script>
+
 
 {% endblock %}
