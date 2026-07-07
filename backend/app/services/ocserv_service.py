@@ -141,7 +141,7 @@ class OcservService:
             raise Exception(result.stderr.strip())
 
     @classmethod
-    def user_exists(cls):
+    def user_exists(cls, username):
 
         try:
 
