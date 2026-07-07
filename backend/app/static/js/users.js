@@ -1,95 +1,118 @@
-async function api(url, method = "POST") {
+async function postAction(url, message){
 
-    const r = await fetch(url, {
-        method: method
+    const r = await fetch(url,{
+        method:"POST"
     });
 
     const j = await r.json();
 
-    alert(j.detail);
+    alert(j.detail || message);
 
-    if (r.ok)
-        location.reload();
+    location.reload();
 
 }
 
-document.addEventListener("click", function (e) {
+document.addEventListener("click",function(e){
 
-    if (e.target.closest(".menu-btn")) {
+    document.querySelectorAll(".dropdown").forEach(d=>{
 
-        const menu = e.target.closest(".actions-menu");
-        const drop = menu.querySelector(".dropdown");
+        if(!d.parentElement.contains(e.target))
+            d.classList.remove("show");
 
-        document.querySelectorAll(".dropdown").forEach(d => {
-            if (d !== drop)
-                d.classList.remove("show");
-        });
+    });
 
-        drop.classList.toggle("show");
+    const btn=e.target.closest(".menu-btn");
+
+    if(btn){
 
         e.stopPropagation();
 
-        return;
+        const menu=btn.parentElement.querySelector(".dropdown");
+
+        document.querySelectorAll(".dropdown").forEach(d=>{
+
+            if(d!==menu)
+                d.classList.remove("show");
+
+        });
+
+        menu.classList.toggle("show");
+
     }
 
-    document.querySelectorAll(".dropdown").forEach(d => d.classList.remove("show"));
-
 });
 
 
-document.querySelectorAll(".delete-user").forEach(btn => {
+document.addEventListener("click",async function(e){
 
-    btn.onclick = () => {
+    const a=e.target.closest("a");
 
-        if (!confirm("Delete user?"))
-            return;
-
-        api("/users/" + btn.dataset.user, "DELETE");
-
-    };
-
-});
+    if(!a) return;
 
 
-document.querySelectorAll(".enable-user").forEach(btn => {
+    if(a.classList.contains("enable-user")){
 
-    btn.onclick = () => {
+        e.preventDefault();
 
-        api("/users/" + btn.dataset.user + "/enable");
+        await postAction("/users/"+a.dataset.user+"/enable");
 
-    };
-
-});
+    }
 
 
-document.querySelectorAll(".disable-user").forEach(btn => {
+    if(a.classList.contains("disable-user")){
 
-    btn.onclick = () => {
+        e.preventDefault();
 
-        api("/users/" + btn.dataset.user + "/disable");
+        await postAction("/users/"+a.dataset.user+"/disable");
 
-    };
-
-});
+    }
 
 
-document.querySelectorAll(".block-user").forEach(btn => {
+    if(a.classList.contains("block-user")){
 
-    btn.onclick = () => {
+        e.preventDefault();
 
-        api("/users/" + btn.dataset.user + "/block");
+        await postAction("/users/"+a.dataset.user+"/block");
 
-    };
-
-});
+    }
 
 
-document.querySelectorAll(".unblock-user").forEach(btn => {
+    if(a.classList.contains("unblock-user")){
 
-    btn.onclick = () => {
+        e.preventDefault();
 
-        api("/users/" + btn.dataset.user + "/unblock");
+        await postAction("/users/"+a.dataset.user+"/unblock");
 
-    };
+    }
+
+
+    if(a.classList.contains("reset-traffic")){
+
+        e.preventDefault();
+
+        if(!confirm("Reset traffic?")) return;
+
+        await postAction("/users/"+a.dataset.user+"/traffic/reset");
+
+    }
+
+
+    if(a.classList.contains("delete-user")){
+
+        e.preventDefault();
+
+        if(!confirm("Delete user?")) return;
+
+        const r=await fetch("/users/"+a.dataset.user,{
+            method:"DELETE"
+        });
+
+        const j=await r.json();
+
+        alert(j.detail);
+
+        location.reload();
+
+    }
 
 });
