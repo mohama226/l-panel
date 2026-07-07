@@ -162,6 +162,20 @@ def reset_traffic(
     }
 
 
+@router.post("/users/{username}/disconnect")
+def disconnect_user(
+    username: str,
+    admin=Depends(require_login),
+    db: Session = Depends(get_db),
+):
+
+    get_service(db).disconnect(username)
+
+    return {
+        "detail": "User disconnected"
+    }
+
+
 @router.delete("/users/{username}")
 def delete_user(
     username: str,
