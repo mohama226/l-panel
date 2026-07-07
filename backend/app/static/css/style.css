@@ -838,7 +838,7 @@ button{
 
     border:1px solid var(--border);
 
-    overflow:hidden;
+    overflow:visible;
 
     box-shadow:var(--shadow);
 
