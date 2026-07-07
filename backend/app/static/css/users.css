@@ -87,3 +87,31 @@ table{
 .dropdown.show{
     display:block;
 }
+
+
+/* ===========================
+   Online Status
+=========================== */
+
+.online-cell{
+    text-align:center;
+    width:60px;
+}
+
+.online-dot,
+.offline-dot{
+    width:12px;
+    height:12px;
+    border-radius:50%;
+    display:inline-block;
+}
+
+.online-dot{
+    background:#22c55e;
+    box-shadow:0 0 8px rgba(34,197,94,.8);
+}
+
+.offline-dot{
+    background:#ef4444;
+    box-shadow:0 0 8px rgba(239,68,68,.8);
+}
