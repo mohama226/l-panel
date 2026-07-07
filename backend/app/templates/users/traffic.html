@@ -11,127 +11,113 @@
 
     <div class="page-actions">
 
-        <a href="/users/{{ user.username }}" class="btn-primary">
-            ← Back To Profile
+        <a href="/users/{{ user.username }}" class="btn-secondary">
+            ← Back
         </a>
 
     </div>
 
 </div>
 
+
 <div class="dashboard-grid">
 
-    <div class="stat-card">
+    <div class="dashboard-box">
 
-        <div class="stat-icon blue">
-            <i class="fa-solid fa-chart-column"></i>
+        <div class="box-header">
+            <h3>Live Session</h3>
         </div>
 
-        <div class="stat-info">
-            <div class="stat-value" id="total-traffic">
-                {{ user.traffic }}
-            </div>
-            <div class="stat-title">
-                Total Traffic (GB)
-            </div>
-        </div>
+        <div class="box-content">
 
-    </div>
+            <table class="status-table">
 
-    <div class="stat-card">
+                <tr>
+                    <td><strong>Username</strong></td>
+                    <td id="username">{{ user.username }}</td>
+                </tr>
 
-        <div class="stat-icon green">
-            <i class="fa-solid fa-download"></i>
-        </div>
+                <tr>
+                    <td><strong>Status</strong></td>
+                    <td id="status">Loading...</td>
+                </tr>
 
-        <div class="stat-info">
-            <div class="stat-value" id="download">
-                -
-            </div>
-            <div class="stat-title">
-                Download
-            </div>
-        </div>
+                <tr>
+                    <td><strong>IPv4</strong></td>
+                    <td id="ipv4">-</td>
+                </tr>
 
-    </div>
+                <tr>
+                    <td><strong>IPv6</strong></td>
+                    <td id="ipv6">-</td>
+                </tr>
 
-    <div class="stat-card">
+                <tr>
+                    <td><strong>Connected Since</strong></td>
+                    <td id="since">-</td>
+                </tr>
 
-        <div class="stat-icon orange">
-            <i class="fa-solid fa-upload"></i>
-        </div>
+                <tr>
+                    <td><strong>Session Time</strong></td>
+                    <td id="duration">-</td>
+                </tr>
 
-        <div class="stat-info">
-            <div class="stat-value" id="upload">
-                -
-            </div>
-            <div class="stat-title">
-                Upload
-            </div>
-        </div>
+                <tr>
+                    <td><strong>Device</strong></td>
+                    <td id="device">-</td>
+                </tr>
 
-    </div>
+                <tr>
+                    <td><strong>TLS</strong></td>
+                    <td id="tls">-</td>
+                </tr>
 
-    <div class="stat-card">
+                <tr>
+                    <td><strong>Cipher</strong></td>
+                    <td id="cipher">-</td>
+                </tr>
 
-        <div class="stat-icon purple">
-            <i class="fa-solid fa-clock"></i>
-        </div>
+            </table>
 
-        <div class="stat-info">
-            <div class="stat-value" id="online-time">
-                -
-            </div>
-            <div class="stat-title">
-                Online Time
-            </div>
         </div>
 
     </div>
 
-</div>
 
 
-<div class="dashboard-box">
+    <div class="dashboard-box">
 
-    <div class="box-header">
-        <h3>Traffic Details</h3>
-    </div>
+        <div class="box-header">
+            <h3>Traffic</h3>
+        </div>
 
-    <div class="box-content">
+        <div class="box-content">
 
-        <table>
+            <table class="status-table">
 
-            <tbody>
+                <tr>
+                    <td><strong>Download</strong></td>
+                    <td id="rx">0 B</td>
+                </tr>
 
-            <tr>
-                <td>Total Traffic</td>
-                <td id="t-total">{{ user.traffic }} GB</td>
-            </tr>
+                <tr>
+                    <td><strong>Upload</strong></td>
+                    <td id="tx">0 B</td>
+                </tr>
 
-            <tr>
-                <td>Download</td>
-                <td id="t-download">-</td>
-            </tr>
+                <tr>
+                    <td><strong>Download Speed</strong></td>
+                    <td id="rxspeed">0 B/s</td>
+                </tr>
 
-            <tr>
-                <td>Upload</td>
-                <td id="t-upload">-</td>
-            </tr>
+                <tr>
+                    <td><strong>Upload Speed</strong></td>
+                    <td id="txspeed">0 B/s</td>
+                </tr>
 
-            <tr>
-                <td>Online Time</td>
-                <td id="t-online">-</td>
-            </tr>
+            </table>
 
-            <tr>
-                <td>Last Connection</td>
-                <td id="t-last">-</td>
-            </tr>
-
-            </tbody>
-
-        </table>
+        </div>
 
     </div>
 
@@ -139,26 +125,85 @@
 
 <script>
 
-fetch("/users/{{ user.username }}/sessions")
-.then(r=>r.json())
-.then(data=>{
+async function refreshTraffic(){
 
-if(data.length){
+    try{
 
-let s=data[0];
+        const r = await fetch("/api/users/{{ user.username }}/traffic");
 
-document.getElementById("download").innerText=s.Download || "-";
-document.getElementById("upload").innerText=s.Upload || "-";
-document.getElementById("online-time").innerText=s.Duration || "-";
+        const d = await r.json();
 
-document.getElementById("t-download").innerText=s.Download || "-";
-document.getElementById("t-upload").innerText=s.Upload || "-";
-document.getElementById("t-online").innerText=s.Duration || "-";
-document.getElementById("t-last").innerText=s["Connected at"] || "-";
+        document.getElementById("status").innerHTML =
+            Object.keys(d).length ? "🟢 Online" : "🔴 Offline";
+
+        document.getElementById("ipv4").innerText =
+            d["Remote IP"] ||
+            d.remote_ip ||
+            "-";
+
+        document.getElementById("ipv6").innerText =
+            d["IPv6"] ||
+            d.ipv6 ||
+            "-";
+
+        document.getElementById("since").innerText =
+            d["Connected at"] ||
+            d.connected_at ||
+            "-";
+
+        document.getElementById("duration").innerText =
+            d["Session Time"] ||
+            d.session_time ||
+            "-";
+
+        document.getElementById("device").innerText =
+            d["Device"] ||
+            d.device ||
+            "-";
+
+        document.getElementById("tls").innerText =
+            d["TLS Version"] ||
+            d.tls ||
+            "-";
+
+        document.getElementById("cipher").innerText =
+            d["Cipher"] ||
+            d.cipher ||
+            "-";
+
+        document.getElementById("rx").innerText =
+            d["RX"] ||
+            d["Bytes Received"] ||
+            d.rx ||
+            "-";
+
+        document.getElementById("tx").innerText =
+            d["TX"] ||
+            d["Bytes Sent"] ||
+            d.tx ||
+            "-";
+
+        document.getElementById("rxspeed").innerText =
+            d["RX Speed"] ||
+            d.rx_speed ||
+            "-";
+
+        document.getElementById("txspeed").innerText =
+            d["TX Speed"] ||
+            d.tx_speed ||
+            "-";
+
+    }catch(e){
+
+        document.getElementById("status").innerHTML="🔴 Offline";
+
+    }
 
 }
 
-});
+refreshTraffic();
+
+setInterval(refreshTraffic,2000);
 
 </script>
 
