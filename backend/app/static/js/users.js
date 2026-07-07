@@ -1,137 +1,169 @@
-// ---------- Dropdown ----------
+function postAction(url, message){
 
-document.addEventListener("click", function (e) {
-
-    const btn = e.target.closest(".menu-btn");
-
-    if (btn) {
-
-        e.stopPropagation();
-
-        const menu = btn.closest(".actions-menu").querySelector(".dropdown");
-
-        document.querySelectorAll(".dropdown").forEach(d => {
-            if (d !== menu)
-                d.classList.remove("show");
-        });
-
-        menu.classList.toggle("show");
-
-        return;
-    }
-
-    document.querySelectorAll(".dropdown").forEach(d => d.classList.remove("show"));
-
-});
-
-// ---------- helper ----------
-
-async function post(url) {
-
-    const r = await fetch(url, {
-        method: "POST"
+    fetch(url,{
+        method:"POST"
+    })
+    .then(r=>r.json())
+    .then(j=>{
+        alert(j.detail || message);
+        location.reload();
     });
-
-    const j = await r.json();
-
-    alert(j.detail);
-
-    location.reload();
 
 }
 
-// ---------- Delete ----------
+// ----------------------
+// Menu
+// ----------------------
 
-document.querySelectorAll(".delete-user").forEach(btn => {
+document.addEventListener("click",function(e){
 
-    btn.onclick = async () => {
+    if(e.target.closest(".menu-btn")){
 
-        if (!confirm("Delete user?"))
-            return;
+        let menu=e.target.closest(".actions-menu");
 
-        const r = await fetch("/users/" + btn.dataset.user, {
-            method: "DELETE"
+        let drop=menu.querySelector(".dropdown");
+
+        if(drop.classList.contains("show")){
+            drop.classList.remove("show");
+        }else{
+
+            document.querySelectorAll(".dropdown").forEach(d=>{
+                d.classList.remove("show");
+            });
+
+            drop.classList.add("show");
+        }
+
+        e.stopPropagation();
+        return;
+    }
+
+    document.querySelectorAll(".dropdown").forEach(d=>{
+        d.classList.remove("show");
+    });
+
+});
+
+// ----------------------
+// Delete
+// ----------------------
+
+document.querySelectorAll(".delete-user").forEach(btn=>{
+
+    btn.onclick=()=>{
+
+        if(!confirm("Delete user?")) return;
+
+        fetch("/users/"+btn.dataset.user,{
+            method:"DELETE"
+        })
+        .then(r=>r.json())
+        .then(j=>{
+            alert(j.detail);
+            location.reload();
         });
-
-        const j = await r.json();
-
-        alert(j.detail);
-
-        location.reload();
 
     };
 
 });
 
-// ---------- Enable ----------
+// ----------------------
+// Enable
+// ----------------------
 
-document.querySelectorAll(".enable-user").forEach(btn => {
+document.querySelectorAll(".enable-user").forEach(btn=>{
 
-    btn.onclick = () => post("/users/" + btn.dataset.user + "/enable");
+    btn.onclick=()=>{
 
-});
+        postAction(
+            "/users/"+btn.dataset.user+"/enable",
+            "User Enabled"
+        );
 
-// ---------- Disable ----------
-
-document.querySelectorAll(".disable-user").forEach(btn => {
-
-    btn.onclick = () => post("/users/" + btn.dataset.user + "/disable");
-
-});
-
-// ---------- Block ----------
-
-document.querySelectorAll(".block-user").forEach(btn => {
-
-    btn.onclick = () => post("/users/" + btn.dataset.user + "/block");
+    };
 
 });
 
-// ---------- Unblock ----------
+// ----------------------
+// Disable
+// ----------------------
 
-document.querySelectorAll(".unblock-user").forEach(btn => {
+document.querySelectorAll(".disable-user").forEach(btn=>{
 
-    btn.onclick = () => post("/users/" + btn.dataset.user + "/unblock");
+    btn.onclick=()=>{
+
+        postAction(
+            "/users/"+btn.dataset.user+"/disable",
+            "User Disabled"
+        );
+
+    };
 
 });
 
-// ---------- Reset Traffic ----------
+// ----------------------
+// Block
+// ----------------------
 
-document.querySelectorAll(".reset-traffic").forEach(btn => {
+document.querySelectorAll(".block-user").forEach(btn=>{
 
-    btn.onclick = () => post("/users/" + btn.dataset.user + "/traffic/reset");
+    btn.onclick=()=>{
+
+        postAction(
+            "/users/"+btn.dataset.user+"/block",
+            "User Blocked"
+        );
+
+    };
 
 });
 
+// ----------------------
+// Unblock
+// ----------------------
 
-// ---------- Change Password ----------
+document.querySelectorAll(".unblock-user").forEach(btn=>{
 
-document.querySelectorAll(".change-password").forEach(btn => {
+    btn.onclick=()=>{
 
-    btn.onclick = async () => {
+        postAction(
+            "/users/"+btn.dataset.user+"/unblock",
+            "User Unblocked"
+        );
 
-        let password = prompt("New Password");
+    };
 
-        if (!password)
-            return;
+});
 
-        const r = await fetch("/users/" + btn.dataset.user + "/password", {
+// ----------------------
+// Reset Traffic
+// ----------------------
 
-            method: "POST",
+document.querySelectorAll(".reset-traffic").forEach(btn=>{
 
-            headers: {
-                "Content-Type": "application/json"
-            },
+    btn.onclick=()=>{
 
-            body: JSON.stringify({
-                password: password
-            })
+        postAction(
+            "/users/"+btn.dataset.user+"/traffic/reset",
+            "Traffic Reset"
+        );
 
-        });
+    };
 
-        const j = await r.json();
+});
 
-        alert(j.detail);
+// ----------------------
+// Disconnect
+// ----------------------
+
+document.querySelectorAll(".disconnect-user").forEach(btn=>{
+
+    btn.onclick=()=>{
+
+        postAction(
+            "/users/"+btn.dataset.user+"/disconnect",
+            "User Disconnected"
+        );
 
     };
 
