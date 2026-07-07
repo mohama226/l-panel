@@ -1,14 +1,36 @@
-document.addEventListener("click",function(e){
+document.addEventListener("DOMContentLoaded", () => {
 
-document.querySelectorAll(".dropdown").forEach(x=>{
-if(!x.contains(e.target))
-x.classList.remove("show");
-});
+    const menus = document.querySelectorAll(".actions-menu");
 
-if(e.target.closest(".menu-btn")){
-let m=e.target.closest(".actions-menu");
-m.querySelector(".dropdown").classList.toggle("show");
-e.stopPropagation();
-}
+    menus.forEach(menu => {
+
+        const button = menu.querySelector(".menu-btn");
+        const dropdown = menu.querySelector(".dropdown");
+
+        button.addEventListener("click", function (e) {
+
+            e.preventDefault();
+            e.stopPropagation();
+
+            // بستن منوهای دیگر
+            document.querySelectorAll(".dropdown.show").forEach(d => {
+                if (d !== dropdown) {
+                    d.classList.remove("show");
+                }
+            });
+
+            // باز/بسته کردن همین منو
+            dropdown.classList.toggle("show");
+
+        });
+
+    });
+
+    // کلیک بیرون از منو => بستن
+    document.addEventListener("click", function () {
+        document.querySelectorAll(".dropdown.show").forEach(d => {
+            d.classList.remove("show");
+        });
+    });
 
 });
