@@ -81,6 +81,32 @@ def create_user(
             detail=str(e),
         )
 
+@router.get("/users/{username}/traffic")
+def traffic_page(
+    username: str,
+    request: Request,
+    admin=Depends(require_login),
+    db: Session = Depends(get_db),
+):
+
+    service = get_service(db)
+
+    user = service.get(username)
+
+    if not user:
+        raise HTTPException(
+            status_code=404,
+            detail="User not found",
+        )
+
+    return render(
+        request,
+        "users/traffic.html",
+        {
+            "user": user,
+        },
+    )
+    
 
 @router.get("/users/{username}")
 def profile(
