@@ -8,9 +8,9 @@ class UserService:
         self.repo = repo
         self.log_repo = log_repo
 
-    # -------------------------
-    # Users
-    # -------------------------
+    # =====================================================
+    # Basic
+    # =====================================================
 
     def list(self):
         return self.repo.get_all()
@@ -22,7 +22,10 @@ class UserService:
         return self.log_repo.list(username)
 
     def sessions(self, username):
-        return OcservService.user_sessions(username)
+        return OcservService.sessions(username)
+
+    def traffic(self, username):
+        return OcservService.traffic(username)
 
     def disconnect(self, username):
 
@@ -36,12 +39,14 @@ class UserService:
         self.log_repo.create(
             username,
             "DISCONNECT",
-            details="Disconnected active session",
+            details="Disconnected by administrator",
         )
 
-    # -------------------------
+        return True
+
+    # =====================================================
     # Create
-    # -------------------------
+    # =====================================================
 
     def create(self, data):
 
@@ -75,9 +80,9 @@ class UserService:
 
         return user
 
-    # -------------------------
+    # =====================================================
     # Delete
-    # -------------------------
+    # =====================================================
 
     def delete(self, username):
 
@@ -96,9 +101,9 @@ class UserService:
 
         self.repo.delete(user)
 
-    # -------------------------
+    # =====================================================
     # Enable
-    # -------------------------
+    # =====================================================
 
     def enable(self, username):
 
@@ -118,9 +123,9 @@ class UserService:
 
         return user
 
-    # -------------------------
+    # =====================================================
     # Disable
-    # -------------------------
+    # =====================================================
 
     def disable(self, username):
 
@@ -140,9 +145,9 @@ class UserService:
 
         return user
 
-    # -------------------------
+    # =====================================================
     # Suspend
-    # -------------------------
+    # =====================================================
 
     def suspend(self, username):
 
@@ -180,9 +185,9 @@ class UserService:
 
         return user
 
-    # -------------------------
+    # =====================================================
     # Block
-    # -------------------------
+    # =====================================================
 
     def block(self, username):
 
@@ -220,9 +225,9 @@ class UserService:
 
         return user
 
-    # -------------------------
+    # =====================================================
     # Password
-    # -------------------------
+    # =====================================================
 
     def change_password(
         self,
@@ -251,9 +256,9 @@ class UserService:
             details="Password changed",
         )
 
-    # -------------------------
+    # =====================================================
     # Expire
-    # -------------------------
+    # =====================================================
 
     def extend(
         self,
@@ -277,9 +282,9 @@ class UserService:
             details=f"Expire -> {expire}",
         )
 
-    # -------------------------
+    # =====================================================
     # Traffic
-    # -------------------------
+    # =====================================================
 
     def reset_traffic(
         self,
