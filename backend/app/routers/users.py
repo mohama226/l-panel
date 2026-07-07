@@ -1,11 +1,3 @@
-from app.schemas.user import (
-    UserCreate,
-    UserPassword,
-    UserExpire,
-)
-
-
-
 from fastapi import APIRouter
 from fastapi import Depends
 from fastapi import HTTPException
@@ -15,7 +7,6 @@ from sqlalchemy.orm import Session
 
 from app.core.auth import require_login
 from app.core.template import render
-
 from app.db.database import get_db
 
 from app.repositories.user_repository import UserRepository
@@ -23,17 +14,18 @@ from app.repositories.user_log_repository import UserLogRepository
 
 from app.services.user_service import UserService
 
-from app.schemas.user import UserCreate
-from app.schemas.user import UserPassword
+from app.schemas.user import (
+    UserCreate,
+    UserPassword,
+    UserExpire,
+)
 
 router = APIRouter()
 
 
 def get_service(db: Session):
-
     repo = UserRepository(db)
     log_repo = UserLogRepository(db)
-
     return UserService(repo, log_repo)
 
 
@@ -91,8 +83,33 @@ def create_user(
 
 
 @router.get("/users/{username}")
+def profile(
+    username: str,
+    request: Request,
+    admin=Depends(require_login),
+    db: Session = Depends(get_db),
+):
 
+    service = get_service(db)
 
+    user = service.get(username)
+
+    if not user:
+        raise HTTPException(
+            status_code=404,
+            detail="User not found",
+        )
+
+    logs = service.logs(username)
+
+    return render(
+        request,
+        "users/profile.html",
+        {
+            "user": user,
+            "logs": logs,
+        },
+    )
 
 
 @router.post("/users/{username}/password")
@@ -138,44 +155,11 @@ def reset_traffic(
     db: Session = Depends(get_db),
 ):
 
-    get_service(db).reset_traffic(
-        username,
-    )
+    get_service(db).reset_traffic(username)
 
     return {
         "detail": "Traffic reset"
     }
-
-
-
-def profile(
-    username: str,
-    request: Request,
-    admin=Depends(require_login),
-    db: Session = Depends(get_db),
-):
-
-    service = get_service(db)
-
-    user = service.get(username)
-
-    if not user:
-
-        raise HTTPException(
-            status_code=404,
-            detail="User not found",
-        )
-
-    logs = service.logs(username)
-
-    return render(
-        request,
-        "users/profile.html",
-        {
-            "user": user,
-            "logs": logs,
-        },
-    )
 
 
 @router.delete("/users/{username}")
