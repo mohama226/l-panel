@@ -27,6 +27,15 @@ class UserService:
     def traffic(self, username):
         return OcservService.traffic(username)
 
+    def traffic_usage(self, username):
+
+        user = self.repo.get(username)
+
+        if not user:
+            raise Exception("User not found")
+
+        return OcservService.traffic(username)
+
     def disconnect(self, username):
 
         user = self.repo.get(username)
@@ -102,7 +111,7 @@ class UserService:
         self.repo.delete(user)
 
     # =====================================================
-    # Enable
+    # Enable / Disable
     # =====================================================
 
     def enable(self, username):
@@ -122,10 +131,6 @@ class UserService:
         )
 
         return user
-
-    # =====================================================
-    # Disable
-    # =====================================================
 
     def disable(self, username):
 
@@ -229,11 +234,7 @@ class UserService:
     # Password
     # =====================================================
 
-    def change_password(
-        self,
-        username,
-        password,
-    ):
+    def change_password(self, username, password):
 
         user = self.repo.get(username)
 
@@ -260,11 +261,7 @@ class UserService:
     # Expire
     # =====================================================
 
-    def extend(
-        self,
-        username,
-        expire,
-    ):
+    def extend(self, username, expire):
 
         user = self.repo.get(username)
 
@@ -286,10 +283,7 @@ class UserService:
     # Traffic
     # =====================================================
 
-    def reset_traffic(
-        self,
-        username,
-    ):
+    def reset_traffic(self, username):
 
         user = self.repo.get(username)
 
@@ -306,3 +300,5 @@ class UserService:
             "RESET_TRAFFIC",
             details="Traffic reset",
         )
+
+        return True
