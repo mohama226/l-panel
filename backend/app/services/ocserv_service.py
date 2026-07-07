@@ -1,10 +1,15 @@
 import json
 import subprocess
+from typing import List, Dict
 
 
 class OcservService:
 
     PASSWD_FILE = "/etc/ocserv/ocpasswd"
+
+    # =====================================================
+    # Users
+    # =====================================================
 
     @classmethod
     def add_user(cls, username: str, password: str):
@@ -27,7 +32,7 @@ class OcservService:
         p.communicate(password + "\n" + password + "\n")
 
         if p.returncode != 0:
-            raise Exception("Failed to create ocserv user")
+            raise Exception("Failed to create user")
 
     @classmethod
     def delete_user(cls, username: str):
@@ -48,7 +53,11 @@ class OcservService:
             raise Exception(result.stderr.strip())
 
     @classmethod
-    def change_password(cls, username: str, password: str):
+    def change_password(
+        cls,
+        username,
+        password,
+    ):
 
         cmd = [
             "ocpasswd",
@@ -65,80 +74,12 @@ class OcservService:
             text=True,
         )
 
-        p.communicate(password + "\n" + password + "\n")
+        p.communicate(
+            password + "\n" + password + "\n"
+        )
 
         if p.returncode != 0:
             raise Exception("Failed to change password")
-
-    @classmethod
-    def disconnect_user(cls, username: str):
-
-        result = subprocess.run(
-            [
-                "occtl",
-                "disconnect",
-                "user",
-                username,
-            ],
-            capture_output=True,
-            text=True,
-        )
-
-        if result.returncode != 0:
-            raise Exception(result.stderr.strip())
-
-    @classmethod
-    def online_users(cls):
-
-        result = subprocess.run(
-            [
-                "occtl",
-                "--json",
-                "show",
-                "users",
-            ],
-            capture_output=True,
-            text=True,
-        )
-
-        if result.returncode != 0:
-            return []
-
-        try:
-            return json.loads(result.stdout)
-        except Exception:
-            return []
-
-    @classmethod
-    def user_sessions(cls, username):
-
-        users = cls.online_users()
-
-        sessions = []
-
-        for u in users:
-
-            if u.get("Username") == username:
-                sessions.append(u)
-
-        return sessions
-
-    @classmethod
-    def disconnect_id(cls, session_id):
-
-        result = subprocess.run(
-            [
-                "occtl",
-                "disconnect",
-                "id",
-                str(session_id),
-            ],
-            capture_output=True,
-            text=True,
-        )
-
-        if result.returncode != 0:
-            raise Exception(result.stderr.strip())
 
     @classmethod
     def user_exists(cls, username):
@@ -148,6 +89,7 @@ class OcservService:
             with open(cls.PASSWD_FILE) as f:
 
                 for line in f:
+
                     if line.startswith(username + ":"):
                         return True
 
@@ -155,6 +97,10 @@ class OcservService:
             return False
 
         return False
+
+    # =====================================================
+    # Server
+    # =====================================================
 
     @classmethod
     def status(cls):
@@ -181,3 +127,47 @@ class OcservService:
                 "ocserv",
             ]
         )
+
+    @classmethod
+    def reload(cls):
+
+        subprocess.run(
+            [
+                "occtl",
+                "reload",
+            ]
+        )
+
+    # =====================================================
+    # Online Users
+    # =====================================================
+
+    @classmethod
+    def online_users(cls) -> List[Dict]:
+
+        result = subprocess.run(
+            [
+                "occtl",
+                "--json",
+                "show",
+                "users",
+            ],
+            capture_output=True,
+            text=True,
+        )
+
+        if result.returncode != 0:
+            return []
+
+        try:
+
+            data = json.loads(result.stdout)
+
+            if isinstance(data, list):
+                return data
+
+            return []
+
+        except Exception:
+
+            return []
