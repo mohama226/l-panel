@@ -131,14 +131,14 @@ class UserService:
             group_id=data.group_id,
         )
 
-        self.repo.create(user)
+    self.repo.create(user)
         log_action(
-    db=self.repo.db,
-    admin="SYSTEM",
-    target=data.username,
-    action="CREATE USER",
-    details="VPN user created",
-)
+        db=self.repo.db,
+        admin="SYSTEM",
+        target=data.username,
+        action="CREATE USER",
+        details="VPN user created",
+    )
 
      audit(
         db=self.repo.db,
