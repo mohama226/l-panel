@@ -87,12 +87,16 @@ def profile(
             detail="User not found",
         )
 
+    audit_repo = AuditRepository(db)
+    audit_logs = audit_repo.latest_for_user(username)
+
     return render(
         request,
         "users/profile.html",
         {
             "user": user,
             "logs": service.logs(username),
+            "audit_logs": audit_logs,
         },
     )
 
