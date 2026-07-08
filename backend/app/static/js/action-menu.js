@@ -39,21 +39,37 @@ function openUserMenu(button, username){
 
     actionMenu.classList.add("open");
 
-    const rect = button.getBoundingClientRect();
+    // صبر کن مرورگر ارتفاع واقعی منو را محاسبه کند
+    requestAnimationFrame(() => {
 
-    const menuWidth = 260;
+        const rect = button.getBoundingClientRect();
 
-    let left = rect.right - menuWidth;
-    let top = rect.bottom + 8;
+        const menuWidth = actionMenu.offsetWidth;
+        const menuHeight = actionMenu.offsetHeight;
 
-    if(left < 10)
-        left = 10;
+        let left = rect.right - menuWidth;
+        let top = rect.bottom + 8;
 
-    if(left + menuWidth > window.innerWidth)
-        left = window.innerWidth - menuWidth - 10;
+        // خروج از سمت راست
+        if (left + menuWidth > window.innerWidth - 10)
+            left = window.innerWidth - menuWidth - 10;
 
-    actionMenu.style.left = left + "px";
-    actionMenu.style.top = top + "px";
+        // خروج از سمت چپ
+        if (left < 10)
+            left = 10;
+
+        // اگر پایین جا نداشت، بالا باز شود
+        if (top + menuHeight > window.innerHeight - 10)
+            top = rect.top - menuHeight - 8;
+
+        // اگر بالا هم جا نداشت
+        if (top < 10)
+            top = 10;
+
+        actionMenu.style.left = left + "px";
+        actionMenu.style.top = top + "px";
+
+    });
 
 }
 
