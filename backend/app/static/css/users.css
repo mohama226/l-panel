@@ -485,17 +485,16 @@ table{
 
 }
 
-/* ===========================================
-   Custom Checkbox
-=========================================== */
+/* ==========================================================
+   Modern Checkbox
+========================================================== */
 
 .select-col{
-    width:58px;
+    width:52px;
     text-align:center;
 }
 
 .user-check{
-
     appearance:none;
     -webkit-appearance:none;
 
@@ -504,9 +503,9 @@ table{
 
     border-radius:7px;
 
-    border:2px solid #3b82f6;
+    border:2px solid #475569;
 
-    background:#1f2937;
+    background:#111827;
 
     cursor:pointer;
 
@@ -517,37 +516,37 @@ table{
 
 .user-check:hover{
 
-    border-color:#60a5fa;
+    border-color:#3b82f6;
 
-    box-shadow:
-        0 0 10px rgba(59,130,246,.35);
+    transform:scale(1.08);
+
+    box-shadow:0 0 10px rgba(59,130,246,.25);
 
 }
 
 .user-check:checked{
 
-    background:#3b82f6;
+    background:#2563eb;
 
-    border-color:#3b82f6;
+    border-color:#2563eb;
 
 }
 
 .user-check:checked::after{
 
-    content:"";
+    content:"✓";
 
     position:absolute;
 
-    left:5px;
-    top:1px;
+    left:50%;
+    top:50%;
 
-    width:5px;
-    height:10px;
+    transform:translate(-50%,-55%);
 
-    border:solid white;
+    color:#fff;
 
-    border-width:0 2px 2px 0;
+    font-size:13px;
 
-    transform:rotate(45deg);
+    font-weight:700;
 
 }
