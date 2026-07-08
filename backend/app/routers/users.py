@@ -1,4 +1,3 @@
-from app.core.audit import audit
 from fastapi import APIRouter
 from fastapi import Depends
 from fastapi import HTTPException
@@ -130,25 +129,12 @@ def traffic_page(
 
 @router.post("/users")
 def create_user(
-    request: Request,
     data: UserCreate,
     admin=Depends(require_login),
     db: Session = Depends(get_db),
 ):
 
-        get_service(db).create(data)
-
-    audit(
-        db=db,
-        admin_username=admin["username"],
-        action="CREATE_USER",
-        target_user=data.username,
-        details="New VPN user created",
-    )
-
-    return {
-        "detail": "User created successfully"
-    }
+    get_service(db).create(data)
 
     return {
         "detail": "User created successfully"
@@ -167,13 +153,6 @@ def change_password(
         username,
         data.password,
     )
-    audit(
-    db=db,
-    admin_username=admin["username"],
-    action="PASSWORD_CHANGE",
-    target_user=username,
-    details="Password changed",
-)
 
     return {
         "detail": "Password changed"
@@ -192,13 +171,6 @@ def extend_user(
         username,
         data.expire,
     )
-    audit(
-    db=db,
-    admin_username=admin["username"],
-    action="EXTEND",
-    target_user=username,
-    details=f"Expire -> {data.expire}",
-)
 
     return {
         "detail": "Account extended"
@@ -213,13 +185,6 @@ def reset_traffic(
 ):
 
     get_service(db).reset_traffic(username)
-    audit(
-    db=db,
-    admin_username=admin["username"],
-    action="RESET_TRAFFIC",
-    target_user=username,
-    details="Traffic reset",
-)
 
     return {
         "detail": "Traffic reset"
@@ -234,13 +199,6 @@ def disconnect_user(
 ):
 
     get_service(db).disconnect(username)
-    audit(
-    db=db,
-    admin_username=admin["username"],
-    action="DISCONNECT",
-    target_user=username,
-    details="Disconnected by admin",
-)
 
     return {
         "detail": "User disconnected"
@@ -255,49 +213,6 @@ def enable_user(
 ):
 
     get_service(db).enable(username)
-    audit(
-    db=db,
-    admin_username=admin["username"],
-    action="ENABLE",
-    target_user=username,
-    details="User enabled",
-)
-    audit(
-    db=db,
-    admin_username=admin["username"],
-    action="DISABLE",
-    target_user=username,
-    details="User disabled",
-)
-    audit(
-    db=db,
-    admin_username=admin["username"],
-    action="BLOCK",
-    target_user=username,
-    details="User blocked",
-)
-    audit(
-    db=db,
-    admin_username=admin["username"],
-    action="UNBLOCK",
-    target_user=username,
-    details="User unblocked",
-)
-    audit(
-    db=db,
-    admin_username=admin["username"],
-    action="SUSPEND",
-    target_user=username,
-    details="User suspended",
-)
-    audit(
-    db=db,
-    admin_username=admin["username"],
-    action="UNSUSPEND",
-    target_user=username,
-    details="User unsuspended",
-)
-    
 
     return {
         "detail": "User enabled"
@@ -377,27 +292,11 @@ def unsuspend_user(
 @router.delete("/users/{username}")
 def delete_user(
     username: str,
-    request: Request,
     admin=Depends(require_login),
     db: Session = Depends(get_db),
 ):
 
     get_service(db).delete(username)
-    audit(
-    db=db,
-    admin_username=admin["username"],
-    action="DELETE",
-    target_user=username,
-    details="User deleted",
-)
-    audit(
-    db=db,
-    request=request,
-    admin=admin,
-    action="DELETE_USER",
-    target=username,
-    details="VPN user deleted",
-)
 
     return {
         "detail": "User deleted"
