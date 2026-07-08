@@ -1,4 +1,4 @@
-from app.repositories.audit_repository import AuditRepository
+from app.core.audit import audit
 from fastapi import APIRouter
 from fastapi import Depends
 from fastapi import HTTPException
@@ -209,6 +209,7 @@ def extend_user(
 @router.post("/users/{username}/traffic/reset")
 def reset_traffic(
     username: str,
+    request: Request,
     admin=Depends(require_login),
     db: Session = Depends(get_db),
 ):
@@ -231,6 +232,7 @@ def reset_traffic(
 @router.post("/users/{username}/disconnect")
 def disconnect_user(
     username: str,
+    request: Request,
     admin=Depends(require_login),
     db: Session = Depends(get_db),
 ):
@@ -253,6 +255,7 @@ def disconnect_user(
 @router.post("/users/{username}/enable")
 def enable_user(
     username: str,
+    request: Request,
     admin=Depends(require_login),
     db: Session = Depends(get_db),
 ):
@@ -275,6 +278,7 @@ def enable_user(
 @router.post("/users/{username}/disable")
 def disable_user(
     username: str,
+    request: Request,
     admin=Depends(require_login),
     db: Session = Depends(get_db),
 ):
