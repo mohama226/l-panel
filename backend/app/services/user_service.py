@@ -21,7 +21,7 @@ class UserService:
     def logs(self, username):
         return self.log_repo.list(username)
 
-        def audit_logs(self, username):
+    def audit_logs(self, username):
         return (
             self.repo.db.query(AuditLog)
             .filter(AuditLog.target_user == username)
@@ -29,7 +29,6 @@ class UserService:
             .limit(100)
             .all()
         )
-
     # =====================================================
     # Online
     # =====================================================
