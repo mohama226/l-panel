@@ -1,4 +1,5 @@
 let actionMenu = null;
+let currentUser = null;
 
 document.addEventListener("DOMContentLoaded", () => {
 
@@ -16,12 +17,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
     });
 
+    bindActions();
+
 });
 
-function openUserMenu(button, username) {
+function openUserMenu(button, username){
 
-    if (!actionMenu)
-        return;
+    currentUser = username;
 
     document.getElementById("am-profile").href =
         "/users/" + username;
@@ -29,56 +31,121 @@ function openUserMenu(button, username) {
     document.getElementById("am-edit").href =
         "/users/" + username + "/edit";
 
-    document.getElementById("am-password").href =
-        "/users/" + username + "/password";
-
-    document.getElementById("am-enable").href =
-        "/users/" + username + "/enable";
-
-    document.getElementById("am-block").href =
-        "/users/" + username + "/block";
-
-    document.getElementById("am-disconnect").href =
-        "/users/" + username + "/disconnect";
-
     document.getElementById("am-logs").href =
-        "/users/" + username + "/logs";
+        "/users/" + username;
 
     document.getElementById("am-traffic").href =
         "/users/" + username + "/traffic";
-
-    document.getElementById("am-reset").href =
-        "/users/" + username + "/reset-traffic";
-
-    document.getElementById("am-delete").href =
-        "/users/" + username + "/delete";
 
     actionMenu.classList.add("open");
 
     const rect = button.getBoundingClientRect();
 
     const menuWidth = 260;
-    const menuHeight = actionMenu.offsetHeight || 500;
 
     let left = rect.right - menuWidth;
     let top = rect.bottom + 8;
 
-    if (left < 10)
+    if(left < 10)
         left = 10;
 
-    if (left + menuWidth > window.innerWidth - 10)
+    if(left + menuWidth > window.innerWidth)
         left = window.innerWidth - menuWidth - 10;
-
-    if (top + menuHeight > window.innerHeight - 10) {
-
-        top = rect.top - menuHeight - 8;
-
-        if (top < 10)
-            top = 10;
-
-    }
 
     actionMenu.style.left = left + "px";
     actionMenu.style.top = top + "px";
+
+}
+
+function post(url){
+
+    fetch(url,{
+        method:"POST"
+    })
+    .then(r=>r.json())
+    .then(j=>{
+        alert(j.detail || "Done");
+        location.reload();
+    });
+
+}
+
+function bindActions(){
+
+    document.getElementById("am-password").onclick=function(e){
+
+        e.preventDefault();
+
+        let p=prompt("New password");
+
+        if(!p) return;
+
+        fetch("/users/"+currentUser+"/password",{
+
+            method:"POST",
+
+            headers:{
+                "Content-Type":"application/json"
+            },
+
+            body:JSON.stringify({
+                password:p
+            })
+
+        })
+        .then(r=>r.json())
+        .then(j=>{
+            alert(j.detail);
+        });
+
+    };
+
+    document.getElementById("am-enable").onclick=function(e){
+
+        e.preventDefault();
+        post("/users/"+currentUser+"/enable");
+
+    };
+
+    document.getElementById("am-block").onclick=function(e){
+
+        e.preventDefault();
+        post("/users/"+currentUser+"/block");
+
+    };
+
+    document.getElementById("am-disconnect").onclick=function(e){
+
+        e.preventDefault();
+        post("/users/"+currentUser+"/disconnect");
+
+    };
+
+    document.getElementById("am-reset").onclick=function(e){
+
+        e.preventDefault();
+
+        if(confirm("Reset traffic?"))
+            post("/users/"+currentUser+"/traffic/reset");
+
+    };
+
+    document.getElementById("am-delete").onclick=function(e){
+
+        e.preventDefault();
+
+        if(!confirm("Delete user?"))
+            return;
+
+        fetch("/users/"+currentUser,{
+            method:"DELETE"
+        })
+        .then(r=>r.json())
+        .then(j=>{
+            alert(j.detail);
+            location.reload();
+        });
+
+    };
 
 }
