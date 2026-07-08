@@ -154,6 +154,7 @@ def create_user(
 @router.post("/users/{username}/password")
 def change_password(
     username: str,
+    request: Request,
     data: UserPassword,
     admin=Depends(require_login),
     db: Session = Depends(get_db),
@@ -162,6 +163,14 @@ def change_password(
     get_service(db).change_password(
         username,
         data.password,
+    )
+    audit(
+        db=db,
+        request=request,
+        admin=admin,
+        action="PASSWORD_CHANGE",
+        target=username,
+        details="Password changed",
     )
 
     return {
@@ -172,6 +181,7 @@ def change_password(
 @router.post("/users/{username}/extend")
 def extend_user(
     username: str,
+    request: Request,
     data: UserExpire,
     admin=Depends(require_login),
     db: Session = Depends(get_db),
@@ -180,6 +190,15 @@ def extend_user(
     get_service(db).extend(
         username,
         data.expire,
+    )
+
+    audit(
+        db=db,
+        request=request,
+        admin=admin,
+        action="EXTEND_USER",
+        target=username,
+        details=f"Expire -> {data.expire}",
     )
 
     return {
