@@ -209,3 +209,68 @@ class Setting(Base):
     )
 
     value = Column(String(500))
+
+
+# ---------------- Audit Logs ----------------
+
+class AuditLog(Base):
+    __tablename__ = "audit_logs"
+
+    id = Column(
+        Integer,
+        primary_key=True,
+        index=True,
+    )
+
+    created_at = Column(
+        DateTime,
+        default=datetime.utcnow,
+        index=True,
+    )
+
+    admin_username = Column(
+        String(100),
+        nullable=False,
+        index=True,
+    )
+
+    target_user = Column(
+        String(100),
+        nullable=True,
+        index=True,
+    )
+
+    action = Column(
+        String(100),
+        nullable=False,
+    )
+
+    details = Column(
+        String(1000),
+        default="",
+    )
+
+    old_value = Column(
+        String(1000),
+        default="",
+    )
+
+    new_value = Column(
+        String(1000),
+        default="",
+    )
+
+    ip_address = Column(
+        String(64),
+        default="",
+    )
+
+    user_agent = Column(
+        String(255),
+        default="",
+    )
+
+    status = Column(
+        String(20),
+        default="SUCCESS",
+    )
