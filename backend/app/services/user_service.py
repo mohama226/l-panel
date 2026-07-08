@@ -1,4 +1,4 @@
-from app.db.models import VPNUser
+from app.db.models import VPNUser, AuditLog
 from app.services.ocserv_service import OcservService
 from app.services.audit import log_action
 
