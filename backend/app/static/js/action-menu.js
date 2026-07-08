@@ -13,7 +13,6 @@ document.addEventListener("DOMContentLoaded", () => {
             !e.target.closest(".action-menu-button")
         ) {
             actionMenu.classList.remove("open");
-            actionMenu.dataset.user = "";
         }
 
     });
@@ -24,18 +23,16 @@ document.addEventListener("DOMContentLoaded", () => {
 
 function openUserMenu(button, username){
 
-    // اگر منوی همین کاربر باز است، ببند
+    // اگر همین منو باز بود با کلیک دوباره بسته شود
     if(
         actionMenu.classList.contains("open") &&
-        actionMenu.dataset.user === username
+        currentUser === username
     ){
         actionMenu.classList.remove("open");
-        actionMenu.dataset.user = "";
         return;
     }
 
     currentUser = username;
-    actionMenu.dataset.user = username;
 
     document.getElementById("am-profile").href =
         "/users/" + username;
@@ -58,18 +55,27 @@ function openUserMenu(button, username){
         const menuWidth = actionMenu.offsetWidth;
         const menuHeight = actionMenu.offsetHeight;
 
-        let left = rect.right - menuWidth;
-        let top = rect.bottom + 8;
+        const gap = 12;
 
-        if (left + menuWidth > window.innerWidth - 10)
-            left = window.innerWidth - menuWidth - 10;
+        // پیشفرض: سمت راست دکمه
+        let left = rect.right + gap;
+        let top = rect.top;
 
+        // اگر سمت راست جا نبود، سمت چپ دکمه
+        if (left + menuWidth > window.innerWidth - 10) {
+            left = rect.left - menuWidth - gap;
+        }
+
+        // اگر باز هم از چپ بیرون زد
         if (left < 10)
             left = 10;
 
-        if (top + menuHeight > window.innerHeight - 10)
-            top = rect.top - menuHeight - 8;
+        // اگر پایین صفحه جا نبود
+        if (top + menuHeight > window.innerHeight - 10) {
+            top = window.innerHeight - menuHeight - 10;
+        }
 
+        // اگر از بالا بیرون زد
         if (top < 10)
             top = 10;
 
@@ -119,6 +125,7 @@ function bindActions(){
         .then(r=>r.json())
         .then(j=>{
             alert(j.detail);
+
         });
 
     };
