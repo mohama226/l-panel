@@ -131,15 +131,15 @@ class UserService:
             group_id=data.group_id,
         )
 
-    self.repo.create(user)
-        log_action(
-        db=self.repo.db,
-        admin="SYSTEM",
-        target=data.username,
-        action="CREATE USER",
-        details="VPN user created",
-    )
+    self.repo.delete(user)
 
+    log_action(
+            db=self.repo.db,
+            admin="SYSTEM",
+            target=username,
+            action="DELETE USER",
+            details="VPN user deleted",
+        )
      audit(
         db=self.repo.db,
         admin_username="system",
@@ -346,6 +346,11 @@ class UserService:
             target_user=username,
             details="Password changed",
         )
+        self.log_repo.create(
+            username,
+            "PASSWORD",
+            details="Password changed",
+        )
 
     # =====================================================
     # Expire
@@ -378,6 +383,11 @@ class UserService:
             target_user=username,
             details=f"Expire -> {expire}",
         )
+        self.log_repo.create(
+            username,
+            "EXTEND",
+            details=f"Expire -> {expire}",
+        )
 
     # =====================================================
     # Traffic Reset
@@ -400,6 +410,11 @@ class UserService:
             admin_username="system",
             action="RESET_TRAFFIC",
             target_user=username,
+            details="Traffic reset",
+        )
+        self.log_repo.create(
+            username,
+            "TRAFFIC",
             details="Traffic reset",
         )
 
