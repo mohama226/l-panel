@@ -323,7 +323,7 @@ class UserService:
         if not user:
             raise Exception("User not found")
 
-               self.repo.set_expire(
+            self.repo.set_expire(
             username,
             expire,
         )
