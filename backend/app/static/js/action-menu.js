@@ -13,6 +13,7 @@ document.addEventListener("DOMContentLoaded", () => {
             !e.target.closest(".action-menu-button")
         ) {
             actionMenu.classList.remove("open");
+            actionMenu.dataset.user = "";
         }
 
     });
@@ -23,7 +24,18 @@ document.addEventListener("DOMContentLoaded", () => {
 
 function openUserMenu(button, username){
 
+    // اگر منوی همین کاربر باز است، ببند
+    if(
+        actionMenu.classList.contains("open") &&
+        actionMenu.dataset.user === username
+    ){
+        actionMenu.classList.remove("open");
+        actionMenu.dataset.user = "";
+        return;
+    }
+
     currentUser = username;
+    actionMenu.dataset.user = username;
 
     document.getElementById("am-profile").href =
         "/users/" + username;
@@ -39,7 +51,6 @@ function openUserMenu(button, username){
 
     actionMenu.classList.add("open");
 
-    // صبر کن مرورگر ارتفاع واقعی منو را محاسبه کند
     requestAnimationFrame(() => {
 
         const rect = button.getBoundingClientRect();
@@ -50,19 +61,15 @@ function openUserMenu(button, username){
         let left = rect.right - menuWidth;
         let top = rect.bottom + 8;
 
-        // خروج از سمت راست
         if (left + menuWidth > window.innerWidth - 10)
             left = window.innerWidth - menuWidth - 10;
 
-        // خروج از سمت چپ
         if (left < 10)
             left = 10;
 
-        // اگر پایین جا نداشت، بالا باز شود
         if (top + menuHeight > window.innerHeight - 10)
             top = rect.top - menuHeight - 8;
 
-        // اگر بالا هم جا نداشت
         if (top < 10)
             top = 10;
 
