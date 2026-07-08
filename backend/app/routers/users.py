@@ -324,11 +324,20 @@ def block_user(
 @router.post("/users/{username}/unblock")
 def unblock_user(
     username: str,
+    request: Request,
     admin=Depends(require_login),
     db: Session = Depends(get_db),
 ):
 
     get_service(db).unblock(username)
+    audit(
+        db=db,
+        request=request,
+        admin=admin,
+        action="UNBLOCK",
+        target=username,
+        details="User unblocked",
+    )
 
     return {
         "detail": "User unblocked"
@@ -338,11 +347,20 @@ def unblock_user(
 @router.post("/users/{username}/suspend")
 def suspend_user(
     username: str,
+    request: Request,
     admin=Depends(require_login),
     db: Session = Depends(get_db),
 ):
 
     get_service(db).suspend(username)
+    audit(
+        db=db,
+        request=request,
+        admin=admin,
+        action="SUSPEND",
+        target=username,
+        details="User suspended",
+    )
 
     return {
         "detail": "User suspended"
@@ -352,11 +370,20 @@ def suspend_user(
 @router.post("/users/{username}/unsuspend")
 def unsuspend_user(
     username: str,
+    request: Request,
     admin=Depends(require_login),
     db: Session = Depends(get_db),
 ):
 
     get_service(db).unsuspend(username)
+    audit(
+        db=db,
+        request=request,
+        admin=admin,
+        action="UNSUSPEND",
+        target=username,
+        details="User unsuspended",
+    )
 
     return {
         "detail": "User unsuspended"
@@ -366,11 +393,20 @@ def unsuspend_user(
 @router.delete("/users/{username}")
 def delete_user(
     username: str,
+    request: Request,
     admin=Depends(require_login),
     db: Session = Depends(get_db),
 ):
 
     get_service(db).delete(username)
+    audit(
+        db=db,
+        request=request,
+        admin=admin,
+        action="DELETE_USER",
+        target=username,
+        details="VPN user deleted",
+    )
 
     return {
         "detail": "User deleted"
