@@ -94,11 +94,13 @@ class UserService:
 
         OcservService.disconnect_user(username)
 
-        self.log_repo.create(
-            username,
-            "DISCONNECT",
-            details="Disconnected by administrator",
-        )
+audit(
+    db=self.repo.db,
+    admin_username="system",
+    action="DISCONNECT",
+    target_user=username,
+    details="Disconnected by admin",
+)
 
         return True
 
@@ -137,11 +139,13 @@ class UserService:
     details="VPN user created",
 )
 
-        self.log_repo.create(
-            data.username,
-            "CREATE",
-            details="User created",
-        )
+ audit(
+    db=self.repo.db,
+    admin_username="system",
+    action="CREATE_USER",
+    target_user=data.username,
+    details="New VPN user created",
+)
 
         return user
 
@@ -158,11 +162,13 @@ class UserService:
 
         OcservService.delete_user(username)
 
-        self.log_repo.create(
-            username,
-            "DELETE",
-            details="User deleted",
-        )
+audit(
+    db=self.repo.db,
+    admin_username="system",
+    action="DELETE_USER",
+    target_user=username,
+    details="VPN user deleted",
+)
 
         self.repo.delete(user)
         log_action(
@@ -188,10 +194,13 @@ class UserService:
 
         self.repo.update(user)
 
-        self.log_repo.create(
-            username,
-            "ENABLE",
-        )
+audit(
+    db=self.repo.db,
+    admin_username="system",
+    action="ENABLE",
+    target_user=username,
+    details="User enabled",
+)
 
         return user
 
@@ -206,10 +215,13 @@ class UserService:
 
         self.repo.update(user)
 
-        self.log_repo.create(
-            username,
-            "DISABLE",
-        )
+audit(
+    db=self.repo.db,
+    admin_username="system",
+    action="DISABLE",
+    target_user=username,
+    details="User disabled",
+)
 
         return user
 
@@ -228,10 +240,13 @@ class UserService:
 
         self.repo.update(user)
 
-        self.log_repo.create(
-            username,
-            "SUSPEND",
-        )
+audit(
+    db=self.repo.db,
+    admin_username="system",
+    action="SUSPEND",
+    target_user=username,
+    details="User suspended",
+)
 
         return user
 
@@ -246,10 +261,13 @@ class UserService:
 
         self.repo.update(user)
 
-        self.log_repo.create(
-            username,
-            "UNSUSPEND",
-        )
+audit(
+    db=self.repo.db,
+    admin_username="system",
+    action="UNSUSPEND",
+    target_user=username,
+    details="User unsuspended",
+)
 
         return user
 
@@ -268,10 +286,13 @@ class UserService:
 
         self.repo.update(user)
 
-        self.log_repo.create(
-            username,
-            "BLOCK",
-        )
+audit(
+    db=self.repo.db,
+    admin_username="system",
+    action="BLOCK",
+    target_user=username,
+    details="User blocked",
+)
 
         return user
 
@@ -286,10 +307,13 @@ class UserService:
 
         self.repo.update(user)
 
-        self.log_repo.create(
-            username,
-            "UNBLOCK",
-        )
+audit(
+    db=self.repo.db,
+    admin_username="system",
+    action="UNBLOCK",
+    target_user=username,
+    details="User unblocked",
+)
 
         return user
 
@@ -314,11 +338,13 @@ class UserService:
             "",
         )
 
-        self.log_repo.create(
-            username,
-            "PASSWORD",
-            details="Password changed",
-        )
+audit(
+    db=self.repo.db,
+    admin_username="system",
+    action="PASSWORD_CHANGE",
+    target_user=username,
+    details="Password changed",
+)
 
     # =====================================================
     # Expire
@@ -344,11 +370,13 @@ class UserService:
             details=str(expire),
         )
 
-        self.log_repo.create(
-            username,
-            "EXTEND",
-            details=f"Expire -> {expire}",
-        )
+audit(
+    db=self.repo.db,
+    admin_username="system",
+    action="EXTEND_USER",
+    target_user=username,
+    details=f"Expire -> {expire}",
+)
 
     # =====================================================
     # Traffic Reset
@@ -366,10 +394,12 @@ class UserService:
             0,
         )
 
-        self.log_repo.create(
-            username,
-            "RESET_TRAFFIC",
-            details="Traffic reset",
-        )
+audit(
+    db=self.repo.db,
+    admin_username="system",
+    action="RESET_TRAFFIC",
+    target_user=username,
+    details="Traffic reset",
+)
 
         return True
