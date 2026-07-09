@@ -1,9 +1,11 @@
 from sqlalchemy.orm import Session
+from fastapi import Request
 from app.db.models import AuditLog
 
 
 def audit(
     db: Session,
+    request: Request = None,
     admin_username: str = "system",
     action: str = "",
     target_user: str = "",
@@ -14,6 +16,15 @@ def audit(
     user_agent: str = "",
     status: str = "SUCCESS",
 ):
+    if request:
+        # اولویت با X-Forwarded-For (در صورت وجود پروکسی/لोड بالانسر)
+        if request.headers.get("x-forwarded-for"):
+            ip_address = request.headers["x-forwarded-for"].split(",")[0].strip()
+        else:
+            ip_address = request.client.host
+
+        user_agent = request.headers.get("user-agent", "")
+
     log = AuditLog(
         admin_username=admin_username,
         target_user=target_user,
