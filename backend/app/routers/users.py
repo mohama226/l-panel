@@ -1,4 +1,3 @@
-from app.core.audit import audit
 from fastapi import APIRouter
 from fastapi import Depends
 from fastapi import HTTPException
@@ -106,6 +105,8 @@ def profile(
             "audit_logs": audit_logs,
         },
     )
+
+
 @router.get("/users/{username}/traffic")
 def traffic_page(
     username: str,
@@ -144,7 +145,10 @@ def create_user(
     db: Session = Depends(get_db),
 ):
 
-    get_service(db).create(data)
+    get_service(db).create(
+        data,
+        admin["username"],
+    )
 
     return {
         "detail": "User created successfully"
@@ -163,14 +167,7 @@ def change_password(
     get_service(db).change_password(
         username,
         data.password,
-    )
-    audit(
-        db=db,
-        request=request,
-        admin=admin,
-        action="PASSWORD_CHANGE",
-        target=username,
-        details="Password changed",
+        admin["username"],
     )
 
     return {
@@ -283,7 +280,10 @@ def disable_user(
     db: Session = Depends(get_db),
 ):
 
-    get_service(db).disable(username)
+    get_service(db).disable(
+        username,
+        admin["username"],
+    )
     audit(
         db=db,
         request=request,
@@ -306,7 +306,10 @@ def block_user(
     db: Session = Depends(get_db),
 ):
 
-    get_service(db).block(username)
+    get_service(db).block(
+        username,
+        admin["username"],
+    )
     audit(
         db=db,
         request=request,
@@ -329,7 +332,10 @@ def unblock_user(
     db: Session = Depends(get_db),
 ):
 
-    get_service(db).unblock(username)
+    get_service(db).unblock(
+        username,
+        admin["username"],
+    )
     audit(
         db=db,
         request=request,
@@ -352,7 +358,10 @@ def suspend_user(
     db: Session = Depends(get_db),
 ):
 
-    get_service(db).suspend(username)
+    get_service(db).suspend(
+        username,
+        admin["username"],
+    )
     audit(
         db=db,
         request=request,
@@ -375,7 +384,10 @@ def unsuspend_user(
     db: Session = Depends(get_db),
 ):
 
-    get_service(db).unsuspend(username)
+    get_service(db).unsuspend(
+        username,
+        admin["username"],
+    )
     audit(
         db=db,
         request=request,
@@ -398,7 +410,10 @@ def delete_user(
     db: Session = Depends(get_db),
 ):
 
-    get_service(db).delete(username)
+    get_service(db).delete(
+        username,
+        admin["username"],
+    )
     audit(
         db=db,
         request=request,
@@ -431,16 +446,28 @@ async def bulk_users(
     for username in users:
 
         if action == "enable":
-            service.enable(username)
+            service.enable(
+                username,
+                admin["username"]
+            )
 
         elif action == "disable":
-            service.disable(username)
+            service.disable(
+                username,
+                admin["username"]
+            )
 
         elif action == "block":
-            service.block(username)
+            service.block(
+                username,
+                admin["username"]
+            )
 
         elif action == "unblock":
-            service.unblock(username)
+            service.unblock(
+                username,
+                admin["username"]
+            )
 
         elif action == "disconnect":
             service.disconnect(username)
@@ -449,7 +476,10 @@ async def bulk_users(
             service.reset_traffic(username)
 
         elif action == "delete":
-            service.delete(username)
+            service.delete(
+                username,
+                admin["username"]
+            )
 
         elif action == "extend":
 
@@ -465,9 +495,10 @@ async def bulk_users(
                 )
 
     return {
-        "detail":"Bulk operation completed"
+        "detail": "Bulk operation completed"
     }
-    
+
+
 # ==========================================================
 # Live APIs
 # ==========================================================
