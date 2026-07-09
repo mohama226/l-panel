@@ -1,4 +1,3 @@
-from app.core.audit import audit
 from fastapi import APIRouter
 from fastapi import Depends
 from fastapi import HTTPException
@@ -40,9 +39,7 @@ def users_page(
     admin=Depends(require_login),
     db: Session = Depends(get_db),
 ):
-
     service = get_service(db)
-
     users = service.list()
 
     for user in users:
@@ -51,9 +48,7 @@ def users_page(
     return render(
         request,
         "users/index.html",
-        {
-            "users": users,
-        },
+        {"users": users},
     )
 
 
@@ -62,11 +57,7 @@ def new_user_page(
     request: Request,
     admin=Depends(require_login),
 ):
-
-    return render(
-        request,
-        "users/create.html",
-    )
+    return render(request, "users/create.html")
 
 
 @router.get("/users/{username}")
@@ -76,16 +67,11 @@ def profile(
     admin=Depends(require_login),
     db: Session = Depends(get_db),
 ):
-
     service = get_service(db)
-
     user = service.get(username)
 
     if not user:
-        raise HTTPException(
-            status_code=404,
-            detail="User not found",
-        )
+        raise HTTPException(status_code=404, detail="User not found")
 
     from app.db.models import AuditLog
 
@@ -106,6 +92,8 @@ def profile(
             "audit_logs": audit_logs,
         },
     )
+
+
 @router.get("/users/{username}/traffic")
 def traffic_page(
     username: str,
@@ -113,23 +101,16 @@ def traffic_page(
     admin=Depends(require_login),
     db: Session = Depends(get_db),
 ):
-
     service = get_service(db)
-
     user = service.get(username)
 
     if not user:
-        raise HTTPException(
-            status_code=404,
-            detail="User not found",
-        )
+        raise HTTPException(status_code=404, detail="User not found")
 
     return render(
         request,
         "users/traffic.html",
-        {
-            "user": user,
-        },
+        {"user": user},
     )
 
 
@@ -141,14 +122,17 @@ def traffic_page(
 def create_user(
     data: UserCreate,
     admin=Depends(require_login),
+    request: Request = None,  # برای ip و user-agent
     db: Session = Depends(get_db),
 ):
+    get_service(db).create(
+        data,
+        admin.username,
+        request.client.host if request else None,
+        request.headers.get("user-agent") if request else None,
+    )
 
-    get_service(db).create(data)
-
-    return {
-        "detail": "User created successfully"
-    }
+    return {"detail": "User created successfully"}
 
 
 @router.post("/users/{username}/password")
@@ -159,23 +143,14 @@ def change_password(
     admin=Depends(require_login),
     db: Session = Depends(get_db),
 ):
-
     get_service(db).change_password(
         username,
         data.password,
+        admin.username,
+        request.client.host,
+        request.headers.get("user-agent"),
     )
-    audit(
-        db=db,
-        request=request,
-        admin=admin,
-        action="PASSWORD_CHANGE",
-        target=username,
-        details="Password changed",
-    )
-
-    return {
-        "detail": "Password changed"
-    }
+    return {"detail": "Password changed"}
 
 
 @router.post("/users/{username}/extend")
@@ -186,24 +161,14 @@ def extend_user(
     admin=Depends(require_login),
     db: Session = Depends(get_db),
 ):
-
     get_service(db).extend(
         username,
         data.expire,
+        admin.username,
+        request.client.host,
+        request.headers.get("user-agent"),
     )
-
-    audit(
-        db=db,
-        request=request,
-        admin=admin,
-        action="EXTEND_USER",
-        target=username,
-        details=f"Expire -> {data.expire}",
-    )
-
-    return {
-        "detail": "Account extended"
-    }
+    return {"detail": "Account extended"}
 
 
 @router.post("/users/{username}/traffic/reset")
@@ -213,20 +178,13 @@ def reset_traffic(
     admin=Depends(require_login),
     db: Session = Depends(get_db),
 ):
-
-    get_service(db).reset_traffic(username)
-    audit(
-        db=db,
-        request=request,
-        admin=admin,
-        action="RESET_TRAFFIC",
-        target=username,
-        details="Traffic reset",
+    get_service(db).reset_traffic(
+        username,
+        admin.username,
+        request.client.host,
+        request.headers.get("user-agent"),
     )
-
-    return {
-        "detail": "Traffic reset"
-    }
+    return {"detail": "Traffic reset"}
 
 
 @router.post("/users/{username}/disconnect")
@@ -236,20 +194,13 @@ def disconnect_user(
     admin=Depends(require_login),
     db: Session = Depends(get_db),
 ):
-
-    get_service(db).disconnect(username)
-    audit(
-        db=db,
-        request=request,
-        admin=admin,
-        action="DISCONNECT",
-        target=username,
-        details="Disconnected by admin",
+    get_service(db).disconnect(
+        username,
+        admin.username,
+        request.client.host,
+        request.headers.get("user-agent"),
     )
-
-    return {
-        "detail": "User disconnected"
-    }
+    return {"detail": "User disconnected"}
 
 
 @router.post("/users/{username}/enable")
@@ -259,20 +210,13 @@ def enable_user(
     admin=Depends(require_login),
     db: Session = Depends(get_db),
 ):
-
-    get_service(db).enable(username)
-    audit(
-        db=db,
-        request=request,
-        admin=admin,
-        action="ENABLE",
-        target=username,
-        details="User enabled",
+    get_service(db).enable(
+        username,
+        admin.username,
+        request.client.host,
+        request.headers.get("user-agent"),
     )
-
-    return {
-        "detail": "User enabled"
-    }
+    return {"detail": "User enabled"}
 
 
 @router.post("/users/{username}/disable")
@@ -282,20 +226,13 @@ def disable_user(
     admin=Depends(require_login),
     db: Session = Depends(get_db),
 ):
-
-    get_service(db).disable(username)
-    audit(
-        db=db,
-        request=request,
-        admin=admin,
-        action="DISABLE",
-        target=username,
-        details="User disabled",
+    get_service(db).disable(
+        username,
+        admin.username,
+        request.client.host,
+        request.headers.get("user-agent"),
     )
-
-    return {
-        "detail": "User disabled"
-    }
+    return {"detail": "User disabled"}
 
 
 @router.post("/users/{username}/block")
@@ -305,20 +242,13 @@ def block_user(
     admin=Depends(require_login),
     db: Session = Depends(get_db),
 ):
-
-    get_service(db).block(username)
-    audit(
-        db=db,
-        request=request,
-        admin=admin,
-        action="BLOCK",
-        target=username,
-        details="User blocked",
+    get_service(db).block(
+        username,
+        admin.username,
+        request.client.host,
+        request.headers.get("user-agent"),
     )
-
-    return {
-        "detail": "User blocked"
-    }
+    return {"detail": "User blocked"}
 
 
 @router.post("/users/{username}/unblock")
@@ -328,20 +258,13 @@ def unblock_user(
     admin=Depends(require_login),
     db: Session = Depends(get_db),
 ):
-
-    get_service(db).unblock(username)
-    audit(
-        db=db,
-        request=request,
-        admin=admin,
-        action="UNBLOCK",
-        target=username,
-        details="User unblocked",
+    get_service(db).unblock(
+        username,
+        admin.username,
+        request.client.host,
+        request.headers.get("user-agent"),
     )
-
-    return {
-        "detail": "User unblocked"
-    }
+    return {"detail": "User unblocked"}
 
 
 @router.post("/users/{username}/suspend")
@@ -351,20 +274,13 @@ def suspend_user(
     admin=Depends(require_login),
     db: Session = Depends(get_db),
 ):
-
-    get_service(db).suspend(username)
-    audit(
-        db=db,
-        request=request,
-        admin=admin,
-        action="SUSPEND",
-        target=username,
-        details="User suspended",
+    get_service(db).suspend(
+        username,
+        admin.username,
+        request.client.host,
+        request.headers.get("user-agent"),
     )
-
-    return {
-        "detail": "User suspended"
-    }
+    return {"detail": "User suspended"}
 
 
 @router.post("/users/{username}/unsuspend")
@@ -374,20 +290,13 @@ def unsuspend_user(
     admin=Depends(require_login),
     db: Session = Depends(get_db),
 ):
-
-    get_service(db).unsuspend(username)
-    audit(
-        db=db,
-        request=request,
-        admin=admin,
-        action="UNSUSPEND",
-        target=username,
-        details="User unsuspended",
+    get_service(db).unsuspend(
+        username,
+        admin.username,
+        request.client.host,
+        request.headers.get("user-agent"),
     )
-
-    return {
-        "detail": "User unsuspended"
-    }
+    return {"detail": "User unsuspended"}
 
 
 @router.delete("/users/{username}")
@@ -397,20 +306,13 @@ def delete_user(
     admin=Depends(require_login),
     db: Session = Depends(get_db),
 ):
-
-    get_service(db).delete(username)
-    audit(
-        db=db,
-        request=request,
-        admin=admin,
-        action="DELETE_USER",
-        target=username,
-        details="VPN user deleted",
+    get_service(db).delete(
+        username,
+        admin.username,
+        request.client.host,
+        request.headers.get("user-agent"),
     )
-
-    return {
-        "detail": "User deleted"
-    }
+    return {"detail": "User deleted"}
 
 
 @router.post("/users/bulk")
@@ -419,7 +321,6 @@ async def bulk_users(
     admin=Depends(require_login),
     db: Session = Depends(get_db),
 ):
-
     data = await request.json()
 
     users = data.get("users", [])
@@ -427,47 +328,40 @@ async def bulk_users(
     days = int(data.get("days", 0))
 
     service = get_service(db)
+    admin_name = admin.username
+    ip = request.client.host
+    user_agent = request.headers.get("user-agent")
 
     for username in users:
-
         if action == "enable":
-            service.enable(username)
-
+            service.enable(username, admin_name, ip, user_agent)
         elif action == "disable":
-            service.disable(username)
-
+            service.disable(username, admin_name, ip, user_agent)
         elif action == "block":
-            service.block(username)
-
+            service.block(username, admin_name, ip, user_agent)
         elif action == "unblock":
-            service.unblock(username)
-
+            service.unblock(username, admin_name, ip, user_agent)
         elif action == "disconnect":
-            service.disconnect(username)
-
+            service.disconnect(username, admin_name, ip, user_agent)
         elif action == "reset_traffic":
-            service.reset_traffic(username)
-
+            service.reset_traffic(username, admin_name, ip, user_agent)
         elif action == "delete":
-            service.delete(username)
-
+            service.delete(username, admin_name, ip, user_agent)
         elif action == "extend":
-
-            user = service.get(username)
-
-            if user and user.expire:
-
+            user_obj = service.get(username)
+            if user_obj and user_obj.expire:
                 from datetime import timedelta
-
                 service.extend(
                     username,
-                    user.expire + timedelta(days=days)
+                    user_obj.expire + timedelta(days=days),
+                    admin_name,
+                    ip,
+                    user_agent,
                 )
 
-    return {
-        "detail":"Bulk operation completed"
-    }
-    
+    return {"detail": "Bulk operation completed"}
+
+
 # ==========================================================
 # Live APIs
 # ==========================================================
@@ -478,7 +372,6 @@ def user_sessions(
     admin=Depends(require_login),
     db: Session = Depends(get_db),
 ):
-
     return get_service(db).sessions(username)
 
 
@@ -488,7 +381,6 @@ def user_live_traffic(
     admin=Depends(require_login),
     db: Session = Depends(get_db),
 ):
-
     return get_service(db).traffic(username)
 
 
@@ -498,15 +390,10 @@ def user_traffic_api(
     admin=Depends(require_login),
     db: Session = Depends(get_db),
 ):
-
     service = get_service(db)
-
     user = service.get(username)
 
     if not user:
-        raise HTTPException(
-            status_code=404,
-            detail="User not found",
-        )
+        raise HTTPException(status_code=404, detail="User not found")
 
     return service.traffic(username)
