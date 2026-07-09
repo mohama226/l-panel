@@ -106,8 +106,6 @@ def profile(
             "audit_logs": audit_logs,
         },
     )
-
-
 @router.get("/users/{username}/traffic")
 def traffic_page(
     username: str,
@@ -146,7 +144,7 @@ def create_user(
     db: Session = Depends(get_db),
 ):
 
-    get_service(db).create(data, admin_username=admin.username)
+    get_service(db).create(data)
 
     return {
         "detail": "User created successfully"
@@ -165,7 +163,6 @@ def change_password(
     get_service(db).change_password(
         username,
         data.password,
-        admin_username=admin.username,
     )
     audit(
         db=db,
@@ -193,7 +190,6 @@ def extend_user(
     get_service(db).extend(
         username,
         data.expire,
-        admin_username=admin.username,
     )
 
     audit(
@@ -218,7 +214,7 @@ def reset_traffic(
     db: Session = Depends(get_db),
 ):
 
-    get_service(db).reset_traffic(username, admin_username=admin.username)
+    get_service(db).reset_traffic(username)
     audit(
         db=db,
         request=request,
@@ -241,7 +237,7 @@ def disconnect_user(
     db: Session = Depends(get_db),
 ):
 
-    get_service(db).disconnect(username, admin_username=admin.username)
+    get_service(db).disconnect(username)
     audit(
         db=db,
         request=request,
@@ -264,7 +260,7 @@ def enable_user(
     db: Session = Depends(get_db),
 ):
 
-    get_service(db).enable(username, admin_username=admin.username)
+    get_service(db).enable(username)
     audit(
         db=db,
         request=request,
@@ -287,7 +283,7 @@ def disable_user(
     db: Session = Depends(get_db),
 ):
 
-    get_service(db).disable(username, admin_username=admin.username)
+    get_service(db).disable(username)
     audit(
         db=db,
         request=request,
@@ -310,7 +306,7 @@ def block_user(
     db: Session = Depends(get_db),
 ):
 
-    get_service(db).block(username, admin_username=admin.username)
+    get_service(db).block(username)
     audit(
         db=db,
         request=request,
@@ -333,7 +329,7 @@ def unblock_user(
     db: Session = Depends(get_db),
 ):
 
-    get_service(db).unblock(username, admin_username=admin.username)
+    get_service(db).unblock(username)
     audit(
         db=db,
         request=request,
@@ -356,7 +352,7 @@ def suspend_user(
     db: Session = Depends(get_db),
 ):
 
-    get_service(db).suspend(username, admin_username=admin.username)
+    get_service(db).suspend(username)
     audit(
         db=db,
         request=request,
@@ -379,7 +375,7 @@ def unsuspend_user(
     db: Session = Depends(get_db),
 ):
 
-    get_service(db).unsuspend(username, admin_username=admin.username)
+    get_service(db).unsuspend(username)
     audit(
         db=db,
         request=request,
@@ -402,7 +398,7 @@ def delete_user(
     db: Session = Depends(get_db),
 ):
 
-    get_service(db).delete(username, admin_username=admin.username)
+    get_service(db).delete(username)
     audit(
         db=db,
         request=request,
@@ -435,25 +431,25 @@ async def bulk_users(
     for username in users:
 
         if action == "enable":
-            service.enable(username, admin_username=admin.username)
+            service.enable(username)
 
         elif action == "disable":
-            service.disable(username, admin_username=admin.username)
+            service.disable(username)
 
         elif action == "block":
-            service.block(username, admin_username=admin.username)
+            service.block(username)
 
         elif action == "unblock":
-            service.unblock(username, admin_username=admin.username)
+            service.unblock(username)
 
         elif action == "disconnect":
-            service.disconnect(username, admin_username=admin.username)
+            service.disconnect(username)
 
         elif action == "reset_traffic":
-            service.reset_traffic(username, admin_username=admin.username)
+            service.reset_traffic(username)
 
         elif action == "delete":
-            service.delete(username, admin_username=admin.username)
+            service.delete(username)
 
         elif action == "extend":
 
@@ -465,15 +461,13 @@ async def bulk_users(
 
                 service.extend(
                     username,
-                    user.expire + timedelta(days=days),
-                    admin_username=admin.username,
+                    user.expire + timedelta(days=days)
                 )
 
     return {
-        "detail": "Bulk operation completed"
+        "detail":"Bulk operation completed"
     }
-
-
+    
 # ==========================================================
 # Live APIs
 # ==========================================================
