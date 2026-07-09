@@ -1,4 +1,4 @@
-from app.core.audit import audit
+from app.services.audit import log_action
 from fastapi import APIRouter
 from fastapi import Depends
 from fastapi import HTTPException
@@ -146,12 +146,12 @@ def extend_user(
         data.expire,
         admin["username"],
     )
-    audit(
+    log_action(
         db=db,
         request=request,
-        admin_username=admin["username"],
+        admin=admin["username"],
         action="EXTEND_USER",
-        target_user=username,
+        target=username,
         details=f"Expire -> {data.expire}",
     )
     return {
@@ -168,12 +168,12 @@ def reset_traffic(
         username,
         admin["username"],
     )
-    audit(
+    log_action(
         db=db,
         request=request,
-        admin_username=admin["username"],
+        admin=admin["username"],
         action="RESET_TRAFFIC",
-        target_user=username,
+        target=username,
         details="Traffic reset",
     )
     return {
@@ -190,12 +190,12 @@ def disconnect_user(
         username,
         admin["username"],
     )
-    audit(
+    log_action(
         db=db,
         request=request,
-        admin_username=admin["username"],
+        admin=admin["username"],
         action="DISCONNECT",
-        target_user=username,
+        target=username,
         details="Disconnected by admin",
     )
     return {
@@ -212,12 +212,12 @@ def enable_user(
         username,
         admin["username"],
     )
-    audit(
+    log_action(
         db=db,
         request=request,
-        admin_username=admin["username"],
+        admin=admin["username"],
         action="ENABLE",
-        target_user=username,
+        target=username,
         details="User enabled",
     )
     return {
@@ -234,12 +234,12 @@ def disable_user(
         username,
         admin["username"],
     )
-    audit(
+    log_action(
         db=db,
         request=request,
-        admin_username=admin["username"],
+        admin=admin["username"],
         action="DISABLE",
-        target_user=username,
+        target=username,
         details="User disabled",
     )
     return {
@@ -256,12 +256,12 @@ def block_user(
         username,
         admin["username"],
     )
-    audit(
+    log_action(
         db=db,
         request=request,
-        admin_username=admin["username"],
+        admin=admin["username"],
         action="BLOCK",
-        target_user=username,
+        target=username,
         details="User blocked",
     )
     return {
@@ -278,12 +278,12 @@ def unblock_user(
         username,
         admin["username"],
     )
-    audit(
+    log_action(
         db=db,
         request=request,
-        admin_username=admin["username"],
+        admin=admin["username"],
         action="UNBLOCK",
-        target_user=username,
+        target=username,
         details="User unblocked",
     )
     return {
@@ -300,12 +300,12 @@ def suspend_user(
         username,
         admin["username"],
     )
-    audit(
+    log_action(
         db=db,
         request=request,
-        admin_username=admin["username"],
+        admin=admin["username"],
         action="SUSPEND",
-        target_user=username,
+        target=username,
         details="User suspended",
     )
     return {
@@ -322,12 +322,12 @@ def unsuspend_user(
         username,
         admin["username"],
     )
-    audit(
+    log_action(
         db=db,
         request=request,
-        admin_username=admin["username"],
+        admin=admin["username"],
         action="UNSUSPEND",
-        target_user=username,
+        target=username,
         details="User unsuspended",
     )
     return {
@@ -344,12 +344,12 @@ def delete_user(
         username,
         admin["username"],
     )
-    audit(
+    log_action(
         db=db,
         request=request,
-        admin_username=admin["username"],
+        admin=admin["username"],
         action="DELETE_USER",
-        target_user=username,
+        target=username,
         details="VPN user deleted",
     )
     return {
