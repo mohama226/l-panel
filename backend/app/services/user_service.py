@@ -82,13 +82,6 @@ class UserService:
         if not user:
             raise Exception("User not found")
         OcservService.disconnect_user(username)
-        audit(
-            db=self.repo.db,
-            admin_username=admin_username,
-            action="DISCONNECT",
-            target_user=username,
-            details="Disconnected by admin",
-        )
         return True
 
     # =====================================================
@@ -101,12 +94,10 @@ class UserService:
     ):
         if self.repo.get(data.username):
             raise Exception("Username already exists")
-
         OcservService.add_user(
             data.username,
             data.password,
         )
-
         user = VPNUser(
             username=data.username,
             password="",
@@ -118,17 +109,7 @@ class UserService:
             server_id=data.server_id,
             group_id=data.group_id,
         )
-
         self.repo.create(user)
-
-        audit(
-            db=self.repo.db,
-            admin_username=admin_username,
-            action="CREATE_USER",
-            target_user=data.username,
-            details="New VPN user created",
-        )
-
         return user
 
     # =====================================================
@@ -142,19 +123,8 @@ class UserService:
         user = self.repo.get(username)
         if not user:
             raise Exception("User not found")
-
         OcservService.delete_user(username)
-
         self.repo.delete(user)
-
-        audit(
-            db=self.repo.db,
-            admin_username=admin_username,
-            action="DELETE_USER",
-            target_user=username,
-            details="VPN user deleted",
-        )
-
         log_action(
             db=self.repo.db,
             admin="SYSTEM",
@@ -176,13 +146,6 @@ class UserService:
             raise Exception("User not found")
         user.enabled = True
         self.repo.update(user)
-        audit(
-            db=self.repo.db,
-            admin_username=admin_username,
-            action="ENABLE",
-            target_user=username,
-            details="User enabled",
-        )
         return user
 
     def disable(
@@ -195,13 +158,6 @@ class UserService:
             raise Exception("User not found")
         user.enabled = False
         self.repo.update(user)
-        audit(
-            db=self.repo.db,
-            admin_username=admin_username,
-            action="DISABLE",
-            target_user=username,
-            details="User disabled",
-        )
         return user
 
     # =====================================================
@@ -217,13 +173,6 @@ class UserService:
             raise Exception("User not found")
         user.suspended = True
         self.repo.update(user)
-        audit(
-            db=self.repo.db,
-            admin_username=admin_username,
-            action="SUSPEND",
-            target_user=username,
-            details="User suspended",
-        )
         return user
 
     def unsuspend(
@@ -236,13 +185,6 @@ class UserService:
             raise Exception("User not found")
         user.suspended = False
         self.repo.update(user)
-        audit(
-            db=self.repo.db,
-            admin_username=admin_username,
-            action="UNSUSPEND",
-            target_user=username,
-            details="User unsuspended",
-        )
         return user
 
     # =====================================================
@@ -258,13 +200,6 @@ class UserService:
             raise Exception("User not found")
         user.blocked = True
         self.repo.update(user)
-        audit(
-            db=self.repo.db,
-            admin_username=admin_username,
-            action="BLOCK",
-            target_user=username,
-            details="User blocked",
-        )
         return user
 
     def unblock(
@@ -277,13 +212,6 @@ class UserService:
             raise Exception("User not found")
         user.blocked = False
         self.repo.update(user)
-        audit(
-            db=self.repo.db,
-            admin_username=admin_username,
-            action="UNBLOCK",
-            target_user=username,
-            details="User unblocked",
-        )
         return user
 
     # =====================================================
@@ -298,18 +226,8 @@ class UserService:
         user = self.repo.get(username)
         if not user:
             raise Exception("User not found")
-
         OcservService.change_password(username, password)
         self.repo.set_password(username, "")
-
-        # فقط در Admin Activity لاگ شود (History حذف شد)
-        audit(
-            db=self.repo.db,
-            admin_username=admin_username,
-            action="PASSWORD_CHANGE",
-            target_user=username,
-            details="Password changed",
-        )
 
     # =====================================================
     # Expire
@@ -323,9 +241,7 @@ class UserService:
         user = self.repo.get(username)
         if not user:
             raise Exception("User not found")
-
         self.repo.set_expire(username, expire)
-
         log_action(
             db=self.repo.db,
             admin="SYSTEM",
@@ -333,15 +249,6 @@ class UserService:
             action="EXTEND USER",
             details=str(expire),
         )
-
-        audit(
-            db=self.repo.db,
-            admin_username=admin_username,
-            action="EXTEND_USER",
-            target_user=username,
-            details=f"Expire -> {expire}",
-        )
-
         self.log_repo.create(
             username,
             "EXTEND",
@@ -359,17 +266,7 @@ class UserService:
         user = self.repo.get(username)
         if not user:
             raise Exception("User not found")
-
         self.repo.set_traffic(username, 0)
-
-        audit(
-            db=self.repo.db,
-            admin_username=admin_username,
-            action="RESET_TRAFFIC",
-            target_user=username,
-            details="Traffic reset",
-        )
-
         self.log_repo.create(
             username,
             "TRAFFIC",
