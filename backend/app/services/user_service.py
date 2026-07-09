@@ -5,9 +5,17 @@ from app.services.audit import log_action
 
 
 class UserService:
-    def __init__(self, repo, log_repo):
+    def __init__(
+        self,
+        repo,
+        log_repo,
+        request=None,
+        admin_username="system",
+    ):
         self.repo = repo
         self.log_repo = log_repo
+        self.request = request
+        self.admin_username = admin_username
 
     # =====================================================
     # Basic
@@ -76,12 +84,20 @@ class UserService:
     def disconnect(
         self,
         username,
-        admin_username,
+        admin_username=None,
     ):
         user = self.repo.get(username)
         if not user:
             raise Exception("User not found")
         OcservService.disconnect_user(username)
+        audit(
+            db=self.repo.db,
+            request=self.request,
+            admin_username=self.admin_username,
+            action="DISCONNECT",
+            target_user=username,
+            details="User disconnected",
+        )
         return True
 
     # =====================================================
@@ -90,7 +106,7 @@ class UserService:
     def create(
         self,
         data,
-        admin_username,
+        admin_username=None,
     ):
         if self.repo.get(data.username):
             raise Exception("Username already exists")
@@ -110,6 +126,14 @@ class UserService:
             group_id=data.group_id,
         )
         self.repo.create(user)
+        audit(
+            db=self.repo.db,
+            request=self.request,
+            admin_username=self.admin_username,
+            action="CREATE_USER",
+            target_user=data.username,
+            details="User created successfully",
+        )
         return user
 
     # =====================================================
@@ -118,19 +142,20 @@ class UserService:
     def delete(
         self,
         username,
-        admin_username,
+        admin_username=None,
     ):
         user = self.repo.get(username)
         if not user:
             raise Exception("User not found")
         OcservService.delete_user(username)
         self.repo.delete(user)
-        log_action(
+        audit(
             db=self.repo.db,
-            admin="SYSTEM",
-            target=username,
-            action="DELETE USER",
-            details="VPN user deleted",
+            request=self.request,
+            admin_username=self.admin_username,
+            action="DELETE_USER",
+            target_user=username,
+            details="User deleted",
         )
 
     # =====================================================
@@ -139,25 +164,41 @@ class UserService:
     def enable(
         self,
         username,
-        admin_username,
+        admin_username=None,
     ):
         user = self.repo.get(username)
         if not user:
             raise Exception("User not found")
         user.enabled = True
         self.repo.update(user)
+        audit(
+            db=self.repo.db,
+            request=self.request,
+            admin_username=self.admin_username,
+            action="ENABLE",
+            target_user=username,
+            details="User enabled",
+        )
         return user
 
     def disable(
         self,
         username,
-        admin_username,
+        admin_username=None,
     ):
         user = self.repo.get(username)
         if not user:
             raise Exception("User not found")
         user.enabled = False
         self.repo.update(user)
+        audit(
+            db=self.repo.db,
+            request=self.request,
+            admin_username=self.admin_username,
+            action="DISABLE",
+            target_user=username,
+            details="User disabled",
+        )
         return user
 
     # =====================================================
@@ -166,25 +207,41 @@ class UserService:
     def suspend(
         self,
         username,
-        admin_username,
+        admin_username=None,
     ):
         user = self.repo.get(username)
         if not user:
             raise Exception("User not found")
         user.suspended = True
         self.repo.update(user)
+        audit(
+            db=self.repo.db,
+            request=self.request,
+            admin_username=self.admin_username,
+            action="SUSPEND",
+            target_user=username,
+            details="User suspended",
+        )
         return user
 
     def unsuspend(
         self,
         username,
-        admin_username,
+        admin_username=None,
     ):
         user = self.repo.get(username)
         if not user:
             raise Exception("User not found")
         user.suspended = False
         self.repo.update(user)
+        audit(
+            db=self.repo.db,
+            request=self.request,
+            admin_username=self.admin_username,
+            action="UNSUSPEND",
+            target_user=username,
+            details="User unsuspended",
+        )
         return user
 
     # =====================================================
@@ -193,25 +250,41 @@ class UserService:
     def block(
         self,
         username,
-        admin_username,
+        admin_username=None,
     ):
         user = self.repo.get(username)
         if not user:
             raise Exception("User not found")
         user.blocked = True
         self.repo.update(user)
+        audit(
+            db=self.repo.db,
+            request=self.request,
+            admin_username=self.admin_username,
+            action="BLOCK",
+            target_user=username,
+            details="User blocked",
+        )
         return user
 
     def unblock(
         self,
         username,
-        admin_username,
+        admin_username=None,
     ):
         user = self.repo.get(username)
         if not user:
             raise Exception("User not found")
         user.blocked = False
         self.repo.update(user)
+        audit(
+            db=self.repo.db,
+            request=self.request,
+            admin_username=self.admin_username,
+            action="UNBLOCK",
+            target_user=username,
+            details="User unblocked",
+        )
         return user
 
     # =====================================================
@@ -221,13 +294,21 @@ class UserService:
         self,
         username,
         password,
-        admin_username,
+        admin_username=None,
     ):
         user = self.repo.get(username)
         if not user:
             raise Exception("User not found")
         OcservService.change_password(username, password)
         self.repo.set_password(username, "")
+        audit(
+            db=self.repo.db,
+            request=self.request,
+            admin_username=self.admin_username,
+            action="PASSWORD_CHANGE",
+            target_user=username,
+            details="Password changed",
+        )
 
     # =====================================================
     # Expire
@@ -236,18 +317,19 @@ class UserService:
         self,
         username,
         expire,
-        admin_username,
+        admin_username=None,
     ):
         user = self.repo.get(username)
         if not user:
             raise Exception("User not found")
         self.repo.set_expire(username, expire)
-        log_action(
+        audit(
             db=self.repo.db,
-            admin="SYSTEM",
-            target=username,
-            action="EXTEND USER",
-            details=str(expire),
+            request=self.request,
+            admin_username=self.admin_username,
+            action="EXTEND_USER",
+            target_user=username,
+            details=f"Expire -> {expire}",
         )
         self.log_repo.create(
             username,
@@ -261,12 +343,20 @@ class UserService:
     def reset_traffic(
         self,
         username,
-        admin_username,
+        admin_username=None,
     ):
         user = self.repo.get(username)
         if not user:
             raise Exception("User not found")
         self.repo.set_traffic(username, 0)
+        audit(
+            db=self.repo.db,
+            request=self.request,
+            admin_username=self.admin_username,
+            action="RESET_TRAFFIC",
+            target_user=username,
+            details="Traffic reset",
+        )
         self.log_repo.create(
             username,
             "TRAFFIC",
