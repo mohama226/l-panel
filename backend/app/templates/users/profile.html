@@ -5,8 +5,8 @@
         <h1>{{ user.username }}</h1>
         <p>User Profile</p>
     </div>
-</div> 
-<!-- ======================= Hero ======================== --> 
+</div>
+<!-- ======================= Hero ======================== -->
 <div class="profile-hero">
     <div class="hero-left">
         <div class="avatar">
@@ -31,8 +31,8 @@
             Live Traffic
         </button>
     </div>
-</div> 
-<!-- ======================= Stats ======================== --> 
+</div>
+<!-- ======================= Stats ======================== -->
 <div class="profile-stats">
     <div class="stat-card">
         <div class="stat-title">Download</div>
@@ -56,8 +56,8 @@
             {% endif %}
         </div>
     </div>
-</div> 
-<!-- ======================= Connection ======================== --> 
+</div>
+<!-- ======================= Connection ======================== -->
 <div class="dashboard-box">
     <div class="box-header">
         <h3>Connection Information</h3>
@@ -70,8 +70,7 @@
             <tr><td><strong>Connected</strong></td><td id="connected-cell">-</td></tr>
         </table>
     </div>
-</div> 
-
+</div>
 <!-- ======================= Live Sessions ======================== -->
 <div class="dashboard-box">
     <div class="box-header">
@@ -79,7 +78,6 @@
             🟢 Live Sessions
         </h3>
     </div>
-
     <div class="box-content">
         <div id="live-sessions-container" class="live-session-grid">
             <div class="loading-box">
@@ -88,7 +86,6 @@
         </div>
     </div>
 </div>
-
 <!-- ======================= Analytics ======================== -->
 <div class="dashboard-box">
 <div class="box-header">
@@ -96,7 +93,6 @@
 📊 User Analytics
 </h3>
 </div>
-
 <div class="box-content">
 <div class="analytics-grid">
 <div class="analytics-card">
@@ -108,7 +104,6 @@ id="connection-count">
 -
 </div>
 </div>
-
 <div class="analytics-card">
 <div class="analytics-title">
 Last Connection
@@ -121,7 +116,6 @@ id="last-connection">
 </div>
 </div>
 </div>
-
 <!-- ======================= User Logs ======================== -->
 <div class="dashboard-box user-logs-card">
     <div class="box-header logs-header">
@@ -133,7 +127,6 @@ id="last-connection">
             <small>User connection logs</small>
         </div>
     </div>
-
     <!-- Live Connections Box -->
     <div class="live-box">
         <div class="live-title">
@@ -149,7 +142,6 @@ id="last-connection">
             </div>
         </div>
     </div>
-
     <div class="logs-toolbar">
         <div class="filter-box">
             <div>
@@ -239,7 +231,53 @@ id="last-connection">
         {% endfor %}
     </div>
 </div>
-<!-- ======================= Admin Activity ======================== --> 
+
+<!-- ======================= Security Center ======================== -->
+<div class="dashboard-box">
+    <div class="box-header">
+        <h3>
+            🔐 Security Center
+        </h3>
+    </div>
+    <div class="box-content">
+        <div class="security-grid">
+            <div class="security-card">
+                <div class="security-title">
+                    Risk Level
+                </div>
+                <div id="security-risk" class="security-value">
+                    -
+                </div>
+            </div>
+            <div class="security-card">
+                <div class="security-title">
+                    Known IP Count
+                </div>
+                <div id="security-ip-count" class="security-value">
+                    -
+                </div>
+            </div>
+            <div class="security-card">
+                <div class="security-title">
+                    Known IPs
+                </div>
+                <div id="security-ips" class="security-list">
+                    -
+                </div>
+            </div>
+            <div class="security-card">
+                <div class="security-title">
+                    Devices
+                </div>
+                <div id="security-devices" class="security-list">
+                    -
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ======================= Admin Activity ======================== -->
 <div class="dashboard-box">
     <div class="box-header">
         <h3>Admin Activity</h3>
@@ -287,7 +325,7 @@ id="last-connection">
             {% endfor %}
             </tbody>
         </table>
-    </div>    
+    </div>
     <!-- Pagination -->
     <div class="d-flex justify-content-between align-items-center mt-4 px-3 pb-3">
         <div class="text-muted small">
@@ -313,7 +351,7 @@ id="last-connection">
             </ul>
         </nav>
     </div>
-</div> 
+</div>
 
 <style>
 /* ... استایل‌های قبلی بدون تغییر ... */
@@ -330,34 +368,57 @@ id="last-connection">
 .btn-nav.active { background: #007bff; color: white; border-color: #007bff; }
 .pagination-pages { display: flex; gap: 5px; }
 .page-ellipsis { padding: 6px 8px; color: #999; }
+
+/* استایل‌های پیشنهادی برای Security Center */
+.security-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 20px;
+}
+.security-card {
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 20px;
+    text-align: center;
+}
+.security-title {
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 8px;
+}
+.security-value {
+    font-size: 28px;
+    font-weight: bold;
+    color: #333;
+}
+.security-list {
+    font-size: 15px;
+    line-height: 1.6;
+    text-align: left;
+    color: #444;
+}
 </style>
 
 <script>
 let currentPage = 1;
 let totalAuditLogs = {{ audit_total }};
-
 function getAuditPerPage(){
     return parseInt(
         document.getElementById("historyPerPage").value
     );
 }
-
 function loadAuditLogs(page = 1){
     const perPage = getAuditPerPage();
     const dateFrom = document.getElementById("historyFrom").value;
     const dateTo = document.getElementById("historyTo").value;
-
     currentPage = page;
-
     let url = `/users/{{ user.username }}?page=${page}&per_page=${perPage}`;
-
     if(dateFrom){
         url += `&date_from=${dateFrom}`;
     }
     if(dateTo){
         url += `&date_to=${dateTo}`;
     }
-
     fetch(url,{
         headers:{
             "X-Requested-With":"XMLHttpRequest",
@@ -371,10 +432,8 @@ function loadAuditLogs(page = 1){
     })
     .catch(err=>console.log(err));
 }
-
 function updateAuditLogsTable(data){
     const tbody = document.querySelector("#audit-logs-table tbody");
-
     if(!data.audit_logs || !data.audit_logs.length){
         tbody.innerHTML = `
         <tr>
@@ -384,7 +443,6 @@ function updateAuditLogsTable(data){
         </tr>`;
         return;
     }
-
     tbody.innerHTML = data.audit_logs.map(log=>`
     <tr>
     <td>${new Date(log.created_at).toLocaleString()}</td>
@@ -394,17 +452,13 @@ function updateAuditLogsTable(data){
     <td>${log.ip_address || "-"}</td>
     </tr>
     `).join("");
-
     totalAuditLogs = data.audit_total;
 }
-
 function updatePaginationControls(){
     const perPage = getAuditPerPage();
     const totalPages = Math.ceil(totalAuditLogs / perPage);
-
     const box = document.getElementById("pagination-pages");
     if(!box) return;
-
     let html = "";
     for(let i = 1; i <= totalPages; i++){
         html += `
@@ -414,10 +468,8 @@ function updatePaginationControls(){
     }
     box.innerHTML = html;
 }
-
 document.getElementById("historyFilter").addEventListener("click", () => loadAuditLogs(1));
 document.getElementById("historyPerPage").addEventListener("change", () => loadAuditLogs(1));
-
 function refreshProfile(){
     fetch("/api/users/{{ user.username }}/traffic")
     .then(r=>r.json())
@@ -431,7 +483,6 @@ function refreshProfile(){
         document.getElementById("total-value").innerText=data.total||"--";
     });
 }
-
 document.addEventListener('DOMContentLoaded', function() {
     refreshProfile();
     const paginationBox = document.getElementById("pagination-pages");
@@ -439,9 +490,7 @@ document.addEventListener('DOMContentLoaded', function() {
         updatePaginationControls();
     }
 });
-
 setInterval(refreshProfile, 3000);
-
 function filterLogs(){
     let from=document.getElementById("date_from").value;
     let to=document.getElementById("date_to").value;
@@ -449,15 +498,12 @@ function filterLogs(){
     window.location = "?page=1&per_page="+per+"&date_from="+from+"&date_to="+to;
 }
 document.getElementById("per_page").value="{{logs_per_page}}";
-
 // ======================= Live Sessions JS =======================
 async function loadLiveSessions(){
     let box = document.getElementById("live-sessions-container");
-
     try{
         let res = await fetch("/users/{{user.username}}/sessions");
         let data = await res.json();
-
         if(!data.length){
             box.innerHTML = `
             <div class="offline-card">
@@ -465,26 +511,21 @@ async function loadLiveSessions(){
             </div>`;
             return;
         }
-
         box.innerHTML = data.map(session => `
         <div class="live-session-card">
             <div class="session-header">
                 <span class="online-dot"></span>
                 Online
             </div>
-
             <div class="session-row">
                 🌐 <span>${session.ip || '-'}</span>
             </div>
-
             <div class="session-row">
                 📱 <span>${session.device || 'Unknown'}</span>
             </div>
-
             <div class="session-row">
                 🕒 <span>${session.connected || '-'}</span>
             </div>
-
             <div class="traffic-box">
                 🌍 ${session.country || '-'}
                 <br>
@@ -498,7 +539,6 @@ async function loadLiveSessions(){
                 <br>
                 📤 ${session.tx || '0'}
             </div>
-
             <button class="disconnect-btn" onclick="disconnectUser()">
             Disconnect
             </button>
@@ -509,15 +549,12 @@ async function loadLiveSessions(){
         box.innerHTML = "Failed loading sessions";
     }
 }
-
 async function disconnectUser(){
     if(!confirm("Disconnect user?")) return;
-
     await fetch("/users/{{user.username}}/disconnect", { method:"POST" });
     loadLiveSessions();
 }
-
 loadLiveSessions();
 setInterval(loadLiveSessions, 5000);
-</script> 
+</script>
 {% endblock %}
