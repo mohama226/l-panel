@@ -117,40 +117,26 @@ def profile(
             detail="User not found",
         )
 
-    # Get paginated user logs
     logs_data = service.logs(
-        username,
+        username=username,
         page=page,
         per_page=per_page,
         date_from=date_from,
         date_to=date_to,
     )
 
-    # Get paginated audit logs
-    audit_query = db.query(AuditLog).filter(
-        AuditLog.target_user == username
+
+    audit_data = service.audit_activity(
+        username=username,
+        page=page,
+        per_page=per_page,
+        date_from=date_from,
+        date_to=date_to,
     )
 
-    if date_from:
-        audit_query = audit_query.filter(
-            AuditLog.created_at >= date_from
-        )
 
-    if date_to:
-        audit_query = audit_query.filter(
-            AuditLog.created_at <= date_to
-        )
-
-    total_audit = audit_query.count()
-
-    audit_logs = (
-        audit_query.order_by(
-            AuditLog.created_at.desc()
-        )
-        .offset((page - 1) * per_page)
-        .limit(per_page)
-        .all()
-    )
+    audit_logs = audit_data["logs"]
+    total_audit = audit_data["total"]
 
     return render(
         request,
