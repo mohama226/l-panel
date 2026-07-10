@@ -626,101 +626,185 @@ Admin Activity
 let currentPage = 1;
 let totalAuditLogs = {{ audit_total }};
 
-function getTotalPages() {
-    const perPage = parseInt(document.getElementById("per-page-select").value);
-    return Math.ceil(totalAuditLogs / perPage);
+
+function getAuditPerPage(){
+
+    return parseInt(
+        document.getElementById("historyPerPage").value
+    );
+
 }
 
-function loadAuditLogs(page) {
-    const perPage = document.getElementById("per-page-select").value;
-    const dateFrom = document.getElementById("date-from").value;
-    const dateTo = document.getElementById("date-to").value;
-    
+
+function loadAuditLogs(page = 1){
+
+    const perPage = getAuditPerPage();
+
+    const dateFrom =
+        document.getElementById("historyFrom").value;
+
+    const dateTo =
+        document.getElementById("historyTo").value;
+
+
     currentPage = page;
-    
-    let url = `/users/{{ user.username }}?page=${page}&per_page=${perPage}`;
-    
-    if (dateFrom) {
+
+
+    let url =
+    `/users/{{ user.username }}?page=${page}&per_page=${perPage}`;
+
+
+    if(dateFrom){
         url += `&date_from=${dateFrom}`;
     }
-    if (dateTo) {
+
+
+    if(dateTo){
         url += `&date_to=${dateTo}`;
     }
-    
-    fetch(url, {
-        headers: {
-            'X-Requested-With': 'XMLHttpRequest',
-            'Accept': 'application/json'
+
+
+
+    fetch(url,{
+        headers:{
+            "X-Requested-With":"XMLHttpRequest",
+            "Accept":"application/json"
         }
     })
-    .then(response => response.json())
-    .then(data => {
+    .then(r=>r.json())
+    .then(data=>{
+
         updateAuditLogsTable(data);
-        updatePaginationControls(data);
+
+        updatePaginationControls();
+
     })
-    .catch(error => console.error('Error:', error));
+    .catch(err=>console.log(err));
+
 }
 
-function updateAuditLogsTable(data) {
-    const tbody = document.querySelector("#audit-logs-table tbody");
-    const perPage = parseInt(document.getElementById("per-page-select").value);
-    
-    if (data.audit_logs.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="5">No admin activity</td></tr>';
-    } else {
-        tbody.innerHTML = data.audit_logs.map(log => `
-            <tr>
-                <td>${new Date(log.created_at).toLocaleString()}</td>
-                <td>${log.admin_username}</td>
-                <td>${log.action}</td>
-                <td>${log.details}</td>
-                <td>${log.ip_address || '-'}</td>
-            </tr>
-        `).join('');
+
+
+function updateAuditLogsTable(data){
+
+    const tbody =
+    document.querySelector("#audit-logs-table tbody");
+
+
+    if(!data.audit_logs.length){
+
+        tbody.innerHTML =
+        `
+        <tr>
+        <td colspan="5">
+        No admin activity
+        </td>
+        </tr>
+        `;
+
+        return;
     }
-    
-    // Update pagination info
-    const start = (currentPage - 1) * perPage + 1;
-    const end = Math.min(currentPage * perPage, data.audit_total);
-    
-    document.getElementById("audit-start").textContent = start;
-    document.getElementById("audit-end").textContent = end;
-    document.getElementById("audit-total").textContent = data.audit_total;
-    
-    totalAuditLogs = data.audit_total;
+
+
+
+    tbody.innerHTML =
+    data.audit_logs.map(log=>`
+
+    <tr>
+
+    <td>${new Date(log.created_at).toLocaleString()}</td>
+
+    <td>${log.admin_username || "-"}</td>
+
+    <td>
+    <span class="badge bg-primary">
+    ${log.action}
+    </span>
+    </td>
+
+    <td>${log.details || "-"}</td>
+
+    <td>${log.ip_address || "-"}</td>
+
+    </tr>
+
+    `).join("");
+
+
+
+    totalAuditLogs=data.audit_total;
+
 }
 
-function updatePaginationControls(data) {
-    const totalPages = getTotalPages();
-    const pagesContainer = document.getElementById("pagination-pages");
-    
-    if (totalPages === 0) return;
-    
-    let pagesHTML = '';
-    
-    // Show page numbers (max 5 visible)
-    let startPage = Math.max(1, currentPage - 2);
-    let endPage = Math.min(totalPages, currentPage + 2);
-    
-    if (startPage > 1) {
-        pagesHTML += '<span class="page-ellipsis">...</span>';
+
+
+function updatePaginationControls(){
+
+    const perPage=getAuditPerPage();
+
+    const totalPages =
+    Math.ceil(totalAuditLogs/perPage);
+
+
+    const box =
+    document.getElementById("pagination-pages");
+
+
+    if(!box) return;
+
+
+    let html="";
+
+
+    for(
+        let i=1;
+        i<=totalPages;
+        i++
+    ){
+
+        html+=`
+
+        <button
+        class="btn-nav ${i===currentPage?'active':''}"
+        onclick="loadAuditLogs(${i})">
+
+        ${i}
+
+        </button>
+
+        `;
+
     }
-    
-    for (let i = startPage; i <= endPage; i++) {
-        const activeClass = i === currentPage ? 'active' : '';
-        pagesHTML += `<button class="btn-nav ${activeClass}" onclick="loadAuditLogs(${i})">${i}</button>`;
-    }
-    
-    if (endPage < totalPages) {
-        pagesHTML += '<span class="page-ellipsis">...</span>';
-    }
-    
-    pagesContainer.innerHTML = pagesHTML;
-    
-    // Disable first/last buttons if at boundaries
-    document.getElementById("btn-first").disabled = currentPage === 1;
-    document.getElementById("btn-last").disabled = currentPage === totalPages;
+
+
+    box.innerHTML=html;
+
 }
+
+
+
+
+document
+.getElementById("historyFilter")
+.addEventListener(
+"click",
+function(){
+
+    loadAuditLogs(1);
+
+});
+
+
+
+document
+.getElementById("historyPerPage")
+.addEventListener(
+"change",
+function(){
+
+    loadAuditLogs(1);
+
+});
 
 function refreshProfile(){
 
@@ -763,10 +847,7 @@ function refreshProfile(){
 // Initialize
 document.addEventListener('DOMContentLoaded', function() {
     refreshProfile();
-    updatePaginationControls({
-        audit_total: {{ audit_total }},
-        audit_logs: []
-    });
+    updatePaginationControls();
 });
 
 setInterval(refreshProfile, 3000);
