@@ -61,7 +61,7 @@ class UserService:
     ):
         """فعالیت‌های ادمین روی کاربر (از طریق AuditRepository)"""
         return self.audit_repo.list_paginated(
-            target_user=username,
+            username=username,
             page=page,
             per_page=per_page,
             search=search,
