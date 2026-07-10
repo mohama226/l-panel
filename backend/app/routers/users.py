@@ -129,7 +129,7 @@ def profile(
     )
 
 
-    audit_data = service.audit_activity(
+    audit_data = service.admin_activity(
         username=username,
         page=page,
         per_page=per_page,
