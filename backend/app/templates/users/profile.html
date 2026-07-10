@@ -6,7 +6,6 @@
         <p>User Profile</p>
     </div>
 </div>
-
 <!-- ======================= Hero ======================== -->
 <div class="profile-hero">
     <div class="hero-left">
@@ -33,7 +32,6 @@
         </button>
     </div>
 </div>
-
 <!-- ======================= Stats ======================== -->
 <div class="profile-stats">
     <div class="stat-card">
@@ -59,7 +57,6 @@
         </div>
     </div>
 </div>
-
 <!-- ======================= Connection ======================== -->
 <div class="dashboard-box">
     <div class="box-header">
@@ -74,7 +71,6 @@
         </table>
     </div>
 </div>
-
 <!-- ======================= Live Sessions ======================== -->
 <div class="dashboard-box">
     <div class="box-header">
@@ -89,7 +85,6 @@
         </div>
     </div>
 </div>
-
 <!-- ======================= Analytics ======================== -->
 <div class="dashboard-box">
     <div class="box-header">
@@ -108,7 +103,6 @@
         </div>
     </div>
 </div>
-
 <!-- ======================= User Logs ======================== -->
 <div class="dashboard-box user-logs-card">
     <div class="box-header logs-header">
@@ -120,7 +114,7 @@
             <small>User connection logs</small>
         </div>
     </div>
-    
+   
     <!-- Live Connections Box -->
     <div class="live-box">
         <div class="live-title">
@@ -134,7 +128,6 @@
             </div>
         </div>
     </div>
-
     <div class="logs-toolbar">
         <div class="filter-box">
             <div>
@@ -154,7 +147,6 @@
             <option value="100">100 rows</option>
         </select>
     </div>
-
     <div class="box-content table-responsive">
         <table class="logs-table">
             <thead>
@@ -187,7 +179,6 @@
             </tbody>
         </table>
     </div>
-
     <div class="logs-pagination">
         {% set pages = ((logs_total / logs_per_page) | round(0, 'ceil')) | int %}
         {% for i in range(1, pages + 1) %}
@@ -197,7 +188,6 @@
         {% endfor %}
     </div>
 </div>
-
 <!-- ======================= Security Center ======================== -->
 <div class="dashboard-box">
     <div class="box-header">
@@ -224,13 +214,12 @@
         </div>
     </div>
 </div>
-
 <!-- ======================= Admin Activity ======================== -->
 <div class="dashboard-box">
     <div class="box-header">
         <h3>Admin Activity</h3>
     </div>
-    
+   
     <!-- Toolbar -->
     <div class="card-header d-flex justify-content-between align-items-center flex-wrap gap-3" style="background: transparent; border: none; padding: 15px 20px 10px 20px;">
         <div class="d-flex align-items-center gap-2">
@@ -249,7 +238,6 @@
             <button class="btn btn-primary btn-sm" id="historyFilter">Filter</button>
         </div>
     </div>
-
     <div class="box-content">
         <table id="audit-logs-table">
             <thead>
@@ -276,7 +264,6 @@
             </tbody>
         </table>
     </div>
-
     <!-- Pagination -->
     <div class="d-flex justify-content-between align-items-center mt-4 px-3 pb-3">
         <div class="text-muted small">
@@ -303,7 +290,6 @@
         </nav>
     </div>
 </div>
-
 <style>
 /* ... استایل‌های قبلی بدون تغییر ... */
 .box-filter { display: flex; gap: 10px; margin-bottom: 20px; padding: 10px; background: #f5f5f5; border-radius: 4px; align-items: flex-end; }
@@ -312,7 +298,6 @@
 .filter-group input { padding: 6px 10px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; }
 .btn-filter { padding: 6px 16px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; }
 .btn-filter:hover { background: #0056b3; }
-
 /* بقیه استایل‌ها ... */
 .pagination-controls { display: flex; justify-content: center; gap: 5px; padding: 15px; border-top: 1px solid #eee; flex-wrap: wrap; }
 .btn-nav { padding: 6px 12px; border: 1px solid #ccc; background: #f9f9f9; border-radius: 4px; cursor: pointer; font-size: 14px; }
@@ -320,7 +305,6 @@
 .btn-nav.active { background: #007bff; color: white; border-color: #007bff; }
 .pagination-pages { display: flex; gap: 5px; }
 .page-ellipsis { padding: 6px 8px; color: #999; }
-
 /* استایل‌های پیشنهادی برای Security Center */
 .security-grid {
     display: grid;
@@ -350,15 +334,12 @@
     color: #444;
 }
 </style>
-
 <script>
 let currentPage = 1;
 let totalAuditLogs = {{ audit_total }};
-
 function getAuditPerPage(){
     return parseInt(document.getElementById("historyPerPage").value);
 }
-
 function loadAuditLogs(page = 1){
     const perPage = getAuditPerPage();
     const dateFrom = document.getElementById("historyFrom").value;
@@ -367,7 +348,6 @@ function loadAuditLogs(page = 1){
     let url = `/users/{{ user.username }}?page=${page}&per_page=${perPage}`;
     if(dateFrom) url += `&date_from=${dateFrom}`;
     if(dateTo) url += `&date_to=${dateTo}`;
-
     fetch(url,{
         headers:{
             "X-Requested-With":"XMLHttpRequest",
@@ -381,7 +361,6 @@ function loadAuditLogs(page = 1){
     })
     .catch(err=>console.log(err));
 }
-
 function updateAuditLogsTable(data){
     const tbody = document.querySelector("#audit-logs-table tbody");
     if(!data.audit_logs || !data.audit_logs.length){
@@ -399,7 +378,6 @@ function updateAuditLogsTable(data){
     `).join("");
     totalAuditLogs = data.audit_total;
 }
-
 function updatePaginationControls(){
     const perPage = getAuditPerPage();
     const totalPages = Math.ceil(totalAuditLogs / perPage);
@@ -411,10 +389,8 @@ function updatePaginationControls(){
     }
     box.innerHTML = html;
 }
-
 document.getElementById("historyFilter").addEventListener("click", () => loadAuditLogs(1));
 document.getElementById("historyPerPage").addEventListener("change", () => loadAuditLogs(1));
-
 function refreshProfile(){
     fetch("/api/users/{{ user.username }}/traffic")
     .then(r=>r.json())
@@ -428,7 +404,6 @@ function refreshProfile(){
         document.getElementById("total-value").innerText = data.total || "--";
     });
 }
-
 document.addEventListener('DOMContentLoaded', function() {
     refreshProfile();
     const paginationBox = document.getElementById("pagination-pages");
@@ -436,25 +411,20 @@ document.addEventListener('DOMContentLoaded', function() {
         updatePaginationControls();
     }
 });
-
 setInterval(refreshProfile, 3000);
-
 function filterLogs(){
     let from = document.getElementById("date_from").value;
     let to = document.getElementById("date_to").value;
     let per = document.getElementById("per_page").value;
     window.location = "?page=1&per_page="+per+"&date_from="+from+"&date_to="+to;
 }
-
 document.getElementById("per_page").value = "{{logs_per_page}}";
-
 // ======================= Live Sessions JS (جدید) =======================
 function loadSessions(){
     fetch("/users/{{user.username}}/sessions")
     .then(r=>r.json())
     .then(data=>{
         let box = document.getElementById("sessions-cards");
-
         if(!data.length){
             box.innerHTML = `
             <div class="session-card">
@@ -462,7 +432,6 @@ function loadSessions(){
             </div>`;
             return;
         }
-
         box.innerHTML = data.map(s=>{
             return `
             <div class="session-card">
@@ -470,22 +439,26 @@ function loadSessions(){
                     <strong>${s.Username || "{{user.username}}"}</strong>
                     <span class="session-online"></span>
                 </div>
-
                 <div class="session-row">
                     <span>IP</span>
                     <b>${s["Remote IP"] || s.IP || "-"}</b>
                 </div>
-
                 <div class="session-row">
                     <span>Device</span>
                     <b>${s.Device || s["User Agent"] || "-"}</b>
                 </div>
-
                 <div class="session-row">
                     <span>Connected</span>
                     <b>${s.Connected || "-"}</b>
                 </div>
-
+                <div class="session-row">
+                    <span>Country</span>
+                    <b>${s.country || "-"}</b>
+                </div>
+                <div class="session-row">
+                    <span>Ping</span>
+                    <b>${s.ping || "-"}</b>
+                </div>
                 <button class="disconnect-btn" onclick="disconnectUser()">
                     Disconnect
                 </button>
@@ -496,7 +469,6 @@ function loadSessions(){
         document.getElementById("sessions-cards").innerHTML = "Failed loading sessions";
     });
 }
-
 function disconnectUser(){
     if(!confirm("Disconnect user?")) return;
     fetch("/users/{{user.username}}/disconnect", { method: "POST" })
@@ -504,7 +476,6 @@ function disconnectUser(){
         loadSessions();
     });
 }
-
 loadSessions();
 setInterval(loadSessions, 5000);
 </script>
