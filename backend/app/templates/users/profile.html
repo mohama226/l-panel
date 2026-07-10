@@ -223,52 +223,46 @@ History
 
     </div>
 
-    <!-- Toolbar -->
-    <div class="card-header d-flex justify-content-between align-items-center flex-wrap gap-3" style="background: transparent; border: none; padding: 15px 20px 10px 20px;">
+    <!-- Toolbar بالای جدول History -->
+    <div class="card-header d-flex justify-content-between align-items-center flex-wrap gap-2">
 
-        <div class="d-flex align-items-center gap-2">
+        <div class="d-flex gap-2">
 
-            <label class="text-muted small mb-0">
-                Show
-            </label>
+            <input
+                type="date"
+                id="date_from"
+                class="form-control form-control-sm"
+                value="{{ request.query_params.get('date_from','') }}"
+            >
+
+            <input
+                type="date"
+                id="date_to"
+                class="form-control form-control-sm"
+                value="{{ request.query_params.get('date_to','') }}"
+            >
+
+            <button
+                class="btn btn-primary btn-sm"
+                onclick="filterLogs()"
+            >
+                Filter
+            </button>
+
+        </div>
+
+        <div>
 
             <select
-                id="historyPerPage"
+                id="per_page"
                 class="form-select form-select-sm"
-                style="width:90px">
-
+                onchange="filterLogs()"
+            >
                 <option value="10">10</option>
                 <option value="25">25</option>
                 <option value="50">50</option>
                 <option value="100">100</option>
-
             </select>
-
-            <label class="text-muted small mb-0">
-                entries
-            </label>
-
-        </div>
-
-        <div class="d-flex align-items-center gap-2">
-
-            <input
-                id="historyFrom"
-                type="date"
-                class="form-control form-control-sm">
-
-            <input
-                id="historyTo"
-                type="date"
-                class="form-control form-control-sm">
-
-            <button
-                class="btn btn-primary btn-sm"
-                id="historyFilter">
-
-                Filter
-
-            </button>
 
         </div>
 
@@ -312,75 +306,29 @@ History
 
     </div>
 
-    <!-- Pagination -->
-    <div class="d-flex justify-content-between align-items-center mt-4 px-3 pb-3">
+    <!-- Pagination پایین جدول History -->
+    <nav class="mt-3">
 
-        <div class="text-muted small">
+    <ul class="pagination pagination-sm justify-content-end">
 
-            Showing
-            {{ logs|length }}
-            of
-            {{ logs_total }}
+    {% set pages=((logs_total/logs_per_page)|round(0,'ceil'))|int %}
 
-        </div>
+    {% for i in range(1,pages+1) %}
 
-        <nav>
+    <li class="page-item {% if i==logs_page %}active{% endif %}">
 
-            <ul class="pagination pagination-sm mb-0">
+    <a class="page-link"
+    href="?page={{i}}&per_page={{logs_per_page}}">
+    {{i}}
+    </a>
 
-                {% if logs_page > 1 %}
+    </li>
 
-                <li class="page-item">
+    {% endfor %}
 
-                    <a
-                        class="page-link"
-                        href="?page={{ logs_page-1 }}">
+    </ul>
 
-                        Previous
-
-                    </a>
-
-                </li>
-
-                {% endif %}
-
-                {% for p in range(1, ((logs_total-1)//logs_per_page)+2) %}
-
-                <li class="page-item {% if p==logs_page %}active{% endif %}">
-
-                    <a
-                        class="page-link"
-                        href="?page={{p}}">
-
-                        {{p}}
-
-                    </a>
-
-                </li>
-
-                {% endfor %}
-
-                {% if logs_page < ((logs_total-1)//logs_per_page)+1 %}
-
-                <li class="page-item">
-
-                    <a
-                        class="page-link"
-                        href="?page={{ logs_page+1 }}">
-
-                        Next
-
-                    </a>
-
-                </li>
-
-                {% endif %}
-
-            </ul>
-
-        </nav>
-
-    </div>
+    </nav>
 
 </div>
 
@@ -822,6 +770,24 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 setInterval(refreshProfile, 3000);
+
+function filterLogs(){
+
+    let from=document.getElementById("date_from").value;
+
+    let to=document.getElementById("date_to").value;
+
+    let per=document.getElementById("per_page").value;
+
+    window.location=
+        "?page=1"+
+        "&per_page="+per+
+        "&date_from="+from+
+        "&date_to="+to;
+
+}
+
+document.getElementById("per_page").value="{{logs_per_page}}";
 
 </script>
 
