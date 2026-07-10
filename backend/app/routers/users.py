@@ -200,14 +200,6 @@ def change_password(
         username,
         data.password,
     )
-    audit(
-        db=db,
-        request=request,
-        admin_username=admin["username"],
-        action="PASSWORD_CHANGE",
-        target_user=username,
-        details="Password changed",
-    )
 
     return {
         "detail": "Password changed"
@@ -232,15 +224,6 @@ def extend_user(
         data.expire,
     )
 
-    audit(
-        db=db,
-        request=request,
-        admin_username=admin["username"],
-        action="EXTEND_USER",
-        target_user=username,
-        details=f"Expire -> {data.expire}",
-    )
-
     return {
         "detail": "Account extended"
     }
@@ -259,14 +242,6 @@ def reset_traffic(
         request,
         admin
     ).reset_traffic(username)
-    audit(
-        db=db,
-        request=request,
-        admin_username=admin["username"],
-        action="RESET_TRAFFIC",
-        target_user=username,
-        details="Traffic reset",
-    )
 
     return {
         "detail": "Traffic reset"
@@ -286,14 +261,6 @@ def disconnect_user(
         request,
         admin
     ).disconnect(username)
-    audit(
-        db=db,
-        request=request,
-        admin_username=admin["username"],
-        action="DISCONNECT",
-        target_user=username,
-        details="Disconnected by admin",
-    )
 
     return {
         "detail": "User disconnected"
@@ -313,14 +280,6 @@ def enable_user(
         request,
         admin
     ).enable(username)
-    audit(
-        db=db,
-        request=request,
-        admin_username=admin["username"],
-        action="ENABLE",
-        target_user=username,
-        details="User enabled",
-    )
 
     return {
         "detail": "User enabled"
@@ -340,14 +299,6 @@ def disable_user(
         request,
         admin
     ).disable(username)
-    audit(
-        db=db,
-        request=request,
-        admin_username=admin["username"],
-        action="DISABLE",
-        target_user=username,
-        details="User disabled",
-    )
 
     return {
         "detail": "User disabled"
@@ -367,14 +318,6 @@ def block_user(
         request,
         admin
     ).block(username)
-    audit(
-        db=db,
-        request=request,
-        admin_username=admin["username"],
-        action="BLOCK",
-        target_user=username,
-        details="User blocked",
-    )
 
     return {
         "detail": "User blocked"
@@ -394,14 +337,6 @@ def unblock_user(
         request,
         admin
     ).unblock(username)
-    audit(
-        db=db,
-        request=request,
-        admin_username=admin["username"],
-        action="UNBLOCK",
-        target_user=username,
-        details="User unblocked",
-    )
 
     return {
         "detail": "User unblocked"
@@ -421,14 +356,6 @@ def suspend_user(
         request,
         admin
     ).suspend(username)
-    audit(
-        db=db,
-        request=request,
-        admin_username=admin["username"],
-        action="SUSPEND",
-        target_user=username,
-        details="User suspended",
-    )
 
     return {
         "detail": "User suspended"
@@ -448,14 +375,6 @@ def unsuspend_user(
         request,
         admin
     ).unsuspend(username)
-    audit(
-        db=db,
-        request=request,
-        admin_username=admin["username"],
-        action="UNSUSPEND",
-        target_user=username,
-        details="User unsuspended",
-    )
 
     return {
         "detail": "User unsuspended"
@@ -475,14 +394,6 @@ def delete_user(
         request,
         admin
     ).delete(username)
-    audit(
-        db=db,
-        request=request,
-        admin_username=admin["username"],
-        action="DELETE_USER",
-        target_user=username,
-        details="User deleted",
-    )
 
     return {
         "detail": "User deleted"
