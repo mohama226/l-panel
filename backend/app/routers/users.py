@@ -545,3 +545,26 @@ def user_traffic_api(
         )
 
     return service.traffic(username)
+
+
+@router.get("/api/users/{username}/live")
+def live_sessions(
+    username: str,
+    admin=Depends(require_login),
+    db: Session = Depends(get_db),
+):
+
+    service = get_service(
+        db,
+        None,
+        admin
+    )
+
+
+    sessions = service.sessions(username)
+
+
+    return {
+        "username": username,
+        "sessions": sessions
+    }
