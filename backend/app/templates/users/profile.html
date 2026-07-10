@@ -6,6 +6,7 @@
         <p>User Profile</p>
     </div>
 </div>
+
 <!-- ======================= Hero ======================== -->
 <div class="profile-hero">
     <div class="hero-left">
@@ -32,6 +33,7 @@
         </button>
     </div>
 </div>
+
 <!-- ======================= Stats ======================== -->
 <div class="profile-stats">
     <div class="stat-card">
@@ -57,6 +59,7 @@
         </div>
     </div>
 </div>
+
 <!-- ======================= Connection ======================== -->
 <div class="dashboard-box">
     <div class="box-header">
@@ -71,60 +74,41 @@
         </table>
     </div>
 </div>
+
 <!-- ======================= Live Sessions ======================== -->
-
 <div class="dashboard-box">
-
-<div class="box-header">
-<h3>
-Live Sessions
-<span class="live-badge">
-LIVE
-</span>
-</h3>
+    <div class="box-header">
+        <h3>
+            Live Sessions
+            <span class="live-badge">LIVE</span>
+        </h3>
+    </div>
+    <div id="sessions-cards" class="sessions-grid">
+        <div class="loading-card">
+            Loading sessions...
+        </div>
+    </div>
 </div>
 
-
-<div id="sessions-cards" class="sessions-grid">
-
-<div class="loading-card">
-Loading sessions...
-</div>
-
-</div>
-
-
-</div>
 <!-- ======================= Analytics ======================== -->
 <div class="dashboard-box">
-<div class="box-header">
-<h3>
-📊 User Analytics
-</h3>
+    <div class="box-header">
+        <h3>📊 User Analytics</h3>
+    </div>
+    <div class="box-content">
+        <div class="analytics-grid">
+            <div class="analytics-card">
+                <div class="analytics-title">Total Connections</div>
+                <div class="analytics-value" id="connection-count">-</div>
+            </div>
+            <div class="analytics-card">
+                <div class="analytics-title">Last Connection</div>
+                <div class="analytics-value" id="last-connection">-</div>
+            </div>
+        </div>
+    </div>
 </div>
-<div class="box-content">
-<div class="analytics-grid">
-<div class="analytics-card">
-<div class="analytics-title">
-Total Connections
-</div>
-<div class="analytics-value"
-id="connection-count">
--
-</div>
-</div>
-<div class="analytics-card">
-<div class="analytics-title">
-Last Connection
-</div>
-<div class="analytics-value"
-id="last-connection">
--
-</div>
-</div>
-</div>
-</div>
-</div>
+
 <!-- ======================= User Logs ======================== -->
 <div class="dashboard-box user-logs-card">
     <div class="box-header logs-header">
@@ -136,55 +120,41 @@ id="last-connection">
             <small>User connection logs</small>
         </div>
     </div>
+    
     <!-- Live Connections Box -->
     <div class="live-box">
-        <div class="live-title">
-            <span class="live-dot"></span>
-            Live Connections
-            <span id="live-count">
-                0
-            </span>
-        </div>
-        <div id="live-sessions">
-            <div class="live-empty">
-                Loading live sessions...
-            </div>
-        </div>
+        <div class="live-title">
+            <span class="live-dot"></span>
+            Live Connections
+            <span id="live-count">0</span>
+        </div>
+        <div id="live-sessions">
+            <div class="live-empty">
+                Loading live sessions...
+            </div>
+        </div>
     </div>
+
     <div class="logs-toolbar">
         <div class="filter-box">
             <div>
                 <label>From</label>
-                <input
-                    type="date"
-                    id="date_from"
-                    value="{{ request.query_params.get('date_from','') }}"
-                >
+                <input type="date" id="date_from" value="{{ request.query_params.get('date_from','') }}">
             </div>
             <div>
                 <label>To</label>
-                <input
-                    type="date"
-                    id="date_to"
-                    value="{{ request.query_params.get('date_to','') }}"
-                >
+                <input type="date" id="date_to" value="{{ request.query_params.get('date_to','') }}">
             </div>
-            <button
-                class="logs-filter-btn"
-                onclick="filterLogs()">
-                🔍 Filter
-            </button>
+            <button class="logs-filter-btn" onclick="filterLogs()">🔍 Filter</button>
         </div>
-        <select
-            id="per_page"
-            class="logs-select"
-            onchange="filterLogs()">
+        <select id="per_page" class="logs-select" onchange="filterLogs()">
             <option value="10">10 rows</option>
             <option value="25">25 rows</option>
             <option value="50">50 rows</option>
             <option value="100">100 rows</option>
         </select>
     </div>
+
     <div class="box-content table-responsive">
         <table class="logs-table">
             <thead>
@@ -200,95 +170,67 @@ id="last-connection">
             <tr>
                 <td>
                     {% if log.action in ["LOGIN","CONNECT"] %}
-                    <span class="log-status success">
-                        ● Connected
-                    </span>
+                    <span class="log-status success">● Connected</span>
                     {% else %}
-                    <span class="log-status danger">
-                        ● {{ log.action }}
-                    </span>
+                    <span class="log-status danger">● {{ log.action }}</span>
                     {% endif %}
                 </td>
-                <td>
-                    {{ log.action }}
-                </td>
-                <td>
-                    {{ log.details }}
-                </td>
-                <td class="log-date">
-                    {{ log.created_at }}
-                </td>
+                <td>{{ log.action }}</td>
+                <td>{{ log.details }}</td>
+                <td class="log-date">{{ log.created_at }}</td>
             </tr>
             {% else %}
             <tr>
-                <td colspan="4" class="empty-log">
-                    No connection history found
-                </td>
+                <td colspan="4" class="empty-log">No connection history found</td>
             </tr>
             {% endfor %}
             </tbody>
         </table>
     </div>
+
     <div class="logs-pagination">
-        {% set pages=((logs_total/logs_per_page)|round(0,'ceil'))|int %}
-        {% for i in range(1,pages+1) %}
-        <a
-        class="{% if i==logs_page %}active{% endif %}"
-        href="?page={{i}}&per_page={{logs_per_page}}">
+        {% set pages = ((logs_total / logs_per_page) | round(0, 'ceil')) | int %}
+        {% for i in range(1, pages + 1) %}
+        <a class="{% if i == logs_page %}active{% endif %}" href="?page={{i}}&per_page={{logs_per_page}}">
             {{i}}
         </a>
         {% endfor %}
     </div>
 </div>
+
 <!-- ======================= Security Center ======================== -->
 <div class="dashboard-box">
     <div class="box-header">
-        <h3>
-            🔐 Security Center
-        </h3>
+        <h3>🔐 Security Center</h3>
     </div>
     <div class="box-content">
         <div class="security-grid">
             <div class="security-card">
-                <div class="security-title">
-                    Risk Level
-                </div>
-                <div id="security-risk" class="security-value">
-                    -
-                </div>
+                <div class="security-title">Risk Level</div>
+                <div id="security-risk" class="security-value">-</div>
             </div>
             <div class="security-card">
-                <div class="security-title">
-                    Known IP Count
-                </div>
-                <div id="security-ip-count" class="security-value">
-                    -
-                </div>
+                <div class="security-title">Known IP Count</div>
+                <div id="security-ip-count" class="security-value">-</div>
             </div>
             <div class="security-card">
-                <div class="security-title">
-                    Known IPs
-                </div>
-                <div id="security-ips" class="security-list">
-                    -
-                </div>
+                <div class="security-title">Known IPs</div>
+                <div id="security-ips" class="security-list">-</div>
             </div>
             <div class="security-card">
-                <div class="security-title">
-                    Devices
-                </div>
-                <div id="security-devices" class="security-list">
-                    -
-                </div>
+                <div class="security-title">Devices</div>
+                <div id="security-devices" class="security-list">-</div>
             </div>
         </div>
     </div>
 </div>
+
 <!-- ======================= Admin Activity ======================== -->
 <div class="dashboard-box">
     <div class="box-header">
         <h3>Admin Activity</h3>
     </div>
+    
     <!-- Toolbar -->
     <div class="card-header d-flex justify-content-between align-items-center flex-wrap gap-3" style="background: transparent; border: none; padding: 15px 20px 10px 20px;">
         <div class="d-flex align-items-center gap-2">
@@ -307,6 +249,7 @@ id="last-connection">
             <button class="btn btn-primary btn-sm" id="historyFilter">Filter</button>
         </div>
     </div>
+
     <div class="box-content">
         <table id="audit-logs-table">
             <thead>
@@ -333,6 +276,7 @@ id="last-connection">
             </tbody>
         </table>
     </div>
+
     <!-- Pagination -->
     <div class="d-flex justify-content-between align-items-center mt-4 px-3 pb-3">
         <div class="text-muted small">
@@ -359,6 +303,7 @@ id="last-connection">
         </nav>
     </div>
 </div>
+
 <style>
 /* ... استایل‌های قبلی بدون تغییر ... */
 .box-filter { display: flex; gap: 10px; margin-bottom: 20px; padding: 10px; background: #f5f5f5; border-radius: 4px; align-items: flex-end; }
@@ -367,6 +312,7 @@ id="last-connection">
 .filter-group input { padding: 6px 10px; border: 1px solid #ccc; border-radius: 4px; font-size: 14px; }
 .btn-filter { padding: 6px 16px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 14px; }
 .btn-filter:hover { background: #0056b3; }
+
 /* بقیه استایل‌ها ... */
 .pagination-controls { display: flex; justify-content: center; gap: 5px; padding: 15px; border-top: 1px solid #eee; flex-wrap: wrap; }
 .btn-nav { padding: 6px 12px; border: 1px solid #ccc; background: #f9f9f9; border-radius: 4px; cursor: pointer; font-size: 14px; }
@@ -374,6 +320,7 @@ id="last-connection">
 .btn-nav.active { background: #007bff; color: white; border-color: #007bff; }
 .pagination-pages { display: flex; gap: 5px; }
 .page-ellipsis { padding: 6px 8px; color: #999; }
+
 /* استایل‌های پیشنهادی برای Security Center */
 .security-grid {
     display: grid;
@@ -403,26 +350,24 @@ id="last-connection">
     color: #444;
 }
 </style>
+
 <script>
 let currentPage = 1;
 let totalAuditLogs = {{ audit_total }};
+
 function getAuditPerPage(){
-    return parseInt(
-        document.getElementById("historyPerPage").value
-    );
+    return parseInt(document.getElementById("historyPerPage").value);
 }
+
 function loadAuditLogs(page = 1){
     const perPage = getAuditPerPage();
     const dateFrom = document.getElementById("historyFrom").value;
     const dateTo = document.getElementById("historyTo").value;
     currentPage = page;
     let url = `/users/{{ user.username }}?page=${page}&per_page=${perPage}`;
-    if(dateFrom){
-        url += `&date_from=${dateFrom}`;
-    }
-    if(dateTo){
-        url += `&date_to=${dateTo}`;
-    }
+    if(dateFrom) url += `&date_from=${dateFrom}`;
+    if(dateTo) url += `&date_to=${dateTo}`;
+
     fetch(url,{
         headers:{
             "X-Requested-With":"XMLHttpRequest",
@@ -436,28 +381,25 @@ function loadAuditLogs(page = 1){
     })
     .catch(err=>console.log(err));
 }
+
 function updateAuditLogsTable(data){
     const tbody = document.querySelector("#audit-logs-table tbody");
     if(!data.audit_logs || !data.audit_logs.length){
-        tbody.innerHTML = `
-        <tr>
-        <td colspan="5">
-        No admin activity
-        </td>
-        </tr>`;
+        tbody.innerHTML = `<tr><td colspan="5">No admin activity</td></tr>`;
         return;
     }
     tbody.innerHTML = data.audit_logs.map(log=>`
     <tr>
-    <td>${new Date(log.created_at).toLocaleString()}</td>
-    <td>${log.admin_username || "-"}</td>
-    <td><span class="badge bg-primary">${log.action}</span></td>
-    <td>${log.details || "-"}</td>
-    <td>${log.ip_address || "-"}</td>
+        <td>${new Date(log.created_at).toLocaleString()}</td>
+        <td>${log.admin_username || "-"}</td>
+        <td><span class="badge bg-primary">${log.action}</span></td>
+        <td>${log.details || "-"}</td>
+        <td>${log.ip_address || "-"}</td>
     </tr>
     `).join("");
     totalAuditLogs = data.audit_total;
 }
+
 function updatePaginationControls(){
     const perPage = getAuditPerPage();
     const totalPages = Math.ceil(totalAuditLogs / perPage);
@@ -465,28 +407,28 @@ function updatePaginationControls(){
     if(!box) return;
     let html = "";
     for(let i = 1; i <= totalPages; i++){
-        html += `
-        <button class="btn-nav ${i===currentPage ? 'active' : ''}" onclick="loadAuditLogs(${i})">
-        ${i}
-        </button>`;
+        html += `<button class="btn-nav ${i===currentPage ? 'active' : ''}" onclick="loadAuditLogs(${i})">${i}</button>`;
     }
     box.innerHTML = html;
 }
+
 document.getElementById("historyFilter").addEventListener("click", () => loadAuditLogs(1));
 document.getElementById("historyPerPage").addEventListener("change", () => loadAuditLogs(1));
+
 function refreshProfile(){
     fetch("/api/users/{{ user.username }}/traffic")
     .then(r=>r.json())
     .then(data=>{
-        document.getElementById("status-cell").innerText=data.status||"-";
-        document.getElementById("ip-cell").innerText=data.ip||"-";
-        document.getElementById("device-cell").innerText=data.device||"-";
-        document.getElementById("connected-cell").innerText=data.connected||"-";
-        document.getElementById("download-value").innerText=data.rx||"--";
-        document.getElementById("upload-value").innerText=data.tx||"--";
-        document.getElementById("total-value").innerText=data.total||"--";
+        document.getElementById("status-cell").innerText = data.status || "-";
+        document.getElementById("ip-cell").innerText = data.ip || "-";
+        document.getElementById("device-cell").innerText = data.device || "-";
+        document.getElementById("connected-cell").innerText = data.connected || "-";
+        document.getElementById("download-value").innerText = data.rx || "--";
+        document.getElementById("upload-value").innerText = data.tx || "--";
+        document.getElementById("total-value").innerText = data.total || "--";
     });
 }
+
 document.addEventListener('DOMContentLoaded', function() {
     refreshProfile();
     const paginationBox = document.getElementById("pagination-pages");
@@ -494,71 +436,76 @@ document.addEventListener('DOMContentLoaded', function() {
         updatePaginationControls();
     }
 });
+
 setInterval(refreshProfile, 3000);
+
 function filterLogs(){
-    let from=document.getElementById("date_from").value;
-    let to=document.getElementById("date_to").value;
-    let per=document.getElementById("per_page").value;
+    let from = document.getElementById("date_from").value;
+    let to = document.getElementById("date_to").value;
+    let per = document.getElementById("per_page").value;
     window.location = "?page=1&per_page="+per+"&date_from="+from+"&date_to="+to;
 }
-document.getElementById("per_page").value="{{logs_per_page}}";
-// ======================= Live Sessions JS =======================
-async function loadLiveSessions(){
-    let box = document.getElementById("sessions-cards");
-    try{
-        let res = await fetch("/users/{{user.username}}/sessions");
-        let data = await res.json();
+
+document.getElementById("per_page").value = "{{logs_per_page}}";
+
+// ======================= Live Sessions JS (جدید) =======================
+function loadSessions(){
+    fetch("/users/{{user.username}}/sessions")
+    .then(r=>r.json())
+    .then(data=>{
+        let box = document.getElementById("sessions-cards");
+
         if(!data.length){
             box.innerHTML = `
-            <div class="offline-card">
-            🔴 User Offline
+            <div class="session-card">
+                Offline
             </div>`;
             return;
         }
-        box.innerHTML = data.map(session => `
-        <div class="live-session-card">
-            <div class="session-header">
-                <span class="online-dot"></span>
-                Online
-            </div>
-            <div class="session-row">
-                🌐 <span>${session.ip || '-'}</span>
-            </div>
-            <div class="session-row">
-                📱 <span>${session.device || 'Unknown'}</span>
-            </div>
-            <div class="session-row">
-                🕒 <span>${session.connected || '-'}</span>
-            </div>
-            <div class="traffic-box">
-                🌍 ${session.country || '-'}
-                <br>
-                🏙 ${session.city || '-'}
-                <br>
-                🏢 ${session.isp || '-'}
-                <br>
-                📡 Ping: ${session.ping || '-'}
-                <hr>
-                📥 ${session.rx || '0'}
-                <br>
-                📤 ${session.tx || '0'}
-            </div>
-            <button class="disconnect-btn" onclick="disconnectUser()">
-            Disconnect
-            </button>
-        </div>
-        `).join("");
-    }
-    catch(e){
-        box.innerHTML = "Failed loading sessions";
-    }
+
+        box.innerHTML = data.map(s=>{
+            return `
+            <div class="session-card">
+                <div class="session-header">
+                    <strong>${s.Username || "{{user.username}}"}</strong>
+                    <span class="session-online"></span>
+                </div>
+
+                <div class="session-row">
+                    <span>IP</span>
+                    <b>${s["Remote IP"] || s.IP || "-"}</b>
+                </div>
+
+                <div class="session-row">
+                    <span>Device</span>
+                    <b>${s.Device || s["User Agent"] || "-"}</b>
+                </div>
+
+                <div class="session-row">
+                    <span>Connected</span>
+                    <b>${s.Connected || "-"}</b>
+                </div>
+
+                <button class="disconnect-btn" onclick="disconnectUser()">
+                    Disconnect
+                </button>
+            </div>`;
+        }).join("");
+    })
+    .catch(() => {
+        document.getElementById("sessions-cards").innerHTML = "Failed loading sessions";
+    });
 }
-async function disconnectUser(){
+
+function disconnectUser(){
     if(!confirm("Disconnect user?")) return;
-    await fetch("/users/{{user.username}}/disconnect", { method:"POST" });
-    loadLiveSessions();
+    fetch("/users/{{user.username}}/disconnect", { method: "POST" })
+    .then(() => {
+        loadSessions();
+    });
 }
-loadLiveSessions();
-setInterval(loadLiveSessions, 5000);
+
+loadSessions();
+setInterval(loadSessions, 5000);
 </script>
 {% endblock %}
