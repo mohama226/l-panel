@@ -1,13 +1,13 @@
-from fastapi import APIRouter, Request, Form, Cookie
+from fastapi import APIRouter, Request, Form, Cookie, Query
 from fastapi.responses import RedirectResponse
 from fastapi.templating import Jinja2Templates
+from fastapi import Depends
 
-from app.db.database import SessionLocal
-from app.db.models import Admin, Role
-
-from app.repositories.admin_repository import AdminRepository
-from app.services.admin_service import AdminService
+from app.db.database import SessionLocal, get_db
+from app.db.models import Admin, Role, AuditLog
 from app.core.security import hash_password
+# اگر require_login دارید، import کنید (در غیر این صورت تعریف کنید)
+from app.core.auth import require_login  # اگر وجود ندارد، کامنت کنید یا تعریف کنید
 
 router = APIRouter()
 
@@ -247,3 +247,52 @@ async def edit_admin(
     finally:
 
         db.close()
+
+
+# ==================== روت activity (جدید/اصلاح‌شده) ====================
+
+@router.get("/admin/activity")
+def activity(
+    request: Request,
+    admin=Depends(require_login),
+    db: Session = Depends(get_db),
+
+    page: int = Query(1, ge=1),
+    per_page: int = Query(10, ge=1, le=100),
+
+    date_from: str | None = Query(None),
+    date_to: str | None = Query(None),
+):
+
+    query = db.query(AuditLog)
+
+    if date_from:
+        query = query.filter(
+            AuditLog.created_at >= date_from
+        )
+
+    if date_to:
+        query = query.filter(
+            AuditLog.created_at <= date_to
+        )
+
+    total = query.count()
+
+    logs = (
+        query
+        .order_by(AuditLog.created_at.desc())
+        .offset((page-1)*per_page)
+        .limit(per_page)
+        .all()
+    )
+
+    return templates.TemplateResponse(
+        "admin/activity.html",
+        {
+            "request": request,
+            "logs": logs,
+            "page": page,
+            "per_page": per_page,
+            "total": total,
+        }
+    )
