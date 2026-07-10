@@ -3,6 +3,7 @@ from fastapi import APIRouter
 from fastapi import Depends
 from fastapi import HTTPException
 from fastapi import Request
+from fastapi import Query
 
 from sqlalchemy.orm import Session
 
@@ -20,6 +21,8 @@ from app.schemas.user import (
     UserPassword,
     UserExpire,
 )
+
+from app.db.models import AuditLog
 
 router = APIRouter()
 
@@ -94,6 +97,10 @@ def profile(
     request: Request,
     admin=Depends(require_login),
     db: Session = Depends(get_db),
+    page: int = Query(1, ge=1),
+    per_page: int = Query(10, ge=1, le=100),
+    date_from: str | None = Query(None),
+    date_to: str | None = Query(None),
 ):
 
     service = get_service(
@@ -110,13 +117,38 @@ def profile(
             detail="User not found",
         )
 
-    from app.db.models import AuditLog
+    # Get paginated user logs
+    logs_data = service.logs(
+        username,
+        page=page,
+        per_page=per_page,
+        date_from=date_from,
+        date_to=date_to,
+    )
+
+    # Get paginated audit logs
+    audit_query = db.query(AuditLog).filter(
+        AuditLog.target_user == username
+    )
+
+    if date_from:
+        audit_query = audit_query.filter(
+            AuditLog.created_at >= date_from
+        )
+
+    if date_to:
+        audit_query = audit_query.filter(
+            AuditLog.created_at <= date_to
+        )
+
+    total_audit = audit_query.count()
 
     audit_logs = (
-        db.query(AuditLog)
-        .filter(AuditLog.target_user == username)
-        .order_by(AuditLog.created_at.desc())
-        .limit(50)
+        audit_query.order_by(
+            AuditLog.created_at.desc()
+        )
+        .offset((page - 1) * per_page)
+        .limit(per_page)
         .all()
     )
 
@@ -125,8 +157,14 @@ def profile(
         "users/profile.html",
         {
             "user": user,
-            "logs": service.logs(username),
+            "logs": logs_data["logs"],
+            "logs_page": logs_data["page"],
+            "logs_per_page": logs_data["per_page"],
+            "logs_total": logs_data["total"],
             "audit_logs": audit_logs,
+            "audit_page": page,
+            "audit_per_page": per_page,
+            "audit_total": total_audit,
         },
     )
 @router.get("/users/{username}/traffic")
