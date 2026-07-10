@@ -6,7 +6,7 @@ from app.services.ping_service import PingService
 
 class OcservService:
     PASSWD_FILE = "/etc/ocserv/ocpasswd"
-    
+   
     # =====================================================
     # Users
     # =====================================================
@@ -28,7 +28,7 @@ class OcservService:
         p.communicate(password + "\n" + password + "\n")
         if p.returncode != 0:
             raise Exception("Failed to create user")
-
+    
     @classmethod
     def delete_user(cls, username: str):
         result = subprocess.run(
@@ -44,7 +44,7 @@ class OcservService:
         )
         if result.returncode != 0:
             raise Exception(result.stderr.strip())
-
+    
     @classmethod
     def change_password(cls, username: str, password: str):
         cmd = [
@@ -63,7 +63,7 @@ class OcservService:
         p.communicate(password + "\n" + password + "\n")
         if p.returncode != 0:
             raise Exception("Failed to change password")
-
+    
     @classmethod
     def user_exists(cls, username: str):
         try:
@@ -74,7 +74,7 @@ class OcservService:
         except Exception:
             return False
         return False
-
+    
     # =====================================================
     # Server
     # =====================================================
@@ -90,7 +90,7 @@ class OcservService:
             text=True,
         )
         return result.stdout.strip() == "active"
-
+    
     @classmethod
     def restart(cls):
         subprocess.run(
@@ -100,7 +100,7 @@ class OcservService:
                 "ocserv",
             ]
         )
-
+    
     @classmethod
     def reload(cls):
         subprocess.run(
@@ -109,14 +109,14 @@ class OcservService:
                 "reload",
             ]
         )
-
+    
     # =====================================================
     # Cache
     # =====================================================
     @classmethod
     def online_users(cls) -> List[Dict]:
         return OcservCache.users()
-
+    
     @classmethod
     def sessions(cls, username: str) -> List[Dict]:
         user = OcservCache.user(username)
@@ -125,7 +125,7 @@ class OcservService:
                 NetworkService.enrich(user)
             ]
         return []
-
+    
     @classmethod
     def disconnect_user(cls, username: str):
         result = subprocess.run(
@@ -141,7 +141,7 @@ class OcservService:
         if result.returncode != 0:
             raise Exception(result.stderr.strip())
         return True
-
+    
     @classmethod
     def traffic(cls, username: str):
         s = OcservCache.user(username)
@@ -154,6 +154,8 @@ class OcservService:
                 "rx": "0 B",
                 "tx": "0 B",
                 "total": "0 B",
+                "download_speed": "0 B",
+                "upload_speed": "0 B",
             }
         rx = (
             s.get("RX")
@@ -175,8 +177,10 @@ class OcservService:
             "rx": rx,
             "tx": tx,
             "total": f"{rx} / {tx}",
+            "download_speed": rx,
+            "upload_speed": tx,
         }
-
+    
     @classmethod
     def online_count(cls):
         return OcservCache.online_count()
