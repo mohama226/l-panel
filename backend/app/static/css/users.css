@@ -550,3 +550,241 @@ table{
     font-weight:700;
 
 }
+
+
+/* ===========================
+   User Connection Logs
+=========================== */
+
+
+.user-logs-card{
+    margin-top:25px;
+}
+
+
+.logs-header{
+
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+
+}
+
+
+.logs-header h3{
+
+    margin:0;
+    font-size:18px;
+
+}
+
+
+.logs-header small{
+
+    color:#888;
+    font-size:12px;
+
+}
+
+
+
+.logs-toolbar{
+
+    display:flex;
+    justify-content:space-between;
+    align-items:end;
+    padding:15px 20px;
+    gap:15px;
+    flex-wrap:wrap;
+
+}
+
+
+
+.filter-box{
+
+    display:flex;
+    gap:12px;
+    align-items:end;
+
+}
+
+
+
+.filter-box label{
+
+    display:block;
+    font-size:12px;
+    color:#777;
+    margin-bottom:5px;
+
+}
+
+
+
+.filter-box input,
+.logs-select{
+
+    height:36px;
+    border-radius:8px;
+    border:1px solid #ddd;
+    padding:0 12px;
+    background:white;
+
+}
+
+
+
+.logs-filter-btn{
+
+    height:36px;
+    border:none;
+    border-radius:8px;
+    padding:0 18px;
+    background:#2563eb;
+    color:white;
+    cursor:pointer;
+
+}
+
+
+
+.logs-filter-btn:hover{
+
+    background:#1d4ed8;
+
+}
+
+
+
+
+.logs-table{
+
+    width:100%;
+    border-collapse:collapse;
+
+}
+
+
+
+.logs-table th{
+
+    text-align:left;
+    padding:14px;
+    font-size:13px;
+    color:#666;
+    border-bottom:1px solid #eee;
+
+}
+
+
+
+.logs-table td{
+
+    padding:14px;
+    border-bottom:1px solid #f1f1f1;
+    font-size:14px;
+
+}
+
+
+
+.logs-table tr:hover{
+
+    background:#fafafa;
+
+}
+
+
+
+
+.log-status{
+
+    padding:5px 12px;
+    border-radius:20px;
+    font-size:12px;
+    font-weight:600;
+
+}
+
+
+
+.log-status.success{
+
+    background:#dcfce7;
+    color:#15803d;
+
+}
+
+
+
+.log-status.danger{
+
+    background:#fee2e2;
+    color:#b91c1c;
+
+}
+
+
+
+.log-date{
+
+    color:#555;
+    font-size:13px;
+
+}
+
+
+
+.empty-log{
+
+    text-align:center;
+    padding:35px!important;
+    color:#999;
+
+}
+
+
+
+.logs-pagination{
+
+    display:flex;
+    justify-content:center;
+    gap:6px;
+    padding:20px;
+
+}
+
+
+
+.logs-pagination a{
+
+    width:32px;
+    height:32px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    border-radius:8px;
+    text-decoration:none;
+    border:1px solid #ddd;
+    color:#555;
+
+}
+
+
+
+.logs-pagination a:hover{
+
+    background:#f3f4f6;
+
+}
+
+
+
+.logs-pagination a.active{
+
+    background:#2563eb;
+    color:white;
+    border-color:#2563eb;
+
+}
