@@ -11,14 +11,15 @@ do
     echo "               Version 0.0.2"
     echo "========================================="
     echo
-    echo " 1) Install"
-    echo " 2) Update"
-    echo " 3) Restart Service"
-    echo " 4) Stop Service"
-    echo " 5) Start Service"
-    echo " 6) Service Status"
-    echo " 7) View Logs"
-    echo " 8) Uninstall"
+    echo " 1) Install Panel"
+    echo " 2) Install ocserv"
+    echo " 3) Update"
+    echo " 4) Restart Service"
+    echo " 5) Stop Service"
+    echo " 6) Start Service"
+    echo " 7) Service Status"
+    echo " 8) View Logs"
+    echo " 9) Uninstall"
     echo
     echo " 0) Exit"
     echo
@@ -36,16 +37,25 @@ do
             ;;
 
         2)
+            if [ -f "/opt/lak-panel/install/install_ocserv.sh" ]; then
+        
+                bash /opt/lak-panel/install/install_ocserv.sh
+        
+            else
+        
+                echo
+                echo "ocserv installer not found."
+        
+            fi
+            ;;
+
+        3)
             if [ -f "$SCRIPT_DIR/update.sh" ]; then
                 bash "$SCRIPT_DIR/update.sh"
             else
                 echo
                 echo "Update script not found."
             fi
-            ;;
-
-        3)
-            bash "$SCRIPT_DIR/service.sh" restart
             ;;
 
         4)
