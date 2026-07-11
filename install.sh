@@ -47,7 +47,6 @@ if [ -d "$DIR" ]; then
 fi
 
 echo "Downloading LAK Panel..."
-
 cd /opt
 rm -rf "$DIR"
 rm -rf /opt/lak-panel-main
@@ -81,21 +80,10 @@ SUPERADMIN_USERNAME=$ADMIN_USER
 SUPERADMIN_PASSWORD=$ADMIN_PASS
 EOF
 
-echo "Creating systemd service"
-cat > /etc/systemd/system/lak-panel.service <<EOF
-[Unit]
-Description=LAK Panel
-After=network.target
+echo "Setting up systemd service..."
 
-[Service]
-WorkingDirectory=/opt/lak-panel/backend
-ExecStart=/opt/lak-panel/backend/venv/bin/python3 main.py --port $PANEL_PORT
-Restart=always
-User=root
-
-[Install]
-WantedBy=multi-user.target
-EOF
+# استفاده از فایل سرویس آماده موجود در ریپازیتوری
+cp "$DIR/systemd/lak-panel.service" /etc/systemd/system/lak-panel.service
 
 systemctl daemon-reload
 systemctl enable lak-panel
@@ -116,7 +104,7 @@ echo
 echo "================================="
 echo " LAK PANEL INSTALLED SUCCESSFULLY"
 echo
-echo "URL:   http://$IP:$PANEL_PORT"
+echo "URL: http://$IP:$PANEL_PORT"
 echo "Admin: $ADMIN_USER"
 echo
 echo "You can run 'lak-panel' command for management menu."
