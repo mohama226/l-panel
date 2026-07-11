@@ -5,18 +5,43 @@ set -e
 REPO="https://github.com/mohama226/lak-panel.git"
 DIR="/opt/lak-panel"
 
-GREEN="\033[0;32m"
-RED="\033[0;31m"
-NC="\033[0m"
 
 if [ "$EUID" -ne 0 ]; then
-    echo -e "${RED}Please run as root${NC}"
+    echo "Please run as root"
     exit 1
 fi
 
-echo -e "${GREEN}Updating packages...${NC}"
+
+echo "================================="
+echo "       LAK PANEL INSTALL"
+echo "================================="
+
+
+read -rp "Panel Port [8000]: " PANEL_PORT
+PANEL_PORT=${PANEL_PORT:-8000}
+
+
+read -rp "Superadmin Username: " ADMIN_USER
+
+while true
+do
+read -rsp "Superadmin Password: " ADMIN_PASS
+echo
+
+read -rsp "Confirm Password: " ADMIN_PASS2
+echo
+
+if [ "$ADMIN_PASS" = "$ADMIN_PASS2" ]; then
+    break
+fi
+
+echo "Passwords do not match"
+done
+
+
 
 apt-get update
+
 
 apt-get install -y \
 git \
@@ -24,29 +49,63 @@ python3 \
 python3-pip \
 python3-venv
 
+
 if [ -d "$DIR" ]; then
     rm -rf "$DIR"
 fi
 
-echo -e "${GREEN}Downloading LAK Panel...${NC}"
+
+echo "Downloading LAK Panel..."
 
 git clone "$REPO" "$DIR"
 
+
 cd "$DIR/backend"
+
 
 python3 -m venv venv
 
 source venv/bin/activate
 
+
 pip install --upgrade pip
 
 pip install -r requirements.txt
 
-if [ ! -f ".env" ]; then
-    cp .env.example .env
-fi
 
-cp "$DIR/systemd/lak-panel.service" /etc/systemd/system/
+
+echo "Creating environment..."
+
+cat > .env <<EOF
+PORT=$PANEL_PORT
+
+SUPERADMIN_USERNAME=$ADMIN_USER
+
+SUPERADMIN_PASSWORD=$ADMIN_PASS
+EOF
+
+
+
+echo "Creating systemd service"
+
+
+cat > /etc/systemd/system/lak-panel.service <<EOF
+[Unit]
+Description=LAK Panel
+After=network.target
+
+
+[Service]
+WorkingDirectory=/opt/lak-panel/backend
+ExecStart=/opt/lak-panel/backend/venv/bin/python3 main.py --port $PANEL_PORT
+Restart=always
+
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+
 
 systemctl daemon-reload
 
@@ -54,38 +113,32 @@ systemctl enable lak-panel
 
 systemctl restart lak-panel
 
+
+
 chmod +x "$DIR/scripts/menu.sh"
 
-cat > /usr/local/bin/lak-panel << 'EOF'
+
+cat > /usr/local/bin/lak-panel <<EOF
 #!/bin/bash
 bash /opt/lak-panel/scripts/menu.sh
 EOF
 
+
 chmod +x /usr/local/bin/lak-panel
 
 
-sleep 2
 
 IP=$(hostname -I | awk '{print $1}')
 
-echo
-
-echo "========================================"
-
-echo "LAK Panel Installed"
 
 echo
-
-echo "Open:"
-
-echo "http://$IP:8000"
-
+echo "================================="
+echo " LAK PANEL INSTALLED"
 echo
-
-echo "Health:"
-
-echo "http://$IP:8000/health"
-
+echo "URL:"
+echo "http://$IP:$PANEL_PORT"
 echo
-
-echo "========================================"
+echo "ADMIN:"
+echo "$ADMIN_USER"
+echo
+echo "================================="
