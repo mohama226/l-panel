@@ -7,6 +7,8 @@ Type=simple
 
 WorkingDirectory=/opt/lak-panel/backend
 
+Environment=PYTHONUNBUFFERED=1
+
 ExecStart=/opt/lak-panel/backend/venv/bin/python3 /opt/lak-panel/backend/run.py
 
 Restart=always
