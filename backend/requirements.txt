@@ -10,3 +10,4 @@ pytz
 tzdata
 psutil
 requests
+pydantic-settings
