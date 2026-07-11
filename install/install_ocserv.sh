@@ -68,6 +68,9 @@ touch /etc/ocserv/ocpasswd
 chmod 600 /etc/ocserv/ocpasswd
 
 
+chown root:root /etc/ocserv/ocpasswd
+
+
 systemctl daemon-reload
 
 
