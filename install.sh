@@ -1,7 +1,7 @@
 #!/bin/bash
 
 set -e
-
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 clear
 
@@ -74,7 +74,7 @@ mkdir -p $BASE
 
 echo "Installing dependencies..."
 
-bash scripts/install_dependencies.sh
+bash $SCRIPT_DIR/scripts/install_dependencies.sh
 
 
 
