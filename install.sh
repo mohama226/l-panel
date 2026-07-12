@@ -1,10 +1,8 @@
 #!/bin/bash
 
 set -e
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
 clear
-
 
 echo "=============================="
 echo "       LAK PANEL INSTALL"
@@ -12,93 +10,75 @@ echo "=============================="
 
 
 if [ "$EUID" -ne 0 ]; then
-
-echo "Run as root"
-
-exit 1
-
+    echo "Run as root"
+    exit 1
 fi
-
 
 
 read -p "SuperAdmin username: " ADMIN
 
-
 read -s -p "SuperAdmin password: " ADMIN_PASS
-
 echo
-
 
 
 read -p "Panel port [2096]: " PORT
-
-
 PORT=${PORT:-2096}
 
 
-
 echo
-
 echo "Install ocserv 1.5?"
-
 echo "1) Yes"
-
 echo "2) No"
-
 
 read OC
 
 
-
-echo
-
 read -p "Continue? (y/n): " CONFIRM
 
 
-
 if [[ "$CONFIRM" != "y" ]]; then
-
-exit 0
-
+    exit 0
 fi
 
 
-
-BASE="/opt/lak-panel"
-
+echo "Installing base dependencies..."
 
 
-mkdir -p $BASE
+apt update -y
+
+apt install -y \
+curl \
+wget \
+unzip \
+openssl \
+python3 \
+python3-venv \
+postgresql \
+postgresql-contrib \
+nginx
 
 
-
-echo "Installing dependencies..."
-
-bash $SCRIPT_DIR/scripts/install_dependencies.sh
+mkdir -p /opt/lak-panel
 
 
-
-echo "Downloading panel..."
-
+echo "Downloading panel package..."
 
 
 cd /tmp
 
 
 wget -O lak-panel.zip \
-https://github.com/USERNAME/lak-panel/releases/latest/download/lak-panel.zip
+https://github.com/YOUR_USERNAME/lak-panel/releases/latest/download/lak-panel.zip
+
+
+unzip -o lak-panel.zip -d /opt/lak-panel
 
 
 
-unzip -o lak-panel.zip -d $BASE
+echo "Installing python packages..."
 
 
-
-echo "Creating python environment"
-
-
-
-cd $BASE/backend
+cd /opt/lak-panel/backend
 
 
 python3 -m venv venv
@@ -109,37 +89,22 @@ source venv/bin/activate
 
 pip install --upgrade pip
 
-
 pip install -r requirements.txt
-python -m pip install --upgrade pip
 
 
-DB_NAME="lakpanel"
+echo "Creating environment..."
 
-DB_USER="lakpanel"
 
 DB_PASS=$(openssl rand -hex 20)
 
 
-
-echo "Creating database"
-
-
-
-bash $BASE/scripts/setup_postgresql.sh \
-$DB_NAME \
-$DB_USER \
-$DB_PASS
-
-
-
-cat > $BASE/.env <<EOF
+cat > /opt/lak-panel/.env <<EOF
 
 APP_PORT=$PORT
 
-DB_NAME=$DB_NAME
+DB_NAME=lakpanel
 
-DB_USER=$DB_USER
+DB_USER=lakpanel
 
 DB_PASSWORD=$DB_PASS
 
@@ -152,23 +117,4 @@ INSTALL_OCSERV=$OC
 EOF
 
 
-
-echo "Creating service"
-
-
-
-bash $BASE/scripts/setup_service.sh
-
-
-
-echo
-
-echo "=============================="
-
-echo "LAK PANEL READY"
-
-echo "PORT : $PORT"
-
-echo "ADMIN : $ADMIN"
-
-echo "=============================="
+echo "Done"
