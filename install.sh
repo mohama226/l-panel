@@ -2,146 +2,140 @@
 
 set -e
 
+
 clear
 
-echo "================================="
-echo "       LAK PANEL INSTALLER"
-echo "================================="
+
+echo "=============================="
+echo "       LAK PANEL INSTALL"
+echo "=============================="
+
 
 if [ "$EUID" -ne 0 ]; then
-    echo "Please run as root"
-    exit 1
+
+echo "Run as root"
+
+exit 1
+
 fi
 
 
-echo ""
-echo "Enter SuperAdmin username:"
-read SUPERADMIN
+
+read -p "SuperAdmin username: " ADMIN
 
 
-echo ""
-echo "Enter SuperAdmin password:"
-read -s ADMIN_PASS
-echo ""
+read -s -p "SuperAdmin password: " ADMIN_PASS
+
+echo
 
 
-echo ""
-echo "Enter panel port:"
-read PANEL_PORT
+
+read -p "Panel port [2096]: " PORT
 
 
-if [ -z "$PANEL_PORT" ]; then
-    PANEL_PORT=2096
-fi
+PORT=${PORT:-2096}
 
 
-echo ""
-echo "Install ocserv 1.5 ?"
+
+echo
+
+echo "Install ocserv 1.5?"
+
 echo "1) Yes"
+
 echo "2) No"
 
-read OC_INSTALL
+
+read OC
 
 
-echo ""
-echo "================================="
-echo "Configuration"
-echo "================================="
 
-echo "Admin:"
-echo "$SUPERADMIN"
+echo
 
-echo "Port:"
-echo "$PANEL_PORT"
-
-echo "Install OCServ:"
-echo "$OC_INSTALL"
-
-echo ""
 read -p "Continue? (y/n): " CONFIRM
 
 
+
 if [[ "$CONFIRM" != "y" ]]; then
-    echo "Installation cancelled"
-    exit 0
+
+exit 0
+
 fi
 
 
 
-echo ""
-echo "[1/7] Updating system..."
-
-apt update -y
-apt upgrade -y
+BASE="/opt/lak-panel"
 
 
 
-echo ""
-echo "[2/7] Installing requirements..."
-
-apt install -y \
-python3 \
-python3-pip \
-python3-venv \
-postgresql \
-postgresql-contrib \
-nginx \
-unzip \
-curl \
-git
+mkdir -p $BASE
 
 
 
-echo ""
-echo "[3/7] Creating directories..."
+echo "Installing dependencies..."
 
-
-mkdir -p /opt/lak-panel
-
-
-echo ""
-echo "[4/7] Installing panel files..."
+bash scripts/install_dependencies.sh
 
 
 
-echo ""
-echo "Waiting for release package..."
+echo "Downloading panel..."
 
 
 
-echo ""
-echo "[5/7] PostgreSQL setup..."
+cd /tmp
+
+
+wget -O lak-panel.zip \
+https://github.com/USERNAME/lak-panel/releases/latest/download/lak-panel.zip
+
+
+
+unzip -o lak-panel.zip -d $BASE
+
+
+
+echo "Creating python environment"
+
+
+
+cd $BASE/backend
+
+
+python3 -m venv venv
+
+
+source venv/bin/activate
+
+
+pip install --upgrade pip
+
+
+pip install -r requirements.txt
 
 
 
 DB_NAME="lakpanel"
+
 DB_USER="lakpanel"
 
-
-DB_PASS=$(openssl rand -hex 16)
-
-
-
-sudo -u postgres psql <<EOF
-
-CREATE DATABASE $DB_NAME;
-
-CREATE USER $DB_USER WITH PASSWORD '$DB_PASS';
-
-GRANT ALL PRIVILEGES ON DATABASE $DB_NAME TO $DB_USER;
-
-EOF
+DB_PASS=$(openssl rand -hex 20)
 
 
 
-echo ""
-echo "[6/7] Saving configuration..."
+echo "Creating database"
 
 
 
-cat > /opt/lak-panel/.env <<EOF
+bash $BASE/scripts/setup_postgresql.sh \
+$DB_NAME \
+$DB_USER \
+$DB_PASS
 
-APP_PORT=$PANEL_PORT
+
+
+cat > $BASE/.env <<EOF
+
+APP_PORT=$PORT
 
 DB_NAME=$DB_NAME
 
@@ -149,29 +143,32 @@ DB_USER=$DB_USER
 
 DB_PASSWORD=$DB_PASS
 
-SUPERADMIN=$SUPERADMIN
+ADMIN_USERNAME=$ADMIN
 
-SUPERADMIN_PASSWORD=$ADMIN_PASS
+ADMIN_PASSWORD=$ADMIN_PASS
+
+INSTALL_OCSERV=$OC
 
 EOF
 
 
 
-echo ""
-echo "[7/7] Installation completed"
+echo "Creating service"
 
 
-echo ""
-echo "================================="
-echo " LAK PANEL INSTALLED"
-echo "================================="
 
-echo ""
-echo "Panel Port:"
-echo $PANEL_PORT
+bash $BASE/scripts/setup_service.sh
 
-echo ""
-echo "Admin:"
-echo $SUPERADMIN
 
-echo ""
+
+echo
+
+echo "=============================="
+
+echo "LAK PANEL READY"
+
+echo "PORT : $PORT"
+
+echo "ADMIN : $ADMIN"
+
+echo "=============================="
