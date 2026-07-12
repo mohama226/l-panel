@@ -1,0 +1,11 @@
+python3
+python3-venv
+python3-pip
+nginx
+git
+curl
+wget
+tar
+zip
+unzip
+sqlite3
