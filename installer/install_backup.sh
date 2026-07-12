@@ -1,62 +1,114 @@
 #!/bin/bash
 
-
-BASE="/opt/lak-panel"
-
-
-source $BASE/installer/functions.sh
+set -e
 
 
-title "Installing Backup System"
+BASE_DIR="/opt/lak-panel"
+
+BACKUP_DIR="$BASE_DIR/backups"
+
+mkdir -p "$BACKUP_DIR"
 
 
-mkdir -p $BASE/backup/backups
+echo "================================="
+echo " LAK PANEL BACKUP INSTALLER"
+echo "================================="
 
 
-chmod 700 $BASE/backup/backups
+echo ""
 
 
-
-cat > $BASE/backup/backup.sh <<'EOF'
+cat > "$BASE_DIR/scripts/backup.sh" <<'EOF'
 
 #!/bin/bash
 
 
 BASE="/opt/lak-panel"
 
-DATE=$(date +"%Y-%m-%d_%H-%M")
+BACKUP="/opt/lak-panel/backups"
 
 
-mkdir -p $BASE/backup/backups
+DATE=$(date +"%Y-%m-%d_%H-%M-%S")
+
+
+mkdir -p "$BACKUP/$DATE"
+
+
+echo "Creating backup..."
+
+
+# Database
+
+if [ -f "$BASE/backend/database.db" ]; then
+
+cp "$BASE/backend/database.db" \
+"$BACKUP/$DATE/database.db"
+
+fi
 
 
 
-tar -czf \
-$BASE/backup/backups/lak-panel-$DATE.tar.gz \
-$BASE/panel \
-$BASE/config \
-/etc/systemd/system/lak-panel.service
+# Environment
+
+if [ -f "$BASE/backend/.env" ]; then
+
+cp "$BASE/backend/.env" \
+"$BACKUP/$DATE/.env"
+
+fi
 
 
 
-echo
+# OCServ
+
+if [ -f "/etc/ocserv/ocserv.conf" ]; then
+
+cp /etc/ocserv/ocserv.conf \
+"$BACKUP/$DATE/ocserv.conf"
+
+fi
+
+
+
+# Compress
+
+cd "$BACKUP"
+
+tar -czf "$DATE.tar.gz" "$DATE"
+
+
+rm -rf "$BACKUP/$DATE"
+
 
 echo "Backup created:"
-echo
-
-echo "$BASE/backup/backups/lak-panel-$DATE.tar.gz"
-
+echo "$BACKUP/$DATE.tar.gz"
 
 EOF
 
 
 
-chmod +x $BASE/backup/backup.sh
+chmod +x "$BASE_DIR/scripts/backup.sh"
 
 
 
-(crontab -l 2>/dev/null; echo "0 3 * * * $BASE/backup/backup.sh") | crontab -
+echo "Creating automatic backup schedule..."
 
 
 
-success "Backup system installed"
+cat > /etc/cron.d/lak-panel-backup <<EOF
+
+0 3 * * * root $BASE_DIR/scripts/backup.sh
+
+EOF
+
+
+
+echo ""
+
+echo "Backup system installed"
+
+echo ""
+
+echo "Backup path:"
+
+echo "$BACKUP_DIR"
