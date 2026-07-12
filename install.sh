@@ -2,101 +2,148 @@
 
 set -e
 
-ZIP_URL="https://github.com/mohama226/lak-panel/releases/latest/download/lak-panel.zip"
-
 BASE="/opt/lak-panel"
 
+clear
 
-echo "================================="
-echo "       LAK PANEL INSTALL"
-echo "================================="
+echo "========================================="
+echo "          LAK PANEL INSTALLER"
+echo "              VERSION 1.0"
+echo "========================================="
 
+echo
+echo "Install Path:"
+echo "$BASE"
+echo
 
-apt update
-
-apt install -y curl unzip python3 python3-venv python3-pip nginx
-
-
-echo "Downloading package..."
-
-rm -rf /tmp/lak-panel
-
-mkdir -p /tmp/lak-panel
-
-
-curl -L "$ZIP_URL" \
--o /tmp/lak-panel.zip
-
-
-echo "Extracting..."
-
-
-unzip -o /tmp/lak-panel.zip \
--d /tmp/lak-panel
-
-
-
-echo "Installing files..."
-
-
-rm -rf $BASE
+if [ "$EUID" -ne 0 ]; then
+    echo "Run as root"
+    exit 1
+fi
 
 
 mkdir -p $BASE
 
 
-cp -r /tmp/lak-panel/* $BASE/
+echo "Updating system..."
+
+apt update -y
 
 
-echo "Creating venv..."
+apt install -y \
+python3 \
+python3-pip \
+python3-venv \
+curl \
+wget \
+unzip \
+sqlite3 \
+systemd
 
 
-python3 -m venv \
-$BASE/backend/venv
+echo
+echo "========================================="
+echo " Create Super Admin"
+echo "========================================="
+
+read -p "Username: " ADMIN_USER
+
+while true
+do
+read -s -p "Password: " ADMIN_PASS
+echo
+
+read -s -p "Confirm Password: " ADMIN_PASS2
+echo
+
+if [ "$ADMIN_PASS" = "$ADMIN_PASS2" ]; then
+break
+fi
+
+echo "Passwords not match"
+done
+
+
+echo
+echo "========================================="
+read -p "Panel Port [2096]: " PANEL_PORT
+
+PANEL_PORT=${PANEL_PORT:-2096}
+
+
+echo
+echo "Install OCServ?"
+echo "1) Yes"
+echo "2) No"
+
+read OC
+
+
+echo
+echo "Enable Backup System?"
+echo "1) Yes"
+echo "2) No"
+
+read BACKUP
+
+
+echo
+echo "Install Kolomb Script?"
+echo "1) Yes"
+echo "2) No"
+
+read KOLOMB
 
 
 
-echo "Installing python packages..."
+mkdir -p $BASE/config
 
 
-$BASE/backend/venv/bin/pip install --upgrade pip
-
-
-$BASE/backend/venv/bin/pip install \
--r $BASE/backend/requirements.txt
-
-
-
-echo "Installing systemd..."
-
-
-cp \
-$BASE/systemd/lak-panel.service \
-/etc/systemd/system/lak-panel.service
+cat > $BASE/config/install.conf <<EOF
+ADMIN_USER=$ADMIN_USER
+ADMIN_PASS=$ADMIN_PASS
+PORT=$PANEL_PORT
+OCSERV=$OC
+BACKUP=$BACKUP
+KOLOMB=$KOLOMB
+EOF
 
 
 
-echo "Installing command..."
+chmod +x $BASE/installer/*.sh
 
 
-cp \
-$BASE/scripts/lak-panel \
-/usr/local/bin/lak-panel
-
-
-chmod +x /usr/local/bin/lak-panel
+bash $BASE/installer/install_panel.sh
 
 
 
-systemctl daemon-reload
-
-systemctl enable lak-panel
-
-systemctl restart lak-panel
+if [ "$OC" = "1" ]; then
+bash $BASE/installer/install_ocserv.sh
+fi
 
 
+if [ "$BACKUP" = "1" ]; then
+bash $BASE/installer/install_backup.sh
+fi
 
-echo ""
-echo "INSTALL FINISHED"
 
-systemctl status lak-panel --no-pager
+if [ "$KOLOMB" = "1" ]; then
+bash $BASE/installer/install_kolomb.sh
+fi
+
+
+
+echo
+echo "========================================="
+echo " LAK PANEL INSTALLED"
+echo "========================================="
+
+echo
+echo "Panel:"
+echo "http://SERVER-IP:$PANEL_PORT"
+
+echo
+echo "Command:"
+echo "lak-panel"
+
+echo
