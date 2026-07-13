@@ -14,7 +14,9 @@ wait_for_apt
 
 create_directories
 
+bash "$SCRIPT_DIR/wizard.sh"
 bash "$SCRIPT_DIR/postgres.sh"
+bash "$SCRIPT_DIR/env.sh"
 
 bash "$SCRIPT_DIR/python.sh"
 
