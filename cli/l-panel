@@ -1,3 +1,5 @@
 #!/usr/bin/env bash
 
-bash /opt/l-panel/install/menu.sh "$@"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+bash "${SCRIPT_DIR}/dispatcher.sh" "$@"
