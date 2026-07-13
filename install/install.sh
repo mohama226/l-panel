@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 ########################################
-# L-Panel Bootstrap Installer
+# L-PANEL Bootstrap Installer
 ########################################
 
 set -e
@@ -22,6 +22,12 @@ if [ "$EUID" -ne 0 ]; then
 fi
 
 apt update
+
+while fuser /var/lib/dpkg/lock-frontend >/dev/null 2>&1
+do
+    echo "Waiting for apt..."
+    sleep 5
+done
 
 apt install -y git
 
