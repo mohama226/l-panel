@@ -10,6 +10,8 @@ check_root
 
 check_os
 
+wait_for_apt
+
 create_directories
 
 install_packages
