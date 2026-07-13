@@ -1,27 +1,38 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
-source "$(dirname "$0")/variables.sh"
+########################################
+# L-Panel Bootstrap Installer
+########################################
 
-source "$(dirname "$0")/functions.sh"
+set -e
 
-source "$(dirname "$0")/logo.sh"
+INSTALL_DIR="/opt/l-panel"
 
-check_root
+REPO_URL="https://github.com/mohama226/l-panel.git"
 
-check_os
+BRANCH="main"
 
-create_directories
+echo "========================================"
+echo "        L-PANEL INSTALLER"
+echo "========================================"
 
-bash "$(dirname "$0")/postgres.sh"
+if [ "$EUID" -ne 0 ]; then
+    echo "Please run as root."
+    exit 1
+fi
 
-bash "$(dirname "$0")/nginx.sh"
+apt update
 
-bash "$(dirname "$0")/service.sh"
+apt install -y git
 
-bash "$(dirname "$0")/ssl.sh"
+if [ -d "$INSTALL_DIR" ]; then
+    rm -rf "$INSTALL_DIR"
+fi
 
-bash "$(dirname "$0")/firewall.sh"
+git clone -b "$BRANCH" "$REPO_URL" "$INSTALL_DIR"
 
-bash "$(dirname "$0")/ocserv.sh"
+chmod -R +x "$INSTALL_DIR/install"
 
-green "Installation Finished."
+chmod -R +x "$INSTALL_DIR/cli"
+
+exec bash "$INSTALL_DIR/install/setup.sh"
