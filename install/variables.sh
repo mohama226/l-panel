@@ -1,26 +1,33 @@
-#!/bin/bash
+#!/usr/bin/env bash
+
 ########################################
 # L-Panel Variables
 ########################################
-APP_NAME="L-Panel"
-APP_VERSION="1.0.0"
-REPO_URL="https://github.com/mohama226/l-panel.git"
-BRANCH="main"
-INSTALL_DIR="/opt/l-panel"
-CONFIG_DIR="/etc/l-panel"
-LOG_DIR="/var/log/l-panel"
-BACKUP_DIR="/var/backups/l-panel"
-TMP_DIR="/var/lib/l-panel/tmp"
-UPLOAD_DIR="/var/lib/l-panel/uploads"
-SERVICE_NAME="l-panel"
-SYSTEMD_FILE="/etc/systemd/system/l-panel.service"
-NGINX_AVAILABLE="/etc/nginx/sites-available/l-panel"
-NGINX_ENABLED="/etc/nginx/sites-enabled/l-panel"
-PYTHON_VERSION="3.12"
-POSTGRES_DB="lpanel"
-POSTGRES_USER="lpanel"
-POSTGRES_PASSWORD="lpanel_secure_password"
-PANEL_PORT="8000"
-SUPERADMIN_USER=""
-SUPERADMIN_PASS=""
-PYTHON_BIN="/usr/bin/python3"
+
+export APP_NAME="L-Panel"
+
+export VERSION="1.0.0"
+
+export INSTALL_DIR="/opt/l-panel"
+
+export CONFIG_DIR="/etc/l-panel"
+
+export DATA_DIR="/var/lib/l-panel"
+
+export LOG_DIR="/var/log/l-panel"
+
+export BACKUP_DIR="/var/backups/l-panel"
+
+export TMP_DIR="/tmp/l-panel"
+
+export PANEL_PORT="8080"
+
+export POSTGRES_DB="lpanel"
+
+export POSTGRES_USER="lpanel"
+
+export POSTGRES_PASSWORD="ChangeMe123"
+
+export SERVICE_NAME="l-panel"
+
+export PYTHON_BIN="/usr/bin/python3"
