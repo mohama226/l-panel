@@ -6,6 +6,8 @@
 
 set -e
 
+source /tmp/l-panel-functions.sh
+
 INSTALL_DIR="/opt/l-panel"
 
 REPO_URL="https://github.com/mohama226/l-panel.git"
@@ -21,13 +23,20 @@ if [ "$EUID" -ne 0 ]; then
     exit 1
 fi
 
+# Function to wait for apt to be ready
+wait_for_apt() {
+    while fuser /var/lib/dpkg/lock-frontend >/dev/null 2>&1
+    do
+        echo "Waiting for apt..."
+        sleep 5
+    done
+}
+
+wait_for_apt
+
 apt update
 
-while fuser /var/lib/dpkg/lock-frontend >/dev/null 2>&1
-do
-    echo "Waiting for apt..."
-    sleep 5
-done
+wait_for_apt
 
 apt install -y git
 
