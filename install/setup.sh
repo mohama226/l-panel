@@ -9,6 +9,7 @@ create_directories
 bash "$SCRIPT_DIR/postgres.sh"
 bash "$SCRIPT_DIR/python.sh"
 bash "$SCRIPT_DIR/initdb.sh"
+bash "$SCRIPT_DIR/create_admin.sh"
 bash "$SCRIPT_DIR/service.sh"
 bash "$SCRIPT_DIR/nginx.sh"
 bash "$SCRIPT_DIR/firewall.sh"
