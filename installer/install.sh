@@ -52,14 +52,17 @@ fi
 deactivate
 
 
-echo "[5/5] Creating command..."
+echo "[5/5] Fixing permissions and creating command..."
 
-cat > /usr/local/bin/l-panel <<EOF
-#!/bin/bash
-bash $INSTALL_DIR/installer/menu.sh
-EOF
+# Fixing permissions
+echo "Fixing permissions..."
+chmod +x /opt/l-panel/installer/*.sh
+chmod +x /opt/l-panel/scripts/*
+chmod +x /opt/l-panel/installer/menu.sh
+chmod +x /opt/l-panel/scripts/l-panel
 
-chmod +x /usr/local/bin/l-panel
+# Creating symlink
+ln -sf /opt/l-panel/scripts/l-panel /usr/local/bin/l-panel
 
 
 echo ""
