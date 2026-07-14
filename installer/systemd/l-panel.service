@@ -1,0 +1,24 @@
+[Unit]
+Description=L-Panel Web Panel
+After=network.target
+
+[Service]
+Type=simple
+
+User=root
+Group=root
+
+WorkingDirectory=/opt/l-panel
+
+Environment="PATH=/opt/l-panel/venv/bin"
+
+ExecStart=/opt/l-panel/venv/bin/python3 /opt/l-panel/run.py
+
+Restart=always
+RestartSec=3
+
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target
