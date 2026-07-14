@@ -42,3 +42,10 @@ chmod +x installer/*.sh
 ln -sf /opt/l-panel/scripts/l-panel /usr/local/bin/l-panel
 
 
+
+
+chmod +x scripts/l-panel
+
+chmod +x installer/*.sh
+
+ln -sf /opt/l-panel/scripts/l-panel /usr/local/bin/l-panel
