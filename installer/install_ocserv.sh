@@ -1,15 +1,22 @@
 #!/bin/bash
+
 set -e
+
+BASE="/opt/l-panel"
+VERSION="1.5.0"
 
 echo "=============================="
 echo " L-PANEL OCServ Installer"
-echo " OCServ 1.5.0"
+echo " OCServ Version $VERSION"
 echo "=============================="
+
 
 apt update
 
 apt install -y \
 build-essential \
+meson \
+ninja-build \
 pkg-config \
 libgnutls28-dev \
 libreadline-dev \
@@ -18,109 +25,106 @@ libseccomp-dev \
 liblz4-dev \
 libprotobuf-c-dev \
 protobuf-c-compiler \
+libpam0g-dev \
+libwrap0-dev \
 autoconf \
 automake \
 libtool \
 wget \
-curl \
 tar \
-openssl \
-git
+openssl
+
 
 mkdir -p /usr/local/src
+
 cd /usr/local/src
 
-rm -rf ocserv-1.5.0
+
+rm -rf ocserv-$VERSION
+rm -f ocserv-$VERSION.tar.xz
+
 
 echo "Downloading OCServ..."
 
-wget -O ocserv.tar.gz \
-https://www.infradead.org/ocserv/download/ocserv-1.5.0.tar.xz
+wget https://www.infradead.org/ocserv/download/ocserv-$VERSION.tar.xz
 
 
-tar xf ocserv.tar.gz
+tar xf ocserv-$VERSION.tar.xz
 
-cd ocserv-1.5.0
+
+cd ocserv-$VERSION
+
 
 echo "Building OCServ..."
 
-./configure \
---sysconfdir=/etc/ocserv \
---enable-geoip \
---enable-seccomp
-
-make -j$(nproc)
-
-make install
+meson setup build \
+--prefix=/usr \
+--sysconfdir=/etc
 
 
-mkdir -p /etc/ocserv
+ninja -C build
+
+
+ninja -C build install
+
+
 
 echo "Creating config..."
 
-cat > /etc/ocserv/ocserv.conf <<EOF
-auth = "plain[passwd=/etc/ocserv/ocpasswd]"
+mkdir -p /etc/ocserv
 
-tcp-port = 443
-udp-port = 443
 
-run-as-user = nobody
-run-as-group = nogroup
+if [ -f /usr/share/doc/ocserv/doc/sample.config ]; then
 
-max-clients = 1024
-max-same-clients = 1
+cp /usr/share/doc/ocserv/doc/sample.config \
+/etc/ocserv/ocserv.conf
 
-server-cert = /etc/ocserv/server-cert.pem
-server-key = /etc/ocserv/server-key.pem
+fi
 
-default-domain = vpn
-
-ipv4-network = 10.10.10.0
-ipv4-netmask = 255.255.255.0
-
-dns = 8.8.8.8
-
-keepalive = 32400
-
-dpd = 90
-mobile-dpd = 1800
-EOF
 
 
 echo "Generating certificate..."
 
-openssl req -x509 -newkey rsa:4096 \
+
+openssl req \
+-x509 \
+-newkey rsa:4096 \
 -keyout /etc/ocserv/server-key.pem \
 -out /etc/ocserv/server-cert.pem \
 -days 3650 \
 -nodes \
--subj "/CN=L-PANEL VPN"
+-subj "/CN=L-PANEL"
 
 
-touch /etc/ocserv/ocpasswd
+
+echo "Creating service..."
 
 
 cat >/etc/systemd/system/ocserv.service <<EOF
+
 [Unit]
 Description=OCServ VPN Server
 After=network.target
 
+
 [Service]
-ExecStart=/usr/local/sbin/ocserv -c /etc/ocserv/ocserv.conf
+ExecStart=/usr/sbin/ocserv -f -c /etc/ocserv/ocserv.conf
 Restart=always
+
 
 [Install]
 WantedBy=multi-user.target
+
 EOF
 
 
-systemctl daemon-reload
-systemctl enable ocserv
-systemctl restart ocserv
 
+systemctl daemon-reload
+
+systemctl enable ocserv
 
 echo ""
-echo "=============================="
-echo " OCServ Installed Successfully"
-echo " Config: /etc/ocserv"
-echo "=============================="
+echo "OCServ installed successfully"
+echo ""
+
+ocserv -v
