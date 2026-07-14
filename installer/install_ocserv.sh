@@ -47,12 +47,10 @@ echo "Downloading OCServ source..."
 
 
 wget -O ocserv.tar.xz \
-https://github.com/openconnect/ocserv/releases/download/v1.5.0/ocserv-1.5.0.tar.xz
+https://github.com/openconnect/ocserv/archive/refs/tags/v1.5.0.tar.gz
 
 
 tar xf ocserv.tar.xz
-
-
 mv ocserv-1.5.0 ocserv
 
 
