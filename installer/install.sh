@@ -20,12 +20,18 @@ unzip -o l-panel.zip
 
 mv l-panel-main /opt/l-panel
 
-# === بخش جدید اضافه شده ===
+# ========================
+# ایجاد محیط مجازی پایتون
+# ========================
+echo "Creating Python environment..."
+
 cd /opt/l-panel
+
 python3 -m venv venv
+
 /opt/l-panel/venv/bin/pip install --upgrade pip
 /opt/l-panel/venv/bin/pip install -r requirements.txt
-# ============================
+# ========================
 
 chmod +x /opt/l-panel/installer/*.sh
 chmod +x /opt/l-panel/scripts/*
@@ -33,11 +39,5 @@ chmod +x /opt/l-panel/scripts/*
 ln -sf /opt/l-panel/scripts/l-panel /usr/local/bin/l-panel
 
 echo "L-Panel Installed"
-
-# === دستورات سرویس systemd ===
-systemctl daemon-reload
-systemctl enable l-panel
-systemctl restart l-panel
-# ============================
 
 l-panel
