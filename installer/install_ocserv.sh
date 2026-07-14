@@ -10,7 +10,6 @@ echo " L-PANEL OCServ Installer"
 echo " OCServ Version $VERSION"
 echo "=============================="
 
-
 apt update
 
 apt install -y \
@@ -34,26 +33,20 @@ wget \
 tar \
 openssl
 
-
 mkdir -p /usr/local/src
 
 cd /usr/local/src
 
-
 rm -rf ocserv-$VERSION
 rm -f ocserv-$VERSION.tar.xz
-
 
 echo "Downloading OCServ..."
 
 wget https://www.infradead.org/ocserv/download/ocserv-$VERSION.tar.xz
 
-
 tar xf ocserv-$VERSION.tar.xz
 
-
 cd ocserv-$VERSION
-
 
 echo "Building OCServ..."
 
@@ -61,30 +54,11 @@ meson setup build \
 --prefix=/usr \
 --sysconfdir=/etc
 
-
 ninja -C build
-
 
 ninja -C build install
 
-
-
-echo "Creating config..."
-
-mkdir -p /etc/ocserv
-
-
-if [ -f /usr/share/doc/ocserv/doc/sample.config ]; then
-
-cp /usr/share/doc/ocserv/doc/sample.config \
-/etc/ocserv/ocserv.conf
-
-fi
-
-
-
 echo "Generating certificate..."
-
 
 openssl req \
 -x509 \
@@ -95,10 +69,18 @@ openssl req \
 -nodes \
 -subj "/CN=L-PANEL"
 
+# ==================== بخش اضافه شده ====================
+echo "Creating config and password file..."
 
+mkdir -p /etc/ocserv
+
+cp $BASE/installer/configs/ocserv.conf /etc/ocserv/ocserv.conf
+
+touch /etc/ocserv/ocpasswd
+chmod 600 /etc/ocserv/ocpasswd
+# =======================================================
 
 echo "Creating service..."
-
 
 cat >/etc/systemd/system/ocserv.service <<EOF
 
@@ -106,21 +88,16 @@ cat >/etc/systemd/system/ocserv.service <<EOF
 Description=OCServ VPN Server
 After=network.target
 
-
 [Service]
 ExecStart=/usr/sbin/ocserv -f -c /etc/ocserv/ocserv.conf
 Restart=always
-
 
 [Install]
 WantedBy=multi-user.target
 
 EOF
 
-
-
 systemctl daemon-reload
-
 systemctl enable ocserv
 
 echo ""
