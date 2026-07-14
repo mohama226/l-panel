@@ -1,107 +1,85 @@
 #!/bin/bash
-
 set -e
 
 BASE="/opt/l-panel"
-VERSION="1.5.0"
+OCSERV_DIR="/etc/ocserv"
 
 echo "=============================="
 echo " L-PANEL OCServ Installer"
-echo " OCServ Version $VERSION"
+echo " OCServ 1.5.0"
+echo " ZIP CONFIG MODE"
 echo "=============================="
+
 
 apt update
 
-apt install -y \
-build-essential \
-meson \
-ninja-build \
-pkg-config \
-libgnutls28-dev \
-libreadline-dev \
-libnl-route-3-dev \
-libseccomp-dev \
-liblz4-dev \
-libprotobuf-c-dev \
-protobuf-c-compiler \
-libpam0g-dev \
-libwrap0-dev \
-autoconf \
-automake \
-libtool \
-wget \
-tar \
-openssl
+apt install -y ocserv openssl
 
-mkdir -p /usr/local/src
 
-cd /usr/local/src
+echo "[1] Creating config directory..."
 
-rm -rf ocserv-$VERSION
-rm -f ocserv-$VERSION.tar.xz
+mkdir -p $OCSERV_DIR
 
-echo "Downloading OCServ..."
 
-wget https://www.infradead.org/ocserv/download/ocserv-$VERSION.tar.xz
+echo "[2] Installing L-Panel config..."
 
-tar xf ocserv-$VERSION.tar.xz
 
-cd ocserv-$VERSION
+if [ -f "$BASE/installer/files/ocserv/ocserv.conf" ]; then
 
-echo "Building OCServ..."
+cp "$BASE/installer/files/ocserv/ocserv.conf" \
+$OCSERV_DIR/ocserv.conf
 
-meson setup build \
---prefix=/usr \
---sysconfdir=/etc
+else
 
-ninja -C build
+echo "ERROR: ocserv.conf missing"
+exit 1
 
-ninja -C build install
+fi
 
-echo "Generating certificate..."
 
-openssl req \
--x509 \
+echo "[3] Creating certificates..."
+
+if [ ! -f "$OCSERV_DIR/server-key.pem" ]; then
+
+openssl req -x509 -nodes \
 -newkey rsa:4096 \
--keyout /etc/ocserv/server-key.pem \
--out /etc/ocserv/server-cert.pem \
+-keyout $OCSERV_DIR/server-key.pem \
+-out $OCSERV_DIR/server-cert.pem \
 -days 3650 \
--nodes \
--subj "/CN=L-PANEL"
+-subj "/CN=L-PANEL OCServ"
 
-# ==================== بخش اضافه شده ====================
-echo "Creating config and password file..."
+fi
 
-mkdir -p /etc/ocserv
 
-cp $BASE/installer/configs/ocserv.conf /etc/ocserv/ocserv.conf
+echo "[4] Creating password file..."
 
-touch /etc/ocserv/ocpasswd
-chmod 600 /etc/ocserv/ocpasswd
-# =======================================================
+if [ ! -f "$OCSERV_DIR/ocpasswd" ]; then
 
-echo "Creating service..."
+touch $OCSERV_DIR/ocpasswd
 
-cat >/etc/systemd/system/ocserv.service <<EOF
+fi
 
-[Unit]
-Description=OCServ VPN Server
-After=network.target
 
-[Service]
-ExecStart=/usr/sbin/ocserv -f -c /etc/ocserv/ocserv.conf
-Restart=always
+echo "[5] Installing service..."
 
-[Install]
-WantedBy=multi-user.target
+if [ -f "$BASE/installer/systemd/ocserv.service" ]; then
 
-EOF
+cp "$BASE/installer/systemd/ocserv.service" \
+/etc/systemd/system/ocserv.service
+
+fi
+
 
 systemctl daemon-reload
+
 systemctl enable ocserv
 
-echo ""
-echo "OCServ installed successfully"
-echo ""
+systemctl restart ocserv
 
-ocserv -v
+
+echo ""
+echo "=============================="
+echo " OCServ Installed"
+echo " Config:"
+echo "$OCSERV_DIR/ocserv.conf"
+echo "=============================="
