@@ -7,6 +7,9 @@ echo "Installing L-Panel..."
 apt update
 apt install -y curl unzip python3 python3-pip python3-venv
 
+# متوقف کردن سرویس قبلی (در صورت وجود)
+systemctl stop l-panel 2>/dev/null || true
+
 rm -rf /opt/l-panel
 
 mkdir -p /opt
@@ -40,4 +43,16 @@ ln -sf /opt/l-panel/scripts/l-panel /usr/local/bin/l-panel
 
 echo "L-Panel Installed"
 
+# اجرای دستور اصلی l-panel (احتمالاً سرویس را هم تنظیم می‌کند)
 l-panel
+
+# ========================
+# تنظیم و راه‌اندازی سرویس systemd
+# ========================
+echo "Setting up and starting L-Panel service..."
+
+systemctl daemon-reload
+systemctl enable l-panel
+systemctl restart l-panel
+
+echo "L-Panel service has been enabled and started."
