@@ -1,72 +1,30 @@
 #!/bin/bash
+
 set -e
 
-APP_NAME="l-panel"
-INSTALL_DIR="/opt/l-panel"
-TMP_DIR="/tmp/l-panel-install"
-
-REPO_ZIP="https://github.com/mohama226/l-panel/archive/refs/heads/main.zip"
-
-echo "=========================="
-echo " Installing L-Panel"
-echo " ZIP Installer Mode"
-echo "=========================="
+echo "Installing L-Panel..."
 
 apt update
-
 apt install -y curl unzip python3 python3-pip python3-venv
 
-rm -rf "$TMP_DIR"
-mkdir -p "$TMP_DIR"
+rm -rf /opt/l-panel
 
-echo "[1/5] Downloading package..."
+mkdir -p /opt
 
-curl -L "$REPO_ZIP" -o "$TMP_DIR/l-panel.zip"
+cd /tmp
 
+curl -L -o l-panel.zip \
+https://github.com/mohama226/l-panel/archive/refs/heads/main.zip
 
-echo "[2/5] Extracting..."
+unzip -o l-panel.zip
 
-unzip -q "$TMP_DIR/l-panel.zip" -d "$TMP_DIR"
+mv l-panel-main /opt/l-panel
 
-
-echo "[3/5] Installing files..."
-
-rm -rf "$INSTALL_DIR"
-
-mv "$TMP_DIR/l-panel-main" "$INSTALL_DIR"
-
-
-echo "[4/5] Installing python environment..."
-
-cd "$INSTALL_DIR"
-
-python3 -m venv venv
-
-source venv/bin/activate
-
-if [ -f requirements.txt ]; then
-    pip install --upgrade pip
-    pip install -r requirements.txt
-fi
-
-deactivate
-
-
-echo "[5/5] Fixing permissions and creating command..."
-
-# Fixing permissions
-echo "Fixing permissions..."
 chmod +x /opt/l-panel/installer/*.sh
 chmod +x /opt/l-panel/scripts/*
-chmod +x /opt/l-panel/installer/menu.sh
-chmod +x /opt/l-panel/scripts/l-panel
 
-# Creating symlink
 ln -sf /opt/l-panel/scripts/l-panel /usr/local/bin/l-panel
 
+echo "L-Panel Installed"
 
-echo ""
-echo "=========================="
-echo " L-Panel Installed"
-echo " Type: l-panel"
-echo "=========================="
+l-panel
