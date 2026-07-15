@@ -24,6 +24,13 @@ unzip -o l-panel.zip
 mv l-panel-main /opt/l-panel
 
 # ========================
+# اجرای setup_database.sh قبل از ساخت venv
+# ========================
+echo "Running database setup..."
+cd /opt/l-panel
+bash installer/setup_database.sh
+
+# ========================
 # ایجاد محیط مجازی پایتون
 # ========================
 echo "Creating Python environment..."
