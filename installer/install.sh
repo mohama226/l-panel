@@ -18,10 +18,21 @@ echo "Starting PostgreSQL service..."
 systemctl start postgresql.service
 systemctl enable postgresql.service
 
-# Create PostgreSQL database and user (هماهنگ با setup_database.sh)
-echo "Creating PostgreSQL database..."
+# Create PostgreSQL database and user (نسخه بهبود یافته و ایمن)
+echo "Creating PostgreSQL database and user..."
 sudo -u postgres psql <<EOF
-CREATE USER lpanel_user WITH PASSWORD 'lpanel_password';
+DO \$\$
+BEGIN
+   IF NOT EXISTS (
+      SELECT FROM pg_roles WHERE rolname = 'lpanel_user'
+   ) THEN
+      CREATE ROLE lpanel_user LOGIN PASSWORD 'lpanel_pass';
+   ELSE
+      ALTER ROLE lpanel_user PASSWORD 'lpanel_pass';
+   END IF;
+END
+\$\$;
+
 CREATE DATABASE lpanel OWNER lpanel_user;
 GRANT ALL PRIVILEGES ON DATABASE lpanel TO lpanel_user;
 EOF
