@@ -1,1 +1,1 @@
-console.log("L-Panel Loaded");
+console.log("LAK PANEL READY");
