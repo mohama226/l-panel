@@ -1,17 +1,31 @@
 #!/bin/bash
 set -e
 echo "Installing L-Panel..."
+
 # بررسی اجرای به عنوان root
 if [ "$(id -u)" -ne 0 ]; then
     echo "Error: This script must be run as root"
     exit 1
 fi
-# Update and install dependencies
-apt update
-apt install -y curl unzip python3 python3-venv postgresql postgresql-contrib libpq-dev
-# Start PostgreSQL
-echo "Starting PostgreSQL service..."
-systemctl start postgresql.service
+
+# پاک‌سازی و دانلود آخرین نسخه
+rm -rf /opt/l-panel
+mkdir -p /opt
+cd /tmp
+echo "Downloading L-Panel..."
+curl -L -o l-panel.zip \
+https://github.com/mohama226/l-panel/archive/refs/heads/main.zip
+unzip -o l-panel.zip
+mv l-panel-main /opt/l-panel
+rm l-panel.zip
+
+# Source the library
+source /opt/l-panel/installer/lib.sh
+
+# Install dependencies using the function
+echo "Installing dependencies..."
+install_dependencies
+
 # ========================
 # Configuring PostgreSQL (بهبود یافته)
 # ========================
@@ -35,40 +49,33 @@ SELECT FROM pg_database WHERE datname='lpanel'
 \gexec
 GRANT ALL PRIVILEGES ON DATABASE lpanel TO lpanel_user;
 EOF
-# متوقف کردن سرویس قبلی (در صورت وجود)
 
-# پاک‌سازی و دانلود آخرین نسخه
-rm -rf /opt/l-panel
-mkdir -p /opt
-cd /tmp
-echo "Downloading L-Panel..."
-curl -L -o l-panel.zip \
-https://github.com/mohama226/l-panel/archive/refs/heads/main.zip
-unzip -o l-panel.zip
-mv l-panel-main /opt/l-panel
-rm l-panel.zip
 # ========================
 # اجرای setup_database.sh
 # ========================
 echo "Running database setup..."
 cd /opt/l-panel
 bash installer/setup_database.sh
+
 # ========================
 # ایجاد محیط مجازی پایتون
 # ========================
 echo "Creating Python virtual environment..."
 cd /opt/l-panel
 python3 -m venv venv
+
 # ========================
 # تنظیم مجوزها و symlink
 # ========================
 echo "Setting permissions and creating command..."
 ln -sf /opt/l-panel/scripts/l-panel /usr/local/bin/l-panel
+
 # ========================
 # کپی فایل سرویس systemd
 # ========================
 echo "Setting up systemd service..."
 cp /opt/l-panel/installer/systemd/l-panel.service /etc/systemd/system/l-panel.service
+
 # ========================
 # Testing database connection (قبل از راه‌اندازی سرویس)
 # ========================
@@ -83,7 +90,7 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 echo "Database connection successful."
-# راه‌اندازی سرویس به post_install.sh منتقل شد
+
 echo "L-Panel Installed Successfully!"
 echo "=================================="
 echo "Command: l-panel"
