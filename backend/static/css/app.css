@@ -1,190 +1,27 @@
 *{
 box-sizing:border-box;
-font-family:Inter,Arial;
 }
 
 
 body{
 
 margin:0;
-background:#061024;
+
+font-family:
+Inter,
+Arial;
+
+background:#050d20;
+
 color:#fff;
 
 }
 
 
-.sidebar{
-
-position:fixed;
-width:260px;
-height:100vh;
-
-background:#07152f;
-
-border-right:1px solid #16294b;
-
-padding:30px;
-
-}
-
-
-.logo{
-
-font-size:22px;
-font-weight:bold;
-
-margin-bottom:40px;
-
-}
-
-
-.logo span{
-
-display:block;
-font-size:12px;
-color:#8ca3c7;
-
-}
-
-
-.sidebar a{
-
-display:block;
-
-padding:15px;
-
-margin:8px 0;
-
-color:#b8c7e6;
-
-text-decoration:none;
-
-border-radius:12px;
-
-}
-
-
-.sidebar a:hover,
-.sidebar .active{
-
-background:#1155ff;
-
-color:white;
-
-}
-
-
-
-.content{
-
-margin-left:260px;
-
-padding:35px;
-
-}
-
-
-
-header{
+.panel{
 
 display:flex;
 
-justify-content:space-between;
-
-align-items:center;
-
-}
-
-
-
-.online{
-
-background:#12372e;
-
-padding:10px 18px;
-
-border-radius:20px;
-
-color:#00e889;
-
-}
-
-
-
-button{
-
-background:#1769ff;
-
-border:none;
-
-color:white;
-
-padding:12px 22px;
-
-border-radius:12px;
-
-cursor:pointer;
-
-}
-
-
-
-
-.card{
-
-background:#0c1935;
-
-border:1px solid #1c3157;
-
-border-radius:18px;
-
-padding:25px;
-
-margin-top:25px;
-
-}
-
-
-
-table{
-
-width:100%;
-
-border-collapse:collapse;
-
-}
-
-
-
-th{
-
-color:#90a5c7;
-
-text-align:left;
-
-padding:18px;
-
-}
-
-
-
-td{
-
-padding:18px;
-
-border-top:1px solid #1a2945;
-
-}
-
-
-.badge{
-
-padding:6px 14px;
-
-border-radius:20px;
-
-background:#3b1525;
-
-color:#ff5d78;
+min-height:100vh;
 
 }
