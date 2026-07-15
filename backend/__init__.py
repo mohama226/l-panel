@@ -18,9 +18,13 @@ def create_app():
     from backend.models.server import Server
     from backend.models.session import Session
 
-    # Create tables
+    # Create tables + update users table
     with app.app_context():
+
         db.create_all()
+
+        from backend.database.update_users import update_users_table
+        update_users_table()
 
     # ==========================
     # Register Blueprints
