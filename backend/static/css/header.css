@@ -1,0 +1,74 @@
+.header{
+
+height:90px;
+
+display:flex;
+
+justify-content:space-between;
+
+align-items:center;
+
+padding:0 35px;
+
+border-bottom:1px solid #182742;
+
+}
+
+
+
+.header h1{
+
+font-size:30px;
+
+}
+
+
+
+.header-actions{
+
+display:flex;
+
+gap:20px;
+
+align-items:center;
+
+}
+
+
+
+.clock,
+.online{
+
+padding:14px 20px;
+
+border:1px solid #203454;
+
+border-radius:14px;
+
+}
+
+
+
+.online{
+
+color:#19d98b;
+
+}
+
+
+
+.header button{
+
+background:#1765ff;
+
+border:none;
+
+color:white;
+
+padding:15px 25px;
+
+border-radius:12px;
+
+font-size:15px;
+
+}
