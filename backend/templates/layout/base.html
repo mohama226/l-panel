@@ -12,13 +12,14 @@ LAK PANEL
 </title>
 
 
+<link rel="stylesheet" href="/static/css/variables.css">
 <link rel="stylesheet" href="/static/css/core.css">
 <link rel="stylesheet" href="/static/css/layout.css">
 <link rel="stylesheet" href="/static/css/components.css">
+<link rel="stylesheet" href="/static/css/app.css">
 
 
-{% block css %}
-{% endblock %}
+{% block css %}{% endblock %}
 
 
 </head>
@@ -30,36 +31,29 @@ LAK PANEL
 <div class="app">
 
 
-{% include "layout/sidebar.html" %}
+    {% include "layout/sidebar.html" %}
 
 
 
-<div class="main">
+    <div class="main">
 
 
-{% include "layout/header.html" %}
-
-
-
-<section class="content">
-
-
-{% block content %}
-{% endblock %}
-
-
-</section>
+        {% include "layout/header.html" %}
 
 
 
-</div>
+        <main class="content">
+
+            {% block content %}
+            {% endblock %}
+
+        </main>
+
+
+    </div>
 
 
 </div>
-
-
-
-<script src="/static/js/app.js"></script>
 
 
 </body>
