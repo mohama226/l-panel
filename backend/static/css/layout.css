@@ -1,0 +1,56 @@
+.layout{
+
+display:flex;
+
+min-height:100vh;
+
+}
+
+
+
+/* SIDEBAR */
+
+
+.sidebar{
+
+width:270px;
+
+background:var(--bg-sidebar);
+
+border-right:1px solid var(--border);
+
+position:fixed;
+
+top:0;
+
+bottom:0;
+
+left:0;
+
+padding:25px;
+
+}
+
+
+
+/* MAIN */
+
+
+.main{
+
+margin-left:270px;
+
+width:calc(100% - 270px);
+
+}
+
+
+
+/* CONTENT */
+
+
+.content{
+
+padding:30px;
+
+}
