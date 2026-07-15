@@ -1,4 +1,6 @@
-from flask import Blueprint
+from flask import Blueprint, render_template
+from backend.models.session import Session
+
 
 sessions_bp = Blueprint(
     "sessions",
@@ -6,7 +8,17 @@ sessions_bp = Blueprint(
     url_prefix="/sessions"
 )
 
-@sessions_bp.route("/")
-def sessions():
 
-    return "Sessions"
+
+@sessions_bp.route("/")
+def index():
+
+    sessions = Session.query.order_by(
+        Session.login_time.desc()
+    ).all()
+
+
+    return render_template(
+        "sessions/list.html",
+        sessions=sessions
+    )
