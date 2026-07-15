@@ -9,9 +9,7 @@ def create_app():
 
     app.config.from_object(Config)
 
-
     db.init_app(app)
-
 
     from backend.models import (
         User,
@@ -19,9 +17,7 @@ def create_app():
         Session
     )
 
-
     with app.app_context():
         db.create_all()
-
 
     return app
