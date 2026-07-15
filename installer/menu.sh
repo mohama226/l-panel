@@ -67,19 +67,19 @@ read -rp "Select: " opt
 case $opt in
 
 1)
-lp_run install.sh
+bash /opt/l-panel/installer/install.sh
 ;;
 
 2)
-lp_run update.sh
+bash /opt/l-panel/installer/update.sh
 ;;
 
 3)
-lp_run install_ocserv.sh
+bash /opt/l-panel/installer/install_ocserv.sh
 ;;
 
 4)
-lp_run upgrade_ocserv.sh
+bash /opt/l-panel/installer/upgrade_ocserv.sh
 ;;
 
 5)
@@ -99,15 +99,15 @@ lp_message "PostgreSQL module coming soon"
 ;;
 
 9)
-lp_run panel_service.sh
+bash /opt/l-panel/installer/panel_service.sh
 ;;
 
 10)
-lp_run ocserv_service.sh
+bash /opt/l-panel/installer/ocserv_service.sh
 ;;
 
 11)
-lp_run restart_services.sh
+bash /opt/l-panel/installer/restart_services.sh
 ;;
 
 12)
@@ -127,15 +127,15 @@ lp_message "Password module coming soon"
 ;;
 
 16)
-lp_run system_info.sh
+bash /opt/l-panel/installer/system_info.sh
 ;;
 
 17)
-lp_run logs.sh
+bash /opt/l-panel/installer/logs.sh
 ;;
 
 18)
-lp_run uninstall.sh
+bash /opt/l-panel/installer/uninstall.sh
 ;;
 
 19)
