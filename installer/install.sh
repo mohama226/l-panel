@@ -18,22 +18,30 @@ echo "Starting PostgreSQL service..."
 systemctl start postgresql.service
 systemctl enable postgresql.service
 
-# Create PostgreSQL database and user (نسخه بهبود یافته و ایمن)
-echo "Creating PostgreSQL database and user..."
+# ========================
+# Configuring PostgreSQL (بهبود یافته)
+# ========================
+echo "Configuring PostgreSQL..."
+
 sudo -u postgres psql <<EOF
 DO \$\$
 BEGIN
-   IF NOT EXISTS (
-      SELECT FROM pg_roles WHERE rolname = 'lpanel_user'
-   ) THEN
-      CREATE ROLE lpanel_user LOGIN PASSWORD 'lpanel_pass';
-   ELSE
-      ALTER ROLE lpanel_user PASSWORD 'lpanel_pass';
-   END IF;
+IF NOT EXISTS (
+SELECT FROM pg_roles WHERE rolname='lpanel_user'
+) THEN
+CREATE ROLE lpanel_user LOGIN PASSWORD 'lpanel_pass';
+ELSE
+ALTER ROLE lpanel_user PASSWORD 'lpanel_pass';
+END IF;
 END
 \$\$;
 
-CREATE DATABASE lpanel OWNER lpanel_user;
+SELECT 'CREATE DATABASE lpanel OWNER lpanel_user'
+WHERE NOT EXISTS (
+SELECT FROM pg_database WHERE datname='lpanel'
+)
+\gexec
+
 GRANT ALL PRIVILEGES ON DATABASE lpanel TO lpanel_user;
 EOF
 
@@ -88,6 +96,22 @@ ln -sf /opt/l-panel/scripts/l-panel /usr/local/bin/l-panel
 # ========================
 echo "Setting up systemd service..."
 cp /opt/l-panel/installer/systemd/l-panel.service /etc/systemd/system/l-panel.service
+
+# ========================
+# Testing database connection (قبل از راه‌اندازی سرویس)
+# ========================
+echo "Testing database connection..."
+PGPASSWORD=lpanel_pass psql \
+-h localhost \
+-U lpanel_user \
+-d lpanel \
+-c "SELECT 1;" > /dev/null 2>&1
+
+if [ $? -ne 0 ]; then
+    echo "Database connection failed"
+    exit 1
+fi
+echo "Database connection successful."
 
 # ========================
 # راه‌اندازی سرویس
