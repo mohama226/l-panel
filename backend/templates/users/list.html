@@ -1,71 +1,77 @@
 {% extends "base.html" %}
 
 
+{% block title %}
+Users
+{% endblock %}
+
+
+
 {% block content %}
 
 
 <div class="cards">
 
 
-<div class="stat-card">
+<div class="card">
 
-<div class="icon">
-👥
-</div>
+<h3>Total Users</h3>
 
-<h2>
+<div class="number">
 {{users|length}}
-</h2>
+</div>
 
-Users
+<p>
+All registered users
+</p>
 
 </div>
 
 
 
-<div class="stat-card">
+<div class="card">
 
-<div class="icon">
-🟢
-</div>
+<h3>Online Users</h3>
 
-<h2>
+<div class="number">
 0
-</h2>
+</div>
 
-Online
+<p>
+Currently connected
+</p>
 
 </div>
 
 
 
-<div class="stat-card">
+<div class="card">
 
-<div class="icon">
-🖥
-</div>
+<h3>Servers</h3>
 
-<h2>
+<div class="number">
 1
-</h2>
+</div>
 
-Servers
+<p>
+Active servers
+</p>
 
 </div>
 
 
 
-<div class="stat-card">
+<div class="card">
 
-<div class="icon">
-📅
-</div>
+<h3>Expiring Soon</h3>
 
-<h2>
+<div class="number">
 0
-</h2>
+</div>
 
-Expiring
+<p>
+Within 7 days
+</p>
 
 </div>
 
@@ -76,10 +82,11 @@ Expiring
 
 
 
-<div class="table-box">
+<div class="panel">
 
 
-<div class="table-header">
+<div class="table-head">
+
 
 <h2>
 Users List
@@ -88,6 +95,7 @@ Users List
 
 <input class="search"
 placeholder="Search users...">
+
 
 </div>
 
@@ -100,27 +108,27 @@ placeholder="Search users...">
 <tr>
 
 <th>
-User
+Username
 </th>
-
 
 <th>
 Status
 </th>
 
-
 <th>
-Expire
+Server
 </th>
-
 
 <th>
 Traffic
 </th>
 
+<th>
+Expire
+</th>
 
 <th>
-Action
+Actions
 </th>
 
 
@@ -137,15 +145,9 @@ Action
 
 <td>
 
-<span class="avatar">
-{{user.username[0]}}
-</span>
-
-
 {{user.username}}
 
 </td>
-
 
 
 <td>
@@ -159,26 +161,23 @@ Offline
 </td>
 
 
-
 <td>
-
-{{user.expire_date}}
-
+Local
 </td>
 
 
-
 <td>
-
 -
-
 </td>
 
 
 <td>
+{{user.expire_date}}
+</td>
 
+
+<td>
 ⋮
-
 </td>
 
 
@@ -186,7 +185,6 @@ Offline
 
 
 {% endfor %}
-
 
 
 </table>
