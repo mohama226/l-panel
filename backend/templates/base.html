@@ -1,251 +1,70 @@
 <!DOCTYPE html>
-<html lang="en">
-
+<html>
 <head>
 
-<meta charset="UTF-8">
+<title>Lak Panel</title>
 
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-
-<title>
-{% block title %}
-LAK PANEL
-{% endblock %}
-</title>
-
-
-<link rel="stylesheet" href="/static/css/dashboard.css">
-
-
-<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
-
+<link rel="stylesheet" href="/static/css/app.css">
 
 </head>
-
 
 <body>
 
 
-<div class="layout">
+<div class="sidebar">
 
-
-<!-- SIDEBAR -->
-
-<aside class="sidebar">
-
-
-<div class="brand">
-
-
-<div class="logo-box">
-<i class="fa-solid fa-shield-halved"></i>
+<div class="logo">
+LAK PANEL
+<span>Control Center</span>
 </div>
 
+
+<a href="/">Dashboard</a>
+
+<a class="active" href="/users">
+Users
+</a>
+
+<a href="#">
+Servers
+</a>
+
+<a href="#">
+Backups
+</a>
+
+<a href="#">
+Settings
+</a>
+
+
+</div>
+
+
+<div class="content">
+
+<header>
 
 <div>
-
 <h2>
-LAK PANEL
+{% block title %}{% endblock %}
 </h2>
+</div>
 
-<span>
-Control Center
+
+<div class="top">
+
+<span class="online">
+● Online
 </span>
 
-
-</div>
-
-
-</div>
-
-
-
-<nav>
-
-
-<div class="section">
-MAIN
-</div>
-
-
-<a href="/">
-<i class="fa-solid fa-house"></i>
-Dashboard
-</a>
-
-
-
-<a href="/users" class="active">
-
-<i class="fa-solid fa-users"></i>
-
-Users
-
-</a>
-
-
-
-<a>
-
-<i class="fa-solid fa-server"></i>
-
-Servers
-
-</a>
-
-
-
-<a>
-
-<i class="fa-solid fa-folder"></i>
-
-Groups
-
-</a>
-
-
-
-<a>
-
-<i class="fa-solid fa-user-shield"></i>
-
-Administrators
-
-</a>
-
-
-
-
-<div class="section">
-SYSTEM
-</div>
-
-
-<a>
-
-<i class="fa-solid fa-file-lines"></i>
-
-Logs
-
-</a>
-
-
-<a>
-
-<i class="fa-solid fa-database"></i>
-
-Backups
-
-</a>
-
-
-<a>
-
-<i class="fa-solid fa-rotate"></i>
-
-Restore
-
-</a>
-
-
-
-<a>
-
-<i class="fa-solid fa-gear"></i>
-
-Settings
-
-</a>
-
-
-</nav>
-
-
-
-</aside>
-
-
-
-
-
-<!-- MAIN -->
-
-
-<main>
-
-
-<header class="topbar">
-
-
-<div class="page-title">
-
-
-<h1>
-
-{% block header %}
-Users
-{% endblock %}
-
-</h1>
-
-
-<p>
-Manage and monitor all users
-</p>
-
-
-</div>
-
-
-
-<div class="top-actions">
-
-
-<div class="time">
-
-<i class="fa-regular fa-clock"></i>
-
-2026-07-09 22:06:51
-
-</div>
-
-
-<div class="online">
-
-● Online
-
-</div>
-
-
-
-<div class="avatar">
-
-V
-
-</div>
-
-
-
-<button class="create">
-
-<i class="fa-solid fa-plus"></i>
-
-Create User
-
+<button>
++ Create User
 </button>
 
-
 </div>
 
-
 </header>
-
-
-
-
-
-<section class="content">
 
 
 {% block content %}
@@ -253,20 +72,10 @@ Create User
 {% endblock %}
 
 
-</section>
-
-
-</main>
-
-
-
 </div>
 
 
-
-<script src="/static/js/dashboard.js"></script>
-
+<script src="/static/js/app.js"></script>
 
 </body>
-
 </html>
