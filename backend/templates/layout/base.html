@@ -12,11 +12,7 @@ LAK PANEL
 </title>
 
 
-<link rel="stylesheet" href="{{ url_for('static',filename='css/variables.css') }}">
-<link rel="stylesheet" href="{{ url_for('static',filename='css/core.css') }}">
-<link rel="stylesheet" href="{{ url_for('static',filename='css/layout.css') }}">
-<link rel="stylesheet" href="{{ url_for('static',filename='css/components.css') }}">
-<link rel="stylesheet" href="{{ url_for('static',filename='css/app.css') }}">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}">
 
 
 {% block css %}
@@ -29,27 +25,24 @@ LAK PANEL
 <body>
 
 
-<div class="app-layout">
+<div class="wrapper">
 
 
     {% include "layouts/sidebar.html" %}
 
 
-
-    <div class="main-area">
+    <div class="main">
 
 
         {% include "layout/header.html" %}
 
 
-
-        <main class="page-content">
+        <section class="content">
 
             {% block content %}
             {% endblock %}
 
-        </main>
-
+        </section>
 
 
     </div>
