@@ -11,15 +11,19 @@ margin-bottom:30px;
 
 .page-head h1{
 
-font-size:34px;
 margin:0;
+
+font-size:32px;
 
 }
 
 
+
 .page-head p{
 
-color:#8fa4ca;
+margin-top:8px;
+
+color:#94a3b8;
 
 }
 
@@ -27,15 +31,23 @@ color:#8fa4ca;
 
 .create-btn{
 
-background:#1765ff;
+background:#2563eb;
 
-padding:15px 25px;
+padding:14px 24px;
 
 border-radius:12px;
+
+color:white;
+
+cursor:pointer;
 
 }
 
 
+
+
+
+/* STAT CARDS */
 
 
 .stats{
@@ -46,7 +58,7 @@ grid-template-columns:repeat(4,1fr);
 
 gap:22px;
 
-margin-bottom:30px;
+margin-bottom:25px;
 
 }
 
@@ -55,19 +67,33 @@ margin-bottom:30px;
 .stat-card{
 
 
-background:#0b1931;
+height:140px;
 
-border:1px solid #203454;
-
-border-radius:18px;
 
 padding:25px;
 
+
+border-radius:18px;
+
+
+background:
+linear-gradient(
+145deg,
+#0d1833,
+#101d3b
+);
+
+
+border:1px solid #1e335c;
+
+
 display:flex;
 
-gap:20px;
 
 align-items:center;
+
+
+gap:20px;
 
 
 }
@@ -76,20 +102,28 @@ align-items:center;
 
 .stat-card .icon{
 
+
 width:55px;
+
 height:55px;
 
-border-radius:18px;
+
+border-radius:16px;
+
 
 display:flex;
+
 
 align-items:center;
 
 justify-content:center;
 
+
 font-size:25px;
 
-background:#10274b;
+
+background:#172554;
+
 
 }
 
@@ -97,42 +131,91 @@ background:#10274b;
 
 .stat-card span{
 
+
 display:block;
 
-color:#9cafcf;
+color:#94a3b8;
+
+font-size:14px;
+
 
 }
 
 
+
 .stat-card strong{
+
 
 display:block;
 
 font-size:32px;
 
+
 margin:5px 0;
 
+
 }
+
 
 
 .stat-card small{
 
-color:#8294b8;
+
+color:#64748b;
+
 
 }
 
 
 
+/* colors */
+
+
+.stat-card.blue .icon{
+
+background:#172554;
+
+}
+
+
+.stat-card.green .icon{
+
+background:#064e3b;
+
+}
+
+
+.stat-card.purple .icon{
+
+background:#3b0764;
+
+}
+
+
+.stat-card.orange .icon{
+
+background:#78350f;
+
+}
+
+
+
+
+
+/* USERS BOX */
 
 
 .users-box{
 
 
-background:#0a172d;
+background:#0b1734;
 
-border:1px solid #203454;
+
+border:1px solid #1e335c;
+
 
 border-radius:18px;
+
 
 padding:25px;
 
@@ -144,11 +227,18 @@ padding:25px;
 
 .box-header{
 
+
 display:flex;
+
 
 justify-content:space-between;
 
-margin-bottom:25px;
+
+align-items:center;
+
+
+margin-bottom:20px;
+
 
 }
 
@@ -156,7 +246,23 @@ margin-bottom:25px;
 
 .box-header h2{
 
+
 margin:0;
+
+
+font-size:20px;
+
+
+}
+
+
+
+.search{
+
+
+display:flex;
+
+gap:10px;
 
 }
 
@@ -164,82 +270,117 @@ margin:0;
 
 .search input{
 
-background:#081427;
 
-border:1px solid #263b60;
+width:280px;
 
-padding:14px;
 
-border-radius:12px;
+background:#071329;
+
+
+border:1px solid #23345d;
+
+
+border-radius:10px;
+
+
+padding:13px 15px;
+
 
 color:white;
 
+
 }
+
 
 
 .search button{
 
-margin-left:10px;
 
-padding:14px 25px;
+background:#101d3b;
 
-border-radius:12px;
 
-background:#132541;
+border:1px solid #23345d;
 
-border:1px solid #263b60;
 
 color:white;
 
+
+border-radius:10px;
+
+
+padding:0 20px;
+
+
 }
 
 
 
 
 
-table{
+/* TABLE */
+
+
+.users-box table{
+
 
 width:100%;
 
+
 border-collapse:collapse;
+
 
 }
 
 
 
-th{
+.users-box th{
+
 
 text-align:left;
 
+
 padding:18px;
 
-color:#8da2c7;
 
-border-bottom:1px solid #203454;
+color:#94a3b8;
+
+
+font-size:14px;
+
+
+}
+
+
+
+.users-box td{
+
+
+padding:18px;
+
+
+border-top:1px solid #172554;
+
 
 }
 
 
-
-td{
-
-padding:20px;
-
-border-bottom:1px solid #172a49;
-
-}
 
 
 
 .username{
 
+
 display:flex;
+
 
 align-items:center;
 
+
 gap:15px;
 
-font-weight:bold;
+
+font-weight:600;
+
 
 }
 
@@ -247,18 +388,25 @@ font-weight:bold;
 
 .avatar{
 
+
 width:38px;
+
 height:38px;
+
 
 border-radius:50%;
 
+
 background:#2563eb;
 
+
 display:flex;
+
 
 align-items:center;
 
 justify-content:center;
+
 
 }
 
@@ -268,34 +416,54 @@ justify-content:center;
 
 .status{
 
-padding:7px 14px;
+
+padding:6px 14px;
+
 
 border-radius:20px;
 
-background:#321b2b;
-
-color:#ff5c6c;
 
 font-size:13px;
+
 
 }
 
 
 
+.offline{
+
+
+background:#3f1722;
+
+color:#fb7185;
+
+
+}
+
+
 
 .action{
 
-background:#162640;
 
-border:0;
+background:#101d3b;
+
+
+border:1px solid #23345d;
+
 
 color:white;
 
+
+width:40px;
+
+height:40px;
+
+
 border-radius:10px;
 
-font-size:22px;
 
-padding:5px 12px;
+font-size:20px;
+
 
 }
 
@@ -303,8 +471,10 @@ padding:5px 12px;
 
 .footer{
 
-padding-top:25px;
 
-color:#8395b8;
+margin-top:25px;
+
+color:#94a3b8;
+
 
 }
