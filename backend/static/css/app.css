@@ -8,22 +8,92 @@ body{
 margin:0;
 
 font-family:
-Inter,
 Arial,
 sans-serif;
 
-background:#0b1220;
+background:#f4f6fb;
 
-color:#e5e7eb;
+}
+
+
+.wrapper{
+
+display:flex;
+
+min-height:100vh;
 
 }
 
 
 
-a{
+.sidebar{
+
+width:260px;
+
+background:#111827;
+
+color:white;
+
+padding:25px;
+
+}
+
+
+
+.sidebar a{
+
+display:block;
+
+color:#cbd5e1;
+
+padding:12px;
+
+margin-top:10px;
 
 text-decoration:none;
 
-color:inherit;
+}
+
+
+
+.sidebar a:hover{
+
+background:#2563eb;
+
+border-radius:8px;
+
+}
+
+
+
+.main{
+
+flex:1;
+
+}
+
+
+
+.header{
+
+height:70px;
+
+background:white;
+
+display:flex;
+
+align-items:center;
+
+justify-content:space-between;
+
+padding:0 30px;
+
+}
+
+
+
+.content{
+
+padding:30px;
 
 }
