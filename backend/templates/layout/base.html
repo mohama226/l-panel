@@ -11,11 +11,16 @@ LAK PANEL
 {% endblock %}
 </title>
 
+<link rel="stylesheet" href="/static/css/variables.css">
+<link rel="stylesheet" href="/static/css/app.css">
+<link rel="stylesheet" href="/static/css/layout.css">
+<link rel="stylesheet" href="/static/css/components.css">
 
 <link rel="stylesheet" href="/static/css/core.css">
-<link rel="stylesheet" href="/static/css/sidebar.css">
-<link rel="stylesheet" href="/static/css/header.css">
-<link rel="stylesheet" href="/static/css/table.css">
+<link rel="stylesheet" href="/static/css/table.css">  
+{% block css %}{% endblock %}
+  
+
 
 
 {% block css %}
