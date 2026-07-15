@@ -1,0 +1,41 @@
+.card{
+
+background:var(--bg-card);
+
+border:1px solid var(--border);
+
+border-radius:var(--radius);
+
+padding:25px;
+
+}
+
+
+
+.btn-primary{
+
+background:var(--primary);
+
+color:white;
+
+border:0;
+
+padding:12px 22px;
+
+border-radius:12px;
+
+}
+
+
+
+.table-box{
+
+background:var(--bg-card);
+
+border:1px solid var(--border);
+
+border-radius:var(--radius);
+
+padding:25px;
+
+}
