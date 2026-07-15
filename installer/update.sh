@@ -2,26 +2,25 @@
 
 set -e
 
-echo "Updating L-Panel..."
+TMP="/tmp/l-panel-update"
 
-cd /tmp
+rm -rf "$TMP"
 
-curl -L -o l-panel.zip \
-https://github.com/mohama226/l-panel/archive/refs/heads/main.zip
+mkdir -p "$TMP"
 
-unzip -o l-panel.zip
+echo "Downloading..."
 
-rm -rf /opt/l-panel-new
+curl -L \
+https://github.com/mohama226/l-panel/archive/refs/heads/main.zip \
+-o "$TMP/panel.zip"
 
-mv l-panel-main /opt/l-panel-new
+unzip -oq "$TMP/panel.zip" -d "$TMP"
 
-rm -rf /opt/l-panel
+cp -rf \
+"$TMP"/l-panel-main/* \
+/opt/l-panel/
 
-mv /opt/l-panel-new /opt/l-panel
+bash /opt/l-panel/installer/post_install.sh
 
-chmod +x /opt/l-panel/installer/*.sh
-chmod +x /opt/l-panel/scripts/*
-
-systemctl daemon-reload
-
-echo "Update completed"
+echo
+echo "Update completed."
