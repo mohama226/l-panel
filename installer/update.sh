@@ -8,19 +8,23 @@ rm -rf "$TMP"
 
 mkdir -p "$TMP"
 
-echo "Downloading..."
+echo "Downloading latest release..."
 
 curl -L \
 https://github.com/mohama226/l-panel/archive/refs/heads/main.zip \
--o "$TMP/panel.zip"
+-o "$TMP/l-panel.zip"
 
-unzip -oq "$TMP/panel.zip" -d "$TMP"
+unzip -oq \
+"$TMP/l-panel.zip" \
+-d "$TMP"
 
-cp -rf \
-"$TMP"/l-panel-main/* \
+echo "Updating files..."
+
+rsync -a --delete \
+"$TMP/l-panel-main/" \
 /opt/l-panel/
 
 bash /opt/l-panel/installer/post_install.sh
 
 echo
-echo "Update completed."
+echo "Update completed successfully."
