@@ -1,56 +1,74 @@
-<h2>
-ویرایش کاربر
-</h2>
+{% extends "base.html" %}
 
 
-<form method="post">
+{% block title %}
+Edit User
+{% endblock %}
 
 
-Username:
-
-<input name="username"
-value="{{user.username}}">
 
 
-<br>
+{% block content %}
 
 
-Password:
-
-<input name="password"
-value="{{user.password}}">
+<div class="card">
 
 
-<br>
+<h2>Edit {{user.username}}</h2>
 
 
-Traffic:
 
-<input name="traffic_limit"
-value="{{user.traffic_limit}}">
+<form method="POST">
 
 
-<br>
+<input
+name="username"
+value="{{user.username}}"
+>
 
 
-Status:
+
+<br><br>
+
+
 
 <select name="status">
 
-<option>
-active
+
+<option value="active"
+{% if user.status=="active" %}
+selected
+{% endif %}
+>
+Active
 </option>
 
 
-<option>
-disabled
+
+<option value="blocked"
+{% if user.status=="blocked" %}
+selected
+{% endif %}
+>
+Blocked
 </option>
 
 
 </select>
 
 
-<br>
+<br><br>
+
+
+
+<input
+type="date"
+name="expire_date"
+>
+
+
+
+<br><br>
 
 
 <button>
@@ -59,3 +77,10 @@ Save
 
 
 </form>
+
+
+
+</div>
+
+
+{% endblock %}
