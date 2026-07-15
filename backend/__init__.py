@@ -48,5 +48,8 @@ def create_app():
     app.register_blueprint(servers_api)
     app.register_blueprint(sessions_api)
 
-    # از این به بعد مسیر "/" و سایر مسیرها از طریق Blueprint مدیریت می‌شوند
+    # ======================== Extra Users Blueprint ========================
+    from backend.routes.users import users_bp as users_bp_extra
+    app.register_blueprint(users_bp_extra)
+
     return app
