@@ -2,43 +2,54 @@ from backend.extensions import db
 from datetime import datetime
 
 
+
 class Session(db.Model):
 
     __tablename__ = "sessions"
+
 
     id = db.Column(
         db.Integer,
         primary_key=True
     )
 
-    username = db.Column(
-        db.String(64),
+
+    user_id = db.Column(
+        db.Integer,
+        db.ForeignKey("users.id"),
         nullable=False
     )
+
+
+    device_id = db.Column(
+        db.String(128)
+    )
+
 
     ip_address = db.Column(
         db.String(64)
     )
 
-    device = db.Column(
-        db.String(100)
-    )
 
-    upload = db.Column(
-        db.BigInteger,
-        default=0
-    )
-
-    download = db.Column(
-        db.BigInteger,
-        default=0
-    )
-
-    connected_at = db.Column(
+    login_time = db.Column(
         db.DateTime,
         default=datetime.utcnow
     )
 
-    disconnected_at = db.Column(
-        db.DateTime
+
+    logout_time = db.Column(
+        db.DateTime,
+        nullable=True
+    )
+
+
+    active = db.Column(
+        db.Boolean,
+        default=True
+    )
+
+
+    user = db.relationship(
+        "User",
+        backref="sessions"
     )
