@@ -37,6 +37,16 @@ def create_app():
     app.register_blueprint(sessions_bp)
     app.register_blueprint(auth_bp)
 
-    # از این به بعد مسیر "/" و سایر مسیرها از طریق Blueprint مدیریت می‌شوند
+    # ======================== API Blueprints ========================
+    from backend.api import (
+        users_api,
+        servers_api,
+        sessions_api
+    )
 
+    app.register_blueprint(users_api)
+    app.register_blueprint(servers_api)
+    app.register_blueprint(sessions_api)
+
+    # از این به بعد مسیر "/" و سایر مسیرها از طریق Blueprint مدیریت می‌شوند
     return app
