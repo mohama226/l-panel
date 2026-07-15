@@ -13,9 +13,13 @@ Users
 <div class="card">
 
 
-<h2>
-Users List
-</h2>
+<a href="/users/create">
+
+<button>
++ Create User
+</button>
+
+</a>
 
 
 
@@ -41,11 +45,11 @@ Traffic
 </th>
 
 <th>
-Action
+Actions
 </th>
 
-
 </tr>
+
 
 
 
@@ -56,34 +60,43 @@ Action
 
 
 <td>
-
 {{user.username}}
-
 </td>
 
 
 
 <td>
 
-<span class="badge">
+{% if user.status=="active" %}
 
-{{user.status}}
-
+<span class="online">
+Online
 </span>
 
+{% else %}
+
+<span class="badge">
+Blocked
+</span>
+
+{% endif %}
+
+
 </td>
 
 
 
 <td>
 
-{{user.expire_date}}
+{{user.expire_date or "-"}}
 
 </td>
 
 
+
 <td>
 
+{{user.used_traffic}} /
 {{user.traffic_limit}}
 
 </td>
@@ -92,11 +105,31 @@ Action
 
 <td>
 
-<button>
-⋮
-</button>
+
+<a href="/users/edit/{{user.id}}">
+Edit
+</a>
+
+
+&nbsp;
+
+
+<a href="/users/toggle/{{user.id}}">
+Block
+</a>
+
+
+&nbsp;
+
+
+<a href="/users/delete/{{user.id}}">
+Delete
+</a>
+
+
 
 </td>
+
 
 
 </tr>
@@ -111,7 +144,6 @@ Action
 
 
 </div>
-
 
 
 {% endblock %}
