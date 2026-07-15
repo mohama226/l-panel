@@ -1,6 +1,7 @@
 [Unit]
 Description=L-Panel Web Panel
-After=network.target
+After=network.target postgresql.service
+Requires=postgresql.service
 
 [Service]
 Type=simple
@@ -15,7 +16,7 @@ Environment="PATH=/opt/l-panel/venv/bin"
 ExecStart=/opt/l-panel/venv/bin/python3 /opt/l-panel/run.py
 
 Restart=always
-RestartSec=3
+RestartSec=5
 
 StandardOutput=journal
 StandardError=journal
