@@ -1,61 +1,44 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fa" dir="rtl">
 
 <head>
+    <meta charset="UTF-8">
+    <title>{% block title %}{% endblock %} - L-Panel</title>
 
-<meta charset="UTF-8">
+    <!-- Bootstrap 5 -->
+    <link rel="stylesheet" href="/static/adminlte/bootstrap.min.css">
 
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- FontAwesome -->
+    <link rel="stylesheet" href="/static/adminlte/fontawesome.min.css">
 
-<title>
-{% block title %}
-L-Panel
-{% endblock %}
-</title>
+    <!-- AdminLTE 4 Dark -->
+    <link rel="stylesheet" href="/static/adminlte/adminlte.dark.min.css">
 
-
-<link rel="stylesheet"
-href="/static/css/style.css">
-
-
+    <!-- Custom -->
+    <link rel="stylesheet" href="/static/css/custom.css">
 </head>
 
+<body class="layout-fixed sidebar-mini dark-mode">
 
-<body>
+<div class="wrapper">
 
+    {% include "layout/navbar.html" %}
+    {% include "layout/sidebar.html" %}
 
-<div class="app">
+    <div class="content-wrapper p-3">
 
+        {% block content %}
+        {% endblock %}
 
-{% include "layouts/sidebar.html" %}
+    </div>
 
-
-
-<div class="main">
-
-
-{% include "layouts/navbar.html" %}
-
-
-
-<div class="page">
-
-{% block content %}
-{% endblock %}
+    {% include "layout/footer.html" %}
 
 </div>
 
-
-</div>
-
-
-</div>
-
-
-
-<script src="/static/js/app.js"></script>
-
+<!-- Scripts -->
+<script src="/static/adminlte/bootstrap.bundle.min.js"></script>
+<script src="/static/adminlte/adminlte.min.js"></script>
 
 </body>
-
 </html>
