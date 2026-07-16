@@ -5,137 +5,76 @@ set -Eeuo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 CLI_DIR="$(dirname "$SCRIPT_DIR")"
 
-source "$CLI_DIR/lib/colors.sh"
-source "$CLI_DIR/lib/common.sh"
+source "$CLI_DIR/../lib/colors.sh"
+source "$CLI_DIR/../lib/common.sh"
 
-REPO="mohama226/l-panel"
-BRANCH="main"
+require_root
 
-TMP_DIR="/tmp/lpanel-update"
-ZIP_FILE="$TMP_DIR/update.zip"
 
-INSTALL_DIR="/opt/l-panel"
+TMP_DIR=$(mktemp -d)
 
-########################################
-
-prepare() {
-
+cleanup(){
     rm -rf "$TMP_DIR"
-
-    mkdir -p "$TMP_DIR"
-
 }
 
-########################################
+trap cleanup EXIT
 
-download_update() {
 
-    info "Downloading latest version..."
+update(){
 
-    curl -L \
-    "https://github.com/${REPO}/archive/refs/heads/${BRANCH}.zip" \
-    -o "$ZIP_FILE"
+    title
 
-}
-########################################
+    info "Checking GitHub updates..."
 
-extract_update() {
+    cd "$TMP_DIR"
 
-    info "Extracting..."
 
-    unzip -oq "$ZIP_FILE" -d "$TMP_DIR"
+    curl -fsSL \
+    https://github.com/mohama226/l-panel/archive/refs/heads/main.zip \
+    -o l-panel.zip
 
-}
 
-########################################
+    unzip -q l-panel.zip
 
-find_project() {
 
-    PROJECT_DIR=$(find "$TMP_DIR" -maxdepth 1 -type d -name "l-panel-*")
+    NEW_DIR=$(find . -maxdepth 1 -type d -name "l-panel-*")
 
-    if [[ -z "$PROJECT_DIR" ]]; then
 
-        fail "Cannot locate extracted project."
+    if [[ -z "$NEW_DIR" ]]; then
+
+        fail "Download failed."
 
         exit 1
 
     fi
 
-}
-
-########################################
-
-backup() {
-
-    BACKUP="/tmp/lpanel-backup-$(date +%Y%m%d%H%M%S)"
-
-    info "Creating Backup..."
-
-    cp -a "$INSTALL_DIR" "$BACKUP"
-
-}########################################
-
-replace_files() {
 
     info "Updating files..."
 
-    rsync -a \
-    --delete \
-    --exclude=".env" \
-    --exclude=".installed" \
-    --exclude=".last_update" \
-    "$PROJECT_DIR/" \
-    "$INSTALL_DIR/"
 
-}
+    cp -a "$NEW_DIR/." /opt/l-panel/
 
-########################################
 
-restart_services() {
+    date "+%Y-%m-%d %H:%M:%S" \
+    > /opt/l-panel/.last_update
 
-    if systemctl list-unit-files | grep -q lpanel.service
-    then
 
-        info "Restarting Service..."
+    chmod +x /opt/l-panel/cli/l-panel
 
-        systemctl restart lpanel
+    chmod +x /opt/l-panel/cli/commands/*.sh
 
-    fi
 
-}########################################
-
-finish() {
-
-    save_last_update
-
-    ok "Update Finished."
+    ok "Update completed."
 
     echo
 
-    echo "Installed Version : $(get_version)"
+    echo "Updated:"
+    cat /opt/l-panel/.last_update
 
-    echo "Last Update       : $(get_last_update)"
 
-}########################################
+    pause
 
-title
+}
 
-info "L-PANEL Update"
 
-prepare
-
-download_update
-
-extract_update
-
-find_project
-
-backup
-
-replace_files
-
-restart_services
-
-finish
-
-pause
+update
