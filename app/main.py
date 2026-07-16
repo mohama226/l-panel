@@ -1,13 +1,9 @@
 from fastapi import FastAPI
-from app.routers import users, admin, ocserv
-from app.database import init_db
+from app.routers import users_router, admin_router, ocserv_router, dashboard_router
 
-app = FastAPI(title="l-panel")
+app = FastAPI()
 
-@app.on_event("startup")
-def startup():
-    init_db()
-
-app.include_router(users.router, prefix="/users", tags=["Users"])
-app.include_router(admin.router, prefix="/admin", tags=["Admin"])
-app.include_router(ocserv.router, prefix="/ocserv", tags=["Ocserv"])
+app.include_router(users_router)
+app.include_router(admin_router)
+app.include_router(ocserv_router)
+app.include_router(dashboard_router)
