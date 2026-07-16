@@ -6,12 +6,9 @@ echo "=== Installing ocserv 1.5.0 ==="
 read -p "Enter ocserv port (default 443): " OCPORT
 OCPORT=${OCPORT:-443}
 
-echo "Installing ocserv on port $OCPORT ..."
-
 dnf install -y epel-release
 dnf install -y ocserv
 
-# Update ocserv config
 sed -i "s/^tcp-port = .*/tcp-port = $OCPORT/" /etc/ocserv/ocserv.conf
 sed -i "s/^udp-port = .*/udp-port = $OCPORT/" /etc/ocserv/ocserv.conf
 
