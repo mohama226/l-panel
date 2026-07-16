@@ -3,16 +3,15 @@
 set -Eeuo pipefail
 
 
-#############################################
-# Path
-#############################################
+########################################
+# Paths
+########################################
 
 SCRIPT_PATH="$(readlink -f "${BASH_SOURCE[0]}")"
 
 SCRIPT_DIR="$(dirname "$SCRIPT_PATH")"
 
 CLI_DIR="$(dirname "$SCRIPT_DIR")"
-
 
 
 source "$CLI_DIR/lib/colors.sh"
@@ -24,15 +23,11 @@ require_root
 
 
 
-#############################################
+########################################
 # Variables
-#############################################
+########################################
 
 OCSERV_VERSION="1.5.0"
-
-BUILD_DIR="/usr/local/src"
-
-SOURCE_DIR="$BUILD_DIR/ocserv-$OCSERV_VERSION"
 
 CONFIG_DIR="/etc/ocserv"
 
@@ -40,43 +35,42 @@ CONFIG_FILE="$CONFIG_DIR/ocserv.conf"
 
 SERVICE_FILE="/etc/systemd/system/ocserv.service"
 
+BUILD_DIR="/usr/local/src"
 
 
-#############################################
+
+########################################
 # Ask Port
-#############################################
+########################################
 
 ask_port(){
 
     echo
 
-    read -rp "Ocserv Port [443]: " OCSERV_PORT
+    read -rp "Ocserv Port [443]: " PORT
 
 
-    OCSERV_PORT=${OCSERV_PORT:-443}
+    PORT=${PORT:-443}
 
 
 }
 
 
 
-#############################################
-# Install Dependencies
-#############################################
+########################################
+# Dependencies
+########################################
 
 install_dependencies(){
 
 
-    info "Installing Ocserv dependencies..."
-
+    info "Installing dependencies..."
 
 
     dnf install -y epel-release
 
 
-
     dnf install -y dnf-plugins-core
-
 
 
     dnf config-manager --set-enabled crb || true
@@ -99,9 +93,9 @@ install_dependencies(){
     automake \
     libtool \
     pkgconf-pkg-config \
+    gnutls-devel \
     readline-devel \
     zlib-devel \
-    gnutls-devel \
     libnl3-devel \
     libseccomp-devel \
     pam-devel \
@@ -109,52 +103,47 @@ install_dependencies(){
     protobuf-c \
     protobuf-c-compiler \
     krb5-devel \
-    openssl-devel
+    openssl-devel \
+    gettext-devel
 
 
 
     ok "Dependencies installed."
 
-}#############################################
-# Prepare Build Directory
-#############################################
+}########################################
+# Install Ocserv Binary
+########################################
 
-prepare_build(){
+install_ocserv(){
 
 
-    info "Preparing build directory..."
+    if command -v ocserv >/dev/null 2>&1; then
+
+
+        CURRENT=$(ocserv --version | head -1)
+
+
+        info "Ocserv already installed: $CURRENT"
+
+
+        return
+
+
+    fi
+
+
+
+    info "Building Ocserv ${OCSERV_VERSION}..."
+
 
 
     mkdir -p "$BUILD_DIR"
 
-
     cd "$BUILD_DIR"
 
 
 
-    rm -rf "ocserv-$OCSERV_VERSION"
-
-
-
-    ok "Build directory ready."
-
-
-}
-
-
-
-#############################################
-# Download Ocserv Source
-#############################################
-
-download_ocserv(){
-
-
-    info "Downloading Ocserv ${OCSERV_VERSION}..."
-
-
-
-    cd "$BUILD_DIR"
+    rm -rf "ocserv-${OCSERV_VERSION}"
 
 
 
@@ -164,34 +153,10 @@ download_ocserv(){
 
 
 
-    tar -xf ocserv.tar.xz
+    tar xf ocserv.tar.xz
 
 
-
-    rm -f ocserv.tar.xz
-
-
-
-    ok "Source downloaded."
-
-
-
-}
-
-
-
-#############################################
-# Configure Build
-#############################################
-
-configure_ocserv(){
-
-
-    info "Configuring Ocserv..."
-
-
-
-    cd "$SOURCE_DIR"
+    cd "ocserv-${OCSERV_VERSION}"
 
 
 
@@ -206,57 +171,11 @@ configure_ocserv(){
     ./configure \
     --prefix=/usr \
     --sysconfdir=/etc/ocserv \
-    --enable-seccomp \
-    --enable-libnl
-
-
-
-    ok "Configure completed."
-
-
-}
-
-
-
-#############################################
-# Compile Ocserv
-#############################################
-
-compile_ocserv(){
-
-
-    info "Compiling Ocserv..."
-
-
-
-    cd "$SOURCE_DIR"
+    --enable-seccomp
 
 
 
     make -j"$(nproc)"
-
-
-
-    ok "Compilation completed."
-
-
-
-}
-
-
-
-#############################################
-# Install Ocserv
-#############################################
-
-install_ocserv(){
-
-
-    info "Installing Ocserv..."
-
-
-
-    cd "$SOURCE_DIR"
 
 
 
@@ -268,18 +187,35 @@ install_ocserv(){
 
 
 
-    ok "Ocserv installed."
+    if ! command -v ocserv >/dev/null 2>&1; then
+
+
+        fail "Ocserv installation failed."
+
+        exit 1
+
+
+    fi
 
 
 
-}#############################################
+    ok "Ocserv ${OCSERV_VERSION} installed."
+
+
+
+}
+
+
+
+
+########################################
 # Create Directories
-#############################################
+########################################
 
 create_directories(){
 
 
-    info "Creating Ocserv directories..."
+    info "Creating directories..."
 
 
 
@@ -296,25 +232,28 @@ create_directories(){
     ok "Directories created."
 
 
+
 }
 
 
 
-#############################################
-# Generate Certificate
-#############################################
-
-generate_certificate(){
 
 
-    info "Generating SSL certificate..."
+########################################
+# Generate Certificates
+########################################
+
+generate_certificates(){
+
+
+    info "Generating certificates..."
 
 
 
-    if [[ -f "$CONFIG_DIR/server-key.pem" ]]; then
+    if [[ -f "$CONFIG_DIR/server-cert.pem" ]]; then
 
 
-        warn "Certificate already exists."
+        warn "Certificates already exist."
 
         return
 
@@ -323,9 +262,9 @@ generate_certificate(){
 
 
 
-    cat > "$CONFIG_DIR/ca.tmpl" <<EOF
-cn = "L-Panel VPN CA"
-organization = "L-Panel"
+    cat > "$CONFIG_DIR/ca.tmpl" <<'EOF'
+cn = L-Panel CA
+organization = L-Panel
 serial = 1
 expiration_days = 3650
 ca
@@ -336,9 +275,10 @@ EOF
 
 
 
-    cat > "$CONFIG_DIR/server.tmpl" <<EOF
-cn = "VPN Server"
-organization = "L-Panel"
+
+    cat > "$CONFIG_DIR/server.tmpl" <<'EOF'
+cn = VPN Server
+organization = L-Panel
 expiration_days = 3650
 signing_key
 encryption_key
@@ -361,7 +301,6 @@ EOF
 
 
 
-
     certtool \
     --generate-privkey \
     --outfile "$CONFIG_DIR/server-key.pem"
@@ -370,9 +309,9 @@ EOF
 
     certtool \
     --generate-certificate \
-    --load-privkey "$CONFIG_DIR/server-key.pem" \
     --load-ca-certificate "$CONFIG_DIR/ca-cert.pem" \
     --load-ca-privkey "$CONFIG_DIR/ca-key.pem" \
+    --load-privkey "$CONFIG_DIR/server-key.pem" \
     --template "$CONFIG_DIR/server.tmpl" \
     --outfile "$CONFIG_DIR/server-cert.pem"
 
@@ -382,48 +321,17 @@ EOF
 
 
 
-    ok "Certificate generated."
+    ok "Certificates created."
 
 
-}
-
-
-
-#############################################
-# Create User Database
-#############################################
-
-create_user_database(){
-
-
-    info "Creating user database..."
-
-
-
-    touch "$CONFIG_DIR/ocpasswd"
-
-
-
-    chmod 600 "$CONFIG_DIR/ocpasswd"
-
-
-
-    ok "User database created."
-
-
-
-}
-
-
-
-#############################################
+}########################################
 # Create Ocserv Config
-#############################################
+########################################
 
 create_config(){
 
 
-    info "Creating configuration..."
+    info "Creating ocserv configuration..."
 
 
 
@@ -431,19 +339,21 @@ create_config(){
 auth = "plain[passwd=$CONFIG_DIR/ocpasswd]"
 
 
-tcp-port = $OCSERV_PORT
-udp-port = $OCSERV_PORT
+tcp-port = $PORT
+udp-port = $PORT
 
 
 server-cert = $CONFIG_DIR/server-cert.pem
 server-key = $CONFIG_DIR/server-key.pem
 
 
-run-as-user = nobody
-run-as-group = nobody
+isolate-workers = true
 
 
 max-clients = 500
+
+
+max-same-clients = 2
 
 
 keepalive = 32400
@@ -459,11 +369,13 @@ try-mtu-discovery = true
 
 
 ipv4-network = 10.10.10.0
+
+
 ipv4-netmask = 255.255.255.0
 
 
-dns = 8.8.8.8
 dns = 1.1.1.1
+dns = 8.8.8.8
 
 
 route = default
@@ -476,12 +388,25 @@ EOF
 
 
 
+    touch "$CONFIG_DIR/ocpasswd"
+
+    chmod 600 "$CONFIG_DIR/ocpasswd"
+
+
+
     ok "Configuration created."
 
 
-}#############################################
-# Enable IP Forward
-#############################################
+
+}
+
+
+
+
+
+########################################
+# Enable Forwarding
+########################################
 
 enable_forwarding(){
 
@@ -490,9 +415,8 @@ enable_forwarding(){
 
 
 
-    cat > /etc/sysctl.d/99-l-panel-ocserv.conf <<EOF
-net.ipv4.ip_forward = 1
-net.ipv6.conf.all.forwarding = 1
+    cat > /etc/sysctl.d/99-l-panel-vpn.conf <<EOF
+net.ipv4.ip_forward=1
 EOF
 
 
@@ -503,13 +427,17 @@ EOF
 
     ok "IP forwarding enabled."
 
+
+
 }
 
 
 
-#############################################
+
+
+########################################
 # Create Systemd Service
-#############################################
+########################################
 
 create_service(){
 
@@ -520,7 +448,7 @@ create_service(){
 
     cat > "$SERVICE_FILE" <<EOF
 [Unit]
-Description=OpenConnect VPN Server (Ocserv)
+Description=L-Panel Ocserv VPN
 After=network.target
 
 
@@ -547,13 +475,16 @@ EOF
     ok "Systemd service created."
 
 
+
 }
 
 
 
-#############################################
+
+
+########################################
 # Configure Firewall
-#############################################
+########################################
 
 configure_firewall(){
 
@@ -565,15 +496,16 @@ configure_firewall(){
     if systemctl is-active firewalld >/dev/null 2>&1; then
 
 
-        firewall-cmd \
-        --permanent \
-        --add-port=${OCSERV_PORT}/tcp
-
-
 
         firewall-cmd \
         --permanent \
-        --add-port=${OCSERV_PORT}/udp
+        --add-port=${PORT}/tcp
+
+
+
+        firewall-cmd \
+        --permanent \
+        --add-port=${PORT}/udp
 
 
 
@@ -581,32 +513,28 @@ configure_firewall(){
 
 
 
-        ok "Firewall configured."
+        ok "Firewall updated."
 
 
 
     else
 
 
-        warn "Firewalld not active."
+        warn "Firewalld not running."
 
 
     fi
 
 
 
-}
-
-
-
-#############################################
+}########################################
 # Start Ocserv
-#############################################
+########################################
 
 start_ocserv(){
 
 
-    info "Starting Ocserv..."
+    info "Starting ocserv..."
 
 
 
@@ -624,14 +552,15 @@ start_ocserv(){
         ok "Ocserv is running."
 
 
-
     else
 
 
         fail "Ocserv failed to start."
 
 
-        systemctl status ocserv --no-pager
+        echo
+
+        journalctl -u ocserv --no-pager -n 50
 
 
         exit 1
@@ -645,11 +574,13 @@ start_ocserv(){
 
 
 
-#############################################
-# Save Installation Data
-#############################################
 
-save_install_info(){
+
+########################################
+# Save Info
+########################################
+
+save_info(){
 
 
     mkdir -p /etc/l-panel
@@ -658,15 +589,21 @@ save_install_info(){
 
     cat > /etc/l-panel/ocserv.info <<EOF
 VERSION=$OCSERV_VERSION
-PORT=$OCSERV_PORT
+PORT=$PORT
 INSTALL_DATE=$(date "+%Y-%m-%d %H:%M:%S")
 EOF
 
 
 
-}#############################################
-# Final Report
-#############################################
+}
+
+
+
+
+
+########################################
+# Final Result
+########################################
 
 show_result(){
 
@@ -675,7 +612,7 @@ show_result(){
 
     echo "=============================================="
 
-    ok "Ocserv installation completed."
+    ok "Ocserv installation completed"
 
     echo "=============================================="
 
@@ -683,15 +620,13 @@ show_result(){
 
     echo "Version : $OCSERV_VERSION"
 
-    echo "Port    : $OCSERV_PORT"
+    echo "Port    : $PORT"
 
     echo "Config  : $CONFIG_FILE"
 
     echo
 
-    echo "Service status:"
-
-    systemctl status ocserv --no-pager -l
+    ocserv --version || true
 
     echo
 
@@ -700,9 +635,11 @@ show_result(){
 
 
 
-#############################################
-# Main Installer
-#############################################
+
+
+########################################
+# Main
+########################################
 
 main(){
 
@@ -710,7 +647,9 @@ main(){
     title
 
 
-    info "Installing Ocserv $OCSERV_VERSION"
+
+    info "Installing Ocserv ${OCSERV_VERSION}"
+
 
 
     ask_port
@@ -718,22 +657,6 @@ main(){
 
 
     install_dependencies
-
-
-
-    prepare_build
-
-
-
-    download_ocserv
-
-
-
-    configure_ocserv
-
-
-
-    compile_ocserv
 
 
 
@@ -745,11 +668,7 @@ main(){
 
 
 
-    generate_certificate
-
-
-
-    create_user_database
+    generate_certificates
 
 
 
@@ -769,7 +688,7 @@ main(){
 
 
 
-    save_install_info
+    save_info
 
 
 
@@ -782,6 +701,7 @@ main(){
 
 
     pause
+
 
 
 }
