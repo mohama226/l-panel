@@ -2,93 +2,211 @@
 
 set -Eeuo pipefail
 
+
+#############################################
+# Variables
+#############################################
+
 REPO="mohama226/l-panel"
+
 BRANCH="main"
 
 ZIP_URL="https://github.com/${REPO}/archive/refs/heads/${BRANCH}.zip"
 
+
 TMP_DIR=$(mktemp -d)
 
-cleanup() {
+
+
+#############################################
+# Cleanup
+#############################################
+
+cleanup(){
+
     rm -rf "$TMP_DIR"
+
 }
+
 
 trap cleanup EXIT
 
-echo "======================================="
-echo "        L-PANEL Bootstrap"
-echo "======================================="
-echo
 
-########################################
+
+#############################################
 # Root Check
-########################################
+#############################################
 
 if [[ $EUID -ne 0 ]]; then
+
     echo "Please run as root."
+
     exit 1
+
 fi
 
-########################################
-# Detect Package Manager
-########################################
+
+
+echo
+
+echo "==================================="
+
+echo "       L-PANEL Bootstrap"
+
+echo "==================================="
+
+echo
+
+
+
+#############################################
+# Package Manager
+#############################################
 
 if command -v dnf >/dev/null 2>&1; then
+
     PKG="dnf"
+
+
 elif command -v yum >/dev/null 2>&1; then
+
     PKG="yum"
+
+
 else
+
     echo "Unsupported Linux."
+
     exit 1
+
 fi
 
-########################################
-# Install dependency if missing
-########################################
 
-install_pkg() {
 
-    BIN=$1
-    PKGNAME=$2
+#############################################
+# Dependencies
+#############################################
 
-    if ! command -v "$BIN" >/dev/null 2>&1; then
+install_package(){
 
-        echo "Installing $PKGNAME ..."
 
-        $PKG install -y "$PKGNAME"
+    COMMAND=$1
+
+    PACKAGE=$2
+
+
+
+    if ! command -v "$COMMAND" >/dev/null 2>&1; then
+
+
+        echo "Installing $PACKAGE ..."
+
+
+        $PKG install -y "$PACKAGE"
+
 
     fi
 
+
 }
 
-install_pkg curl curl
-install_pkg unzip unzip
-install_pkg python3 python3
-install_pkg zip zip
 
-########################################
+
+install_package curl curl
+
+install_package unzip unzip
+
+install_package zip zip
+
+install_package wget wget
+
+
+
+#############################################
 # Download
-########################################
+#############################################
 
 echo
+
 echo "Downloading L-Panel..."
 
-curl -L "$ZIP_URL" -o "$TMP_DIR/l-panel.zip"
 
-########################################
+
+curl -L "$ZIP_URL" \
+-o "$TMP_DIR/l-panel.zip"
+
+
+
+#############################################
 # Extract
-########################################
+#############################################
+
+echo
 
 echo "Extracting..."
 
-unzip -q "$TMP_DIR/l-panel.zip" -d "$TMP_DIR"
 
-########################################
-# Run installer
-########################################
 
-cd "$TMP_DIR/l-panel-main"
+unzip -q \
+"$TMP_DIR/l-panel.zip" \
+-d "$TMP_DIR"
+
+
+
+#############################################
+# Locate Project
+#############################################
+
+PROJECT_DIR=$(find "$TMP_DIR" -maxdepth 1 -type d -name "l-panel-*" | head -n1)
+
+
+
+if [[ -z "$PROJECT_DIR" ]]; then
+
+    echo "Project directory not found."
+
+    exit 1
+
+fi
+
+
+
+#############################################
+# Install
+#############################################
+
+echo
+
+echo "Running installer..."
+
+
+
+cd "$PROJECT_DIR"
+
+
 
 chmod +x installer/install.sh
 
+
+
 bash installer/install.sh
+
+
+
+echo
+
+echo "==================================="
+
+echo " Installation Finished"
+
+echo "==================================="
+
+echo
+
+echo "Run command:"
+
+echo
+
+echo "l-panel"
+
+echo
