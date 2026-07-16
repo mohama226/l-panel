@@ -1,5 +1,7 @@
 #!/bin/bash
 
+cd /opt/l-panel
+
 clear
 echo "===== l-panel ====="
 echo "1) Install l-panel"
