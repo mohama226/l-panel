@@ -11,30 +11,17 @@ source "$BASE_DIR/lib/common.sh"
 source "$BASE_DIR/lib/version.sh"
 
 
-
-#############################################
-# Command Paths
-#############################################
-
 INSTALL_CMD="$BASE_DIR/commands/install.sh"
-
 UPDATE_CMD="$BASE_DIR/commands/update.sh"
-
 OCSERV_CMD="$BASE_DIR/commands/ocserv.sh"
-
 UNINSTALL_CMD="$BASE_DIR/commands/uninstall.sh"
 
 
-
-#############################################
-# Check Commands
-#############################################
-
-check_command(){
+check_file(){
 
     if [[ ! -f "$1" ]]; then
 
-        fail "Command not found: $1"
+        fail "Missing file: $1"
 
         exit 1
 
@@ -43,13 +30,9 @@ check_command(){
 }
 
 
+menu(){
 
-#############################################
-# Show Menu
-#############################################
-
-show_menu(){
-
+clear
 
 show_header
 
@@ -69,117 +52,55 @@ echo "0) Exit"
 echo
 
 
+read -rp "Select option: " OPTION
+
+
+case "$OPTION" in
+
+
+1)
+check_file "$INSTALL_CMD"
+bash "$INSTALL_CMD"
+;;
+
+
+2)
+check_file "$OCSERV_CMD"
+bash "$OCSERV_CMD"
+;;
+
+
+3)
+check_file "$UPDATE_CMD"
+bash "$UPDATE_CMD"
+;;
+
+
+4)
+check_file "$UNINSTALL_CMD"
+bash "$UNINSTALL_CMD"
+;;
+
+
+0)
+exit 0
+;;
+
+
+*)
+fail "Invalid option"
+sleep 2
+;;
+
+esac
+
+
 }
 
 
+while true
+do
 
-#############################################
-# Run Menu
-#############################################
-
-menu_loop(){
-
-
-while true; do
-
-
-    show_menu
-
-
-    read -rp "Select option: " OPTION
-
-
-
-    case "$OPTION" in
-
-
-
-        1)
-
-            check_command "$INSTALL_CMD"
-
-            bash "$INSTALL_CMD"
-
-            ;;
-
-
-
-        2)
-
-            check_command "$OCSERV_CMD"
-
-            bash "$OCSERV_CMD"
-
-            ;;
-
-
-
-        3)
-
-            check_command "$UPDATE_CMD"
-
-            bash "$UPDATE_CMD"
-
-            ;;
-
-
-
-        4)
-
-            check_command "$UNINSTALL_CMD"
-
-            bash "$UNINSTALL_CMD"
-
-            ;;
-
-
-
-        0)
-
-            echo
-
-            info "Bye."
-
-            exit 0
-
-            ;;
-
-
-
-        *)
-
-            fail "Invalid option."
-
-            pause
-
-            ;;
-
-
-    esac
-
+menu
 
 done
-
-
-}
-
-
-
-#############################################
-# Start
-#############################################
-
-main(){
-
-
-require_root
-
-
-menu_loop
-
-
-}
-
-
-
-main
