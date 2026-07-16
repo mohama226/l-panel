@@ -11,6 +11,9 @@ echo "-------------------"
 read -p "Choose: " CH
 
 case $CH in
+    1)
+        bash install/install.sh
+        ;;
     4)
         read -p "Enter panel port (default 2096): " PANELPORT
         PANELPORT=${PANELPORT:-2096}
