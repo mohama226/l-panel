@@ -1,18 +1,25 @@
 #!/bin/bash
 
-# Install git if missing
+# ============================
+# 1) Install git if missing
+# ============================
 if ! command -v git &> /dev/null; then
-    echo "[+] Installing git..."
+    echo "[+] git not found — installing..."
     dnf install -y git
 fi
 
-# Auto-detect project directory
+# ============================
+# 2) Detect real script path
+# ============================
 SCRIPT_PATH=$(readlink -f "$0")
 PROJECT_DIR=$(dirname "$SCRIPT_PATH")
 
-# If project folder is empty, clone it
+# ============================
+# 3) If project folder is empty → clone it
+# ============================
 if [ ! -d "$PROJECT_DIR/app" ]; then
-    echo "[+] Project not found. Cloning l-panel..."
+    echo "[+] Project not found — cloning l-panel..."
+    mkdir -p /opt
     cd /opt
     git clone https://github.com/mohama226/l-panel
     PROJECT_DIR="/opt/l-panel"
@@ -20,7 +27,9 @@ fi
 
 cd "$PROJECT_DIR"
 
-# Load last update time
+# ============================
+# 4) Load last update time
+# ============================
 if [ -f last_update.txt ]; then
     LAST_UPDATE=$(cat last_update.txt)
 else
@@ -38,13 +47,20 @@ echo "-------------------"
 read -p "Choose: " opt
 
 case $opt in
-    1) bash "$PROJECT_DIR/install/install.sh" ;;
-    2) bash "$PROJECT_DIR/install/update.sh" ;;
-    3) bash "$PROJECT_DIR/install/install_ocserv.sh" ;;
+    1)
+        bash "$PROJECT_DIR/install/install.sh"
+        ;;
+    2)
+        bash "$PROJECT_DIR/install/update.sh"
+        ;;
+    3)
+        bash "$PROJECT_DIR/install/install_ocserv.sh"
+        ;;
     4)
         read -p "Enter panel port (default 2096): " PANELPORT
         PANELPORT=${PANELPORT:-2096}
 
+        # Ensure uvicorn is available
         export PATH=/usr/local/bin:/usr/bin:/bin:/usr/sbin:/usr/local/sbin
 
         cd "$PROJECT_DIR"
