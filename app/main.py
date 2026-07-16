@@ -1,13 +1,13 @@
 from fastapi import FastAPI
-from fastapi.staticfiles import StaticFiles
-from .routers import dashboard, users
+from app.routers import users, system, ocserv
+from app.database import init_db
 
 app = FastAPI(title="l-panel")
 
-app.mount("/static", StaticFiles(directory="static"), name="static")
+@app.on_event("startup")
+def startup():
+    init_db()
 
-app.include_router(dashboard.router)
-app.include_router(users.router, prefix="")
-
-# برای اجرای مستقیم با uvicorn:
-# uvicorn app.main:app --host 0.0.0.0 --port 8000
+app.include_router(users.router, prefix="/users", tags=["Users"])
+app.include_router(system.router, prefix="/system", tags=["System"])
+app.include_router(ocserv.router, prefix="/ocserv", tags=["Ocserv"])
