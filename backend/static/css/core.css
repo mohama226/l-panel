@@ -5,7 +5,9 @@ box-sizing:border-box;
 }
 
 
+
 body{
+
 
 margin:0;
 
@@ -14,11 +16,14 @@ Inter,
 Arial,
 sans-serif;
 
+
 background:var(--bg);
 
 color:var(--text);
 
+
 }
+
 
 
 a{
@@ -26,5 +31,13 @@ a{
 text-decoration:none;
 
 color:inherit;
+
+}
+
+
+
+h1,h2,h3,p{
+
+margin:0;
 
 }
