@@ -40,4 +40,7 @@ INSERT INTO superadmin (username, password)
 VALUES ('$ADMIN_USER', '$ADMIN_PASS');
 EOF
 
+# Save update time
+date "+%Y-%m-%d %H:%M:%S" > last_update.txt
+
 echo "[+] l-panel installed successfully."
