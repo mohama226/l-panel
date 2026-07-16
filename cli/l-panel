@@ -2,68 +2,184 @@
 
 set -Eeuo pipefail
 
-BASE_DIR="/opt/l-panel/cli"
+
+BASE_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
 
 source "$BASE_DIR/lib/colors.sh"
 source "$BASE_DIR/lib/common.sh"
 source "$BASE_DIR/lib/version.sh"
 
-while true
-do
+
+
+#############################################
+# Command Paths
+#############################################
+
+INSTALL_CMD="$BASE_DIR/commands/install.sh"
+
+UPDATE_CMD="$BASE_DIR/commands/update.sh"
+
+OCSERV_CMD="$BASE_DIR/commands/ocserv.sh"
+
+UNINSTALL_CMD="$BASE_DIR/commands/uninstall.sh"
+
+
+
+#############################################
+# Check Commands
+#############################################
+
+check_command(){
+
+    if [[ ! -f "$1" ]]; then
+
+        fail "Command not found: $1"
+
+        exit 1
+
+    fi
+
+}
+
+
+
+#############################################
+# Show Menu
+#############################################
+
+show_menu(){
+
 
 show_header
 
+
 echo "1) Install L-Panel"
+
 echo "2) Install Ocserv 1.5.0"
+
 echo "3) Update L-Panel"
+
 echo "4) Uninstall L-Panel"
+
+echo
+
 echo "0) Exit"
 
 echo
 
-read -rp "Select: " OPTION
 
-case "$OPTION" in
+}
 
-1)
 
-    bash "$BASE_DIR/commands/install.sh"
 
-;;
+#############################################
+# Run Menu
+#############################################
 
-2)
+menu_loop(){
 
-    bash "$BASE_DIR/commands/ocserv.sh"
 
-;;
+while true; do
 
-3)
 
-    bash "$BASE_DIR/commands/update.sh"
+    show_menu
 
-;;
 
-4)
+    read -rp "Select option: " OPTION
 
-    bash "$BASE_DIR/commands/uninstall.sh"
 
-;;
 
-0)
+    case "$OPTION" in
 
-    clear
-    exit
 
-;;
 
-*)
+        1)
 
-    fail "Invalid Option"
+            check_command "$INSTALL_CMD"
 
-    sleep 2
+            bash "$INSTALL_CMD"
 
-;;
+            ;;
 
-esac
+
+
+        2)
+
+            check_command "$OCSERV_CMD"
+
+            bash "$OCSERV_CMD"
+
+            ;;
+
+
+
+        3)
+
+            check_command "$UPDATE_CMD"
+
+            bash "$UPDATE_CMD"
+
+            ;;
+
+
+
+        4)
+
+            check_command "$UNINSTALL_CMD"
+
+            bash "$UNINSTALL_CMD"
+
+            ;;
+
+
+
+        0)
+
+            echo
+
+            info "Bye."
+
+            exit 0
+
+            ;;
+
+
+
+        *)
+
+            fail "Invalid option."
+
+            pause
+
+            ;;
+
+
+    esac
+
 
 done
+
+
+}
+
+
+
+#############################################
+# Start
+#############################################
+
+main(){
+
+
+require_root
+
+
+menu_loop
+
+
+}
+
+
+
+main
