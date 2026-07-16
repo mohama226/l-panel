@@ -1,29 +1,44 @@
 #!/usr/bin/env bash
 set -e
 
+echo "[l-panel] شروع نصب..."
+
 REPO_USER="mohama226"
 REPO_NAME="l-panel"
 INSTALL_DIR="/opt/${REPO_NAME}"
 BIN_PATH="/usr/local/bin/l-panel"
 
-echo "[l-panel] نصب در حال انجام..."
+echo "[l-panel] نصب پیش‌نیازها..."
 
-sudo apt update
-sudo apt install -y python3 python3-venv python3-pip unzip curl
+# AlmaLinux / RHEL / CentOS
+sudo dnf install -y python3 python3-pip python3-virtualenv unzip curl
+
+# اگر virtualenv نبود، بسازیم
+if ! command -v virtualenv &> /dev/null; then
+    echo "[l-panel] virtualenv پیدا نشد، نصب می‌کنیم..."
+    sudo pip3 install virtualenv
+fi
 
 TMP_ZIP="/tmp/${REPO_NAME}.zip"
-curl -L "https://github.com/${REPO_USER}/${REPO_NAME}/archive/refs/heads/main.zip" -o "$TMP_ZIP"
+ZIP_URL="https://github.com/${REPO_USER}/${REPO_NAME}/archive/refs/heads/main.zip"
 
+echo "[l-panel] دانلود ZIP از گیت‌هاب..."
+curl -L "$ZIP_URL" -o "$TMP_ZIP"
+
+echo "[l-panel] استخراج فایل‌ها..."
 sudo rm -rf "$INSTALL_DIR"
 sudo mkdir -p "$INSTALL_DIR"
 sudo unzip -q "$TMP_ZIP" -d /opt
 sudo mv "/opt/${REPO_NAME}-main" "$INSTALL_DIR"
 
+echo "[l-panel] ساخت محیط مجازی..."
 cd "$INSTALL_DIR"
-python3 -m venv venv
+virtualenv venv
 source venv/bin/activate
+pip install --upgrade pip
 pip install -r requirements.txt
 
+echo "[l-panel] ساخت دستور اجرایی..."
 sudo tee "$BIN_PATH" >/dev/null <<'EOF'
 #!/usr/bin/env bash
 INSTALL_DIR="/opt/l-panel"
@@ -52,9 +67,13 @@ case "$c" in
         pip install -r requirements.txt
         echo "آپدیت انجام شد."
         ;;
+    0)
+        exit 0
+        ;;
 esac
 EOF
 
 sudo chmod +x "$BIN_PATH"
 
-echo "[l-panel] نصب کامل شد. برای اجرا بنویسید: l-panel"
+echo "[l-panel] نصب کامل شد!"
+echo "برای اجرا بنویسید: l-panel"
