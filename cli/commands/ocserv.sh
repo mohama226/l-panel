@@ -42,7 +42,7 @@ ask_port(){
 
 
 ########################################
-# Dependencies (NEW VERSION)
+# Dependencies (UPDATED)
 ########################################
 
 install_dependencies(){
@@ -52,12 +52,30 @@ install_dependencies(){
     dnf install -y epel-release
 
     dnf install -y \
-        ocserv \
-        gnutls-utils \
-        firewalld \
-        iptables \
+        wget \
         curl \
-        wget
+        tar \
+        xz \
+        make \
+        gcc \
+        gcc-c++ \
+        autoconf \
+        automake \
+        libtool \
+        pkgconf-pkg-config \
+        gnutls-devel \
+        readline-devel \
+        zlib-devel \
+        libnl3-devel \
+        libseccomp-devel \
+        pam-devel \
+        lz4-devel \
+        protobuf-c-devel \
+        protobuf-c-compiler \
+        krb5-devel \
+        openssl-devel \
+        gettext-devel \
+        gnutls-utils
 
     ok "Dependencies installed."
 
@@ -65,28 +83,80 @@ install_dependencies(){
 
 
 ########################################
-# Install Ocserv Binary (NEW VERSION)
+# Install Ocserv Binary (UPDATED)
 ########################################
 
 install_ocserv(){
 
+    info "Checking Ocserv installation..."
+
     if command -v ocserv >/dev/null 2>&1; then
-        ok "Ocserv already installed."
-        return
+
+        CURRENT=$(ocserv --version | awk '{print $2}')
+
+        if [[ "$CURRENT" == "$OCSERV_VERSION" ]]; then
+            ok "Ocserv ${OCSERV_VERSION} already installed."
+            return
+        fi
+
+        warn "Old Ocserv version detected: $CURRENT"
+        info "Removing old package..."
+
+        dnf remove -y ocserv || true
     fi
 
-    info "Installing Ocserv package..."
+    info "Installing Ocserv ${OCSERV_VERSION} from source..."
 
-    dnf install -y ocserv
+    mkdir -p "$BUILD_DIR"
+    cd "$BUILD_DIR"
+
+    rm -rf "ocserv-${OCSERV_VERSION}"
+    rm -f ocserv.tar.xz
+
+    wget \
+        "https://www.infradead.org/ocserv/download/ocserv-${OCSERV_VERSION}.tar.xz" \
+        -O ocserv.tar.xz
+
+    tar xf ocserv.tar.xz
+
+    cd "ocserv-${OCSERV_VERSION}"
+
+    if [[ ! -f configure ]]; then
+
+        info "Generating configure script..."
+
+        if [[ -f autogen.sh ]]; then
+            chmod +x autogen.sh
+            ./autogen.sh
+        else
+            fail "autogen.sh not found"
+            exit 1
+        fi
+    fi
+
+    ./configure \
+        --prefix=/usr \
+        --sysconfdir=/etc/ocserv \
+        --enable-seccomp
+
+    make -j"$(nproc)"
+    make install
+
+    ldconfig
 
     if ! command -v ocserv >/dev/null 2>&1; then
-        fail "Ocserv installation failed."
+        fail "Ocserv installation failed"
         exit 1
     fi
 
-    VERSION=$(ocserv --version | head -1)
+    INSTALLED=$(ocserv --version | awk '{print $2}')
 
-    ok "Installed: $VERSION"
+    if [[ "$INSTALLED" != "$OCSERV_VERSION" ]]; then
+        fail "Wrong version installed: $INSTALLED"
+        exit 1
+    fi
+
+    ok "Ocserv ${INSTALLED} installed successfully."
 
 }
 
