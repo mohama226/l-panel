@@ -79,7 +79,9 @@ install_dependencies(){
         help2man \
         meson \
         ninja-build \
-        gnutls-utils
+        gnutls-utils \
+        libev \
+        libev-devel
 
     ok "Dependencies installed."
 
