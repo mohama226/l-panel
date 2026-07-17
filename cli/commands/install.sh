@@ -2,12 +2,6 @@
 
 set -Eeuo pipefail
 
-
-#####################################
-# L-PANEL INSTALL / REPAIR
-#####################################
-
-
 INSTALL_DIR="/opt/l-panel"
 CONFIG_DIR="/etc/l-panel"
 LOG_DIR="/var/log/l-panel"
@@ -19,6 +13,16 @@ INSTALLED_FILE="$INSTALL_DIR/.installed"
 LAST_UPDATE="$INSTALL_DIR/.last_update"
 
 
+pause(){
+
+echo
+read -rp "Press ENTER to continue..."
+
+}
+
+
+
+title(){
 
 clear
 
@@ -28,248 +32,268 @@ echo "          L-PANEL INSTALL"
 echo "==============================================="
 echo
 
-
-#####################################
-# ROOT CHECK
-#####################################
-
-if [[ $EUID -ne 0 ]]; then
-    echo "Please run as root."
-    exit 1
-fi
+}
 
 
 
-#####################################
-# Package manager
-#####################################
-
-if command -v dnf >/dev/null 2>&1; then
-    PM="dnf"
-elif command -v yum >/dev/null 2>&1; then
-    PM="yum"
-else
-    echo "Unsupported system."
-    exit 1
-fi
-
-
-
-#####################################
-# Existing installation
-#####################################
-
-if [[ -f "$INSTALLED_FILE" ]]; then
-
-    echo
-    echo "L-Panel is already installed."
-    echo
-
-    echo "Current Version:"
-    
-    if [[ -f "$VERSION_FILE" ]]; then
-        cat "$VERSION_FILE"
-    else
-        echo "Unknown"
-    fi
-
-
-    echo
-
-    echo "Last Update:"
-
-    if [[ -f "$LAST_UPDATE" ]]; then
-        cat "$LAST_UPDATE"
-    else
-        echo "Never"
-    fi
-
-
-    echo
-    echo "=============================================="
-    echo
-    echo "1) Repair Installation"
-    echo "2) Reinstall CLI Files"
-    echo "3) Cancel"
-    echo
-
-    read -rp "Select option: " ACTION
-
-
-    case "$ACTION" in
-
-
-        1)
-
-        echo
-        echo "[+] Repairing..."
-
-        mkdir -p \
-        "$CONFIG_DIR" \
-        "$LOG_DIR"
-
-        chmod +x "$INSTALL_DIR/cli/l-panel"
-
-        chmod +x \
-        "$INSTALL_DIR/cli/commands/"*.sh \
-        2>/dev/null || true
-
-
-        ln -sf \
-        "$INSTALL_DIR/cli/l-panel" \
-        "$BIN"
-
-
-        echo
-        echo "Repair completed."
-
-        ;;
-
-
-        2)
-
-        echo
-        echo "Use Update option to download latest files."
-
-        ;;
-
-
-        *)
-
-        echo
-        echo "Cancelled."
-
-        ;;
-
-    esac
-
-
-    exit 0
-
-fi
-
-
-
-
-#####################################
-# First Installation
-#####################################
-
-
-echo "[+] Creating directories..."
-
-
-mkdir -p \
-"$INSTALL_DIR" \
-"$CONFIG_DIR" \
-"$LOG_DIR"
-
-
-
-#####################################
-# Dependencies
-#####################################
-
+repair(){
 
 echo
-echo "[+] Checking dependencies..."
-
-
-PACKAGES=(
-curl
-wget
-unzip
-tar
-rsync
-)
-
-
-for pkg in "${PACKAGES[@]}"
-do
-
-    if ! command -v "$pkg" >/dev/null 2>&1
-    then
-
-        echo "Installing $pkg"
-
-        $PM install -y "$pkg"
-
-    fi
-
-done
-
-
-
-
-#####################################
-# Permission
-#####################################
-
-
+echo "[+] Repairing Installation..."
 echo
-echo "[+] Setting permissions..."
 
+
+mkdir -p "$CONFIG_DIR"
+mkdir -p "$LOG_DIR"
+
+
+if [[ -f "$INSTALL_DIR/cli/l-panel" ]]; then
 
 chmod +x "$INSTALL_DIR/cli/l-panel"
 
-chmod +x \
-"$INSTALL_DIR/cli/commands/"*.sh \
-2>/dev/null || true
+else
 
+echo "ERROR: Main CLI file missing"
+pause
+return
 
-chmod +x \
-"$INSTALL_DIR/cli/lib/"*.sh \
-2>/dev/null || true
-
-
-
-#####################################
-# Command
-#####################################
-
-
-echo
-echo "[+] Creating command..."
-
-
-ln -sf \
-"$INSTALL_DIR/cli/l-panel" \
-"$BIN"
+fi
 
 
 
+chmod +x "$INSTALL_DIR/cli/commands/"*.sh 2>/dev/null || true
 
-#####################################
-# Mark installed
-#####################################
+chmod +x "$INSTALL_DIR/cli/lib/"*.sh 2>/dev/null || true
+
+
+
+ln -sf "$INSTALL_DIR/cli/l-panel" "$BIN"
+
 
 
 touch "$INSTALLED_FILE"
 
 
-date "+%Y-%m-%d %H:%M:%S" \
-> "$LAST_UPDATE"
+
+echo
+echo "Repair completed successfully."
+echo
+
+pause
+
+}
 
 
 
-#####################################
-# Finish
-#####################################
+reinstall_cli(){
+
+
+echo
+echo "[+] Reinstalling CLI files..."
+echo
+
+
+TMP="/tmp/l-panel-cli-reinstall"
+
+rm -rf "$TMP"
+
+mkdir -p "$TMP"
+
+
+
+echo "Downloading latest CLI..."
+
+curl -fsSL \
+https://github.com/mohama226/l-panel/archive/refs/heads/main.zip \
+-o "$TMP/update.zip"
+
+
+
+unzip -qo "$TMP/update.zip" -d "$TMP"
+
+
+
+if [[ -d "$TMP/l-panel-main/cli" ]]; then
+
+
+rm -rf "$INSTALL_DIR/cli"
+
+cp -rf "$TMP/l-panel-main/cli" "$INSTALL_DIR/"
+
+
+
+else
+
+echo
+echo "ERROR: CLI source not found"
+pause
+return
+
+fi
+
+
+
+chmod +x "$INSTALL_DIR/cli/l-panel"
+
+chmod +x "$INSTALL_DIR/cli/commands/"*.sh 2>/dev/null || true
+
+chmod +x "$INSTALL_DIR/cli/lib/"*.sh 2>/dev/null || true
+
+
+
+ln -sf "$INSTALL_DIR/cli/l-panel" "$BIN"
+
+
+
+echo
+echo "CLI reinstall completed."
+echo
+
+
+pause
+
+
+}
+
+
+
+title
+
+
+if [[ $EUID -ne 0 ]]; then
+
+echo "Please run as root."
+exit 1
+
+fi
+
+
+
+if [[ -f "$INSTALLED_FILE" ]]; then
+
+
+
+echo
+echo "L-Panel is already installed."
+echo
+
+
+echo "Current Version:"
+
+if [[ -f "$VERSION_FILE" ]]; then
+
+cat "$VERSION_FILE"
+
+else
+
+echo "Unknown"
+
+fi
+
 
 
 echo
 
-echo "======================================"
+echo "Last Update:"
+
+if [[ -f "$LAST_UPDATE" ]]; then
+
+cat "$LAST_UPDATE"
+
+else
+
+echo "Never"
+
+fi
+
+
+
+echo
+echo "=============================================="
+echo
+
+echo "1) Repair Installation"
+echo "2) Reinstall CLI Files"
+echo "3) Cancel"
+
+echo
+
+read -rp "Select option: " ACTION
+
+
+
+case "$ACTION" in
+
+1)
+
+repair
+
+;;
+
+2)
+
+reinstall_cli
+
+;;
+
+3)
+
+exit 0
+
+;;
+
+*)
+
+echo "Invalid option."
+pause
+
+;;
+
+esac
+
+
+
+exit 0
+
+fi
+
+
+
+#################################
+# Fresh Installation
+#################################
+
+
+echo
+echo "[+] Fresh installation detected"
+echo
+
+
+mkdir -p "$CONFIG_DIR"
+mkdir -p "$LOG_DIR"
+
+
+
+touch "$INSTALLED_FILE"
+
+
+date "+%Y-%m-%d %H:%M:%S" > "$LAST_UPDATE"
+
+
+
+ln -sf "$INSTALL_DIR/cli/l-panel" "$BIN"
+
+
+
+chmod +x "$INSTALL_DIR/cli/l-panel"
+
+
+
+echo
+echo "=============================================="
 echo " L-PANEL INSTALL COMPLETED"
-echo "======================================"
+echo "=============================================="
 
 echo
 
-echo "Run:"
-echo
-
-echo "l-panel"
-
-echo
-
-read -rp "Press ENTER to continue..."
+pause
