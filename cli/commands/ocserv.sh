@@ -75,6 +75,8 @@ install_dependencies(){
         krb5-devel \
         openssl-devel \
         gettext-devel \
+        gettext \
+        help2man \
         gnutls-utils
 
     ok "Dependencies installed."
@@ -121,18 +123,24 @@ install_ocserv(){
 
     cd "ocserv-${OCSERV_VERSION}"
 
+    ########################################
+    # NEW autoreconf SECTION
+    ########################################
+
     if [[ ! -f configure ]]; then
 
         info "Generating configure script..."
 
-        if [[ -f autogen.sh ]]; then
-            chmod +x autogen.sh
-            ./autogen.sh
-        else
-            fail "autogen.sh not found"
-            exit 1
-        fi
+        autoreconf -fi
+
     fi
+
+    if [[ ! -f configure ]]; then
+        fail "Configure generation failed"
+        exit 1
+    fi
+
+    ########################################
 
     ./configure \
         --prefix=/usr \
