@@ -22,11 +22,8 @@ CURRENT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 #############################################
 
 if [[ $EUID -ne 0 ]]; then
-
     echo "Please run as root."
-
     exit 1
-
 fi
 
 
@@ -67,7 +64,7 @@ set_permissions(){
 
 
 #############################################
-# Create Command Link
+# Create Command Link (UPDATED)
 #############################################
 
 create_command(){
@@ -75,9 +72,13 @@ create_command(){
     echo
     echo "Creating l-panel command..."
 
-    rm -f "$BIN_PATH"
-    ln -s "$INSTALL_DIR/cli/l-panel" "$BIN_PATH"
+    cat > "$BIN_PATH" <<EOF
+#!/usr/bin/env bash
 
+exec "$INSTALL_DIR/cli/l-panel" "\$@"
+EOF
+
+    chmod +x "$BIN_PATH"
 }
 
 
@@ -96,9 +97,7 @@ create_state(){
 
     touch "$INSTALL_DIR/.installed"
 
-    date "+%Y-%m-%d %H:%M:%S" \
-    > "$INSTALL_DIR/.last_update"
-
+    date "+%Y-%m-%d %H:%M:%S" > "$INSTALL_DIR/.last_update"
 }
 
 
@@ -118,7 +117,6 @@ finish(){
     echo
     echo "l-panel"
     echo
-
 }
 
 
@@ -134,7 +132,6 @@ main(){
     create_command
     create_state
     finish
-
 }
 
 main
