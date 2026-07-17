@@ -68,13 +68,13 @@ Last Update  : $(get_last_update)
 
 18) Dashboard
 
-19) System Status
+19) Coming Soon
 
 20) Services
 
 21) Logs
 
-22) Versions
+22) Coming Soon
 
 0) Exit
 
