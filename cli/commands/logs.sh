@@ -1,25 +1,27 @@
 #!/usr/bin/env bash
 
-set -Eeuo pipefail
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
+source "$SCRIPT_DIR/lib/colors.sh"
+source "$SCRIPT_DIR/lib/common.sh"
+source "$SCRIPT_DIR/lib/version.sh"
 
-clear
 
 title
 
 
 echo
 echo "=============================="
-echo " SERVICE LOGS"
+echo "        SYSTEM LOGS"
 echo "=============================="
 echo
 
 
-echo "1) Ocserv logs"
-echo "2) System logs"
-echo "0) Back"
-
+echo "1) Ocserv Logs"
+echo "2) L-Panel Logs"
+echo "3) System Logs"
 echo
+
 
 read -rp "Select: " LOG
 
@@ -27,27 +29,19 @@ read -rp "Select: " LOG
 case "$LOG" in
 
 1)
-
-journalctl -u ocserv -n 100 --no-pager
-
+journalctl -u ocserv -n 50 --no-pager
 ;;
 
 2)
-
-journalctl -n 100 --no-pager
-
+journalctl -n 50 --no-pager | grep l-panel
 ;;
 
-0)
-
-exit 0
-
+3)
+journalctl -n 50 --no-pager
 ;;
 
 *)
-
-echo "Invalid option"
-
+echo "Invalid"
 ;;
 
 esac
