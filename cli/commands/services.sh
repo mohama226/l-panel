@@ -1,54 +1,22 @@
 #!/usr/bin/env bash
 
-set -Eeuo pipefail
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
+source "$SCRIPT_DIR/lib/colors.sh"
+source "$SCRIPT_DIR/lib/common.sh"
+source "$SCRIPT_DIR/lib/version.sh"
 
-clear
 
 title
 
-
 echo
 echo "=============================="
-echo " L-PANEL SERVICES"
+echo "       SERVICES STATUS"
 echo "=============================="
 echo
 
 
-SERVICES=(
-    "ocserv"
-    "firewalld"
-    "fail2ban"
-    "nginx"
-    "sshd"
-)
+systemctl --type=service --state=running | grep -E "ocserv|l-panel|nginx|httpd"
 
-
-for SERVICE in "${SERVICES[@]}"
-do
-
-    if systemctl list-unit-files | grep -q "^${SERVICE}.service"
-    then
-
-        STATUS=$(systemctl is-active "$SERVICE" || true)
-
-
-        if [[ "$STATUS" == "active" ]]
-        then
-            ok "$SERVICE : RUNNING"
-        else
-            warn "$SERVICE : STOPPED"
-        fi
-
-    else
-
-        info "$SERVICE : NOT INSTALLED"
-
-    fi
-
-done
-
-
-echo
 
 pause
