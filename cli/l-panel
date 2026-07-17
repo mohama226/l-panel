@@ -4,115 +4,41 @@ SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 
 source "$SCRIPT_DIR/lib/colors.sh"
 source "$SCRIPT_DIR/lib/common.sh"
-
 source "$SCRIPT_DIR/commands/menu.sh"
 
 while true
 do
+    show_menu
 
-show_menu
+    read -rp "Select option: " OPTION
 
-read -rp "Select option: " OPTION
+    case "$OPTION" in
 
-case "$OPTION" in
+        1)
+            bash "$SCRIPT_DIR/commands/install.sh"
+        ;;
 
-1)
-bash "$SCRIPT_DIR/commands/install.sh"
-;;
+        2)
+            bash "$SCRIPT_DIR/commands/ocserv.sh"
+        ;;
 
-2)
-bash "$SCRIPT_DIR/commands/update.sh"
-;;
+        3)
+            bash "$SCRIPT_DIR/commands/update.sh"
+        ;;
 
-3)
-bash "$SCRIPT_DIR/commands/uninstall.sh"
-;;
+        4)
+            bash "$SCRIPT_DIR/commands/uninstall.sh"
+        ;;
 
-4)
-bash "$SCRIPT_DIR/commands/ocserv.sh"
-;;
+        0)
+            exit 0
+        ;;
 
-5)
-bash "$SCRIPT_DIR/commands/status.sh" ocserv
-;;
+        *)
+            echo "Invalid option."
+            sleep 1
+        ;;
 
-6)
-bash "$SCRIPT_DIR/commands/services.sh" restart ocserv
-;;
-
-7)
-bash "$SCRIPT_DIR/commands/services.sh" stop ocserv
-;;
-
-8)
-bash "$SCRIPT_DIR/commands/services.sh" start ocserv
-;;
-
-9)
-bash "$SCRIPT_DIR/commands/users.sh"
-;;
-
-10)
-bash "$SCRIPT_DIR/commands/users.sh" online
-;;
-
-11)
-bash "$SCRIPT_DIR/commands/users.sh" disconnect
-;;
-
-12)
-bash "$SCRIPT_DIR/commands/users.sh" stats
-;;
-
-13)
-bash "$SCRIPT_DIR/commands/ssl.sh"
-;;
-
-14)
-bash "$SCRIPT_DIR/commands/firewall.sh"
-;;
-
-15)
-bash "$SCRIPT_DIR/commands/fail2ban.sh"
-;;
-
-16)
-bash "$SCRIPT_DIR/commands/backup.sh"
-;;
-
-17)
-bash "$SCRIPT_DIR/commands/restore.sh"
-;;
-
-18)
-bash "$SCRIPT_DIR/commands/dashboard.sh"
-;;
-
-19)
-bash "$SCRIPT_DIR/commands/status.sh"
-;;
-
-20)
-bash "$SCRIPT_DIR/commands/services.sh"
-;;
-
-21)
-bash "$SCRIPT_DIR/commands/logs.sh"
-;;
-
-22)
-bash "$SCRIPT_DIR/commands/info.sh"
-;;
-
-0)
-exit
-;;
-
-*)
-fail "Invalid option"
-sleep 1
-;;
-
-esac
+    esac
 
 done
