@@ -1,172 +1,288 @@
 #!/usr/bin/env bash
 
-set -Euo pipefail
-trap 'echo "[ERROR] Line $LINENO failed"; exit 1' ERR
+set -Eeuo pipefail
 
-SCRIPT_PATH="$(readlink -f "${BASH_SOURCE[0]}")"
-SCRIPT_DIR="$(dirname "$SCRIPT_PATH")"
-CLI_DIR="$(dirname "$SCRIPT_DIR")"
 
-source "$CLI_DIR/lib/colors.sh"
-source "$CLI_DIR/lib/common.sh"
+#############################################
+# L-PANEL Update Manager
+#############################################
 
-require_root
 
-TMP_DIR=$(mktemp -d)
-OLD_DIR="/opt/l-panel"
+REPO="mohama226/l-panel"
 
-UPDATED_FILES=()
+BRANCH="main"
 
-TOTAL_FILES=0
-CURRENT_FILE=0
-UPDATED_COUNT=0
+INSTALL_DIR="/opt/l-panel"
 
-cleanup(){
-    rm -rf "$TMP_DIR"
-}
+TMP_DIR="/tmp/l-panel-update"
 
-trap cleanup EXIT
+BACKUP_DIR="/opt/l-panel-backups"
 
-#########################################
-# Calculate Hash
-#########################################
 
-file_hash(){
-    sha256sum "$1" 2>/dev/null | awk '{print $1}'
-}
+#############################################
+# Load Libraries
+#############################################
 
-#########################################
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
+BASE_DIR="$(cd "$SCRIPT_DIR/../.." && pwd)"
+
+
+source "$BASE_DIR/cli/lib/colors.sh"
+source "$BASE_DIR/cli/lib/common.sh"
+
+
+#############################################
+# Start
+#############################################
+
+clear
+
+title
+
+
+echo
+
+echo "=============================================="
+
+echo "          L-PANEL UPDATE"
+
+echo "=============================================="
+
+echo
+
+
+
+#############################################
+# Previous Update
+#############################################
+
+
+echo "Last Update:"
+
+if [[ -f "$INSTALL_DIR/.last_update" ]]; then
+
+    cat "$INSTALL_DIR/.last_update"
+
+else
+
+    echo "Never"
+
+fi
+
+
+echo
+
+
+#############################################
+# Confirm
+#############################################
+
+
+read -rp "Continue update? (y/n): " CONFIRM
+
+
+if [[ "$CONFIRM" != "y" ]]; then
+
+    echo "Cancelled"
+
+    exit 0
+
+fi
+
+
+
+#############################################
+# Prepare
+#############################################
+
+
+rm -rf "$TMP_DIR"
+
+mkdir -p "$TMP_DIR"
+
+mkdir -p "$BACKUP_DIR"
+
+
+
+#############################################
+# Backup
+#############################################
+
+
+BACKUP_FILE="$BACKUP_DIR/l-panel-$(date +%Y%m%d-%H%M%S).tar.gz"
+
+
+echo
+
+echo "[+] Creating backup..."
+
+tar -czf "$BACKUP_FILE" \
+    -C /opt \
+    l-panel
+
+
+
+echo
+
+echo "Backup created:"
+
+echo "$BACKUP_FILE"
+
+
+
+#############################################
 # Download
-#########################################
+#############################################
 
-download_update(){
 
-    info "Downloading latest version..."
+echo
 
-    curl -fsSL \
-        https://github.com/mohama226/l-panel/archive/refs/heads/main.zip \
-        -o "$TMP_DIR/update.zip"
+echo "[+] Downloading latest version..."
 
-    unzip -q "$TMP_DIR/update.zip" -d "$TMP_DIR"
 
-    NEW_DIR=$(find "$TMP_DIR" -maxdepth 1 -type d -name "l-panel-*")
+curl -fsSL \
+"https://github.com/${REPO}/archive/refs/heads/${BRANCH}.tar.gz" \
+-o "$TMP_DIR/update.tar.gz"
 
-    if [[ -z "$NEW_DIR" ]]; then
-        fail "Update package not found."
-        exit 1
-    fi
-}
 
-#########################################
-# Count Files
-#########################################
 
-count_files(){
-    TOTAL_FILES=$(find "$NEW_DIR" -type f | wc -l)
-}
+tar -xzf "$TMP_DIR/update.tar.gz" \
+-C "$TMP_DIR"
 
-#########################################
+
+
+NEW_DIR=$(find "$TMP_DIR" -maxdepth 1 -type d -name "l-panel-*")
+
+
+
+#############################################
+# Compare Files
+#############################################
+
+
+echo
+
+echo "Changed files:"
+
+echo "--------------------------------"
+
+
+FILES=$(diff -qr "$INSTALL_DIR" "$NEW_DIR" 2>/dev/null \
+| grep "Files" \
+| awk '{print $2}')
+
+
+COUNT=$(echo "$FILES" | grep -c "/" || true)
+
+
+
+if [[ "$COUNT" -eq 0 ]]; then
+
+    echo "No changes detected."
+
+else
+
+
+    echo "Total changed files: $COUNT"
+
+    echo
+
+
+    echo "$FILES"
+
+
+fi
+
+
+
+echo
+
+read -rp "Apply update? (y/n): " APPLY
+
+
+if [[ "$APPLY" != "y" ]]; then
+
+    echo "Update stopped."
+
+    exit 0
+
+fi
+
+
+
+#############################################
 # Update Files
-#########################################
+#############################################
 
-update_files(){
 
-    info "Checking files..."
-    echo
+echo
 
-    while IFS= read -r NEW_FILE
-    do
-        RELATIVE="${NEW_FILE#$NEW_DIR/}"
-        OLD_FILE="$OLD_DIR/$RELATIVE"
+echo "[+] Updating files..."
 
-        CURRENT_FILE=$((CURRENT_FILE + 1))
 
-        PERCENT=$((CURRENT_FILE * 100 / TOTAL_FILES))
 
-        printf "\rProgress: %s%%" "$PERCENT"
+rsync -av \
+--exclude=".git" \
+"$NEW_DIR/" \
+"$INSTALL_DIR/" \
+> "$TMP_DIR/rsync.log"
 
-        if [[ -f "$OLD_FILE" ]]; then
 
-            OLD_HASH=$(file_hash "$OLD_FILE")
-            NEW_HASH=$(file_hash "$NEW_FILE")
 
-            if [[ "$OLD_HASH" != "$NEW_HASH" ]]; then
-                UPDATED_FILES+=("$RELATIVE")
-                UPDATED_COUNT=$((UPDATED_COUNT + 1))
-            fi
+#############################################
+# Permissions
+#############################################
 
-        else
-            UPDATED_FILES+=("$RELATIVE")
-            UPDATED_COUNT=$((UPDATED_COUNT + 1))
-        fi
 
-        mkdir -p "$(dirname "$OLD_FILE")"
-        cp -f "$NEW_FILE" "$OLD_FILE"
+echo
 
-    done < <(find "$NEW_DIR" -type f)
+echo "[+] Fix permissions..."
 
-    echo
-}
 
-#########################################
-# Permission Fix
-#########################################
 
-fix_permission(){
+chmod +x "$INSTALL_DIR/cli/l-panel"
 
-    chmod +x /opt/l-panel/cli/l-panel
-    chmod +x /opt/l-panel/cli/commands/*.sh
-}
+chmod +x "$INSTALL_DIR/cli/commands/"*.sh
 
-#########################################
-# Report
-#########################################
+chmod +x "$INSTALL_DIR/cli/lib/"*.sh
 
-report(){
 
-    echo
-    echo "================================"
-    ok "Update Finished"
-    echo "================================"
-    echo
 
-    echo "Total files checked : $TOTAL_FILES"
-    echo "Updated files       : $UPDATED_COUNT"
-    echo
+#############################################
+# Update Date
+#############################################
 
-    if (( UPDATED_COUNT > 0 )); then
-        echo "Changed files:"
-        echo
-        for FILE in "${UPDATED_FILES[@]}"; do
-            echo " - $FILE"
-        done
-    else
-        echo "No changes detected."
-    fi
 
-    echo
+save_last_update
 
-    save_last_update
 
-    echo "Update time:"
-    get_last_update
 
-    pause
-}
+#############################################
+# Finish
+#############################################
 
-#########################################
-# Main
-#########################################
 
-main(){
+echo
 
-    title
+echo "=============================================="
 
-    download_update
-    count_files
-    update_files
-    fix_permission
-    report
-}
+echo " L-PANEL UPDATED SUCCESSFULLY"
 
-main
+echo "=============================================="
+
+echo
+
+echo "Updated files: $COUNT"
+
+echo
+
+echo "Time:"
+
+date
+
+
+echo
+
+
+pause
