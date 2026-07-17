@@ -3,60 +3,173 @@
 set -Eeuo pipefail
 
 
-########################################
-# Paths
-########################################
+#############################################
+# L-PANEL OCSERV INSTALLER
+# Version: 1.5.0
+#############################################
+
 
 SCRIPT_PATH="$(readlink -f "${BASH_SOURCE[0]}")"
 SCRIPT_DIR="$(dirname "$SCRIPT_PATH")"
 CLI_DIR="$(dirname "$SCRIPT_DIR")"
 
+
 source "$CLI_DIR/lib/colors.sh"
 source "$CLI_DIR/lib/common.sh"
+
 
 require_root
 
 
-########################################
+
+#############################################
 # Variables
-########################################
+#############################################
+
 
 OCSERV_VERSION="1.5.0"
+
+INSTALL_PREFIX="/usr"
+
 CONFIG_DIR="/etc/ocserv"
+
 CONFIG_FILE="$CONFIG_DIR/ocserv.conf"
+
 SERVICE_FILE="/etc/systemd/system/ocserv.service"
-BUILD_DIR="/usr/local/src"
+
+SOURCE_DIR="/usr/local/src"
+
+LP_CONFIG="/etc/l-panel"
+
+INFO_FILE="$LP_CONFIG/ocserv.info"
+
+PORT=""
 
 
-########################################
+
+#############################################
+# Header
+#############################################
+
+
+clear
+
+title
+
+
+echo
+
+echo "=============================================="
+
+echo "        OCSERV INSTALLER"
+
+echo "=============================================="
+
+echo
+
+echo "Version : $OCSERV_VERSION"
+
+echo
+
+
+
+#############################################
 # Ask Port
-########################################
+#############################################
+
 
 ask_port(){
 
     echo
+
     read -rp "Ocserv Port [443]: " PORT
+
+
     PORT=${PORT:-443}
+
+
+
+    if ! [[ "$PORT" =~ ^[0-9]+$ ]]; then
+
+        fail "Invalid port"
+
+        exit 1
+
+    fi
+
+
+    if [[ "$PORT" -lt 1 || "$PORT" -gt 65535 ]]; then
+
+        fail "Port out of range"
+
+        exit 1
+
+    fi
+
 
 }
 
 
-########################################
-# Dependencies (FINAL VERSION)
-########################################
+
+#############################################
+# Detect Package Manager
+#############################################
+
+
+detect_pm(){
+
+
+    if command -v dnf >/dev/null 2>&1; then
+
+        PM="dnf"
+
+
+    elif command -v yum >/dev/null 2>&1; then
+
+        PM="yum"
+
+
+    else
+
+        fail "Unsupported system"
+
+        exit 1
+
+    fi
+
+
+}#############################################
+# Install Dependencies
+#############################################
 
 install_dependencies(){
 
     info "Installing dependencies..."
 
-    dnf install -y epel-release
-    dnf install -y dnf-plugins-core
+    detect_pm
 
-    dnf config-manager --set-enabled crb
 
-    dnf groupinstall -y "Development Tools"
+    $PM install -y epel-release || true
 
-    dnf install -y \
+    $PM install -y dnf-plugins-core || true
+
+
+    if command -v dnf >/dev/null 2>&1; then
+
+        dnf config-manager --set-enabled crb || true
+
+    fi
+
+
+
+    info "Installing build tools..."
+
+
+    $PM groupinstall -y "Development Tools"
+
+
+
+    $PM install -y \
         meson \
         ninja-build \
         libev-devel \
@@ -77,134 +190,248 @@ install_dependencies(){
         xz \
         wget \
         curl \
-        tar
+        tar \
+        unzip \
+        gcc \
+        make \
+        pkgconfig \
+        certbot \
+        gnutls-utils
+
+
 
     ok "Dependencies installed."
 
 }
 
 
-########################################
-# Install Ocserv Binary (MESON BUILD)
-########################################
 
-install_ocserv(){
+#############################################
+# Check Existing Ocserv
+#############################################
 
-    cd /
 
-    info "Checking Ocserv installation..."
+check_existing_ocserv(){
 
-    ########################################
-    # REMOVE OLD VERSION IF INSTALLED
-    ########################################
 
     if command -v ocserv >/dev/null 2>&1; then
 
-        CURRENT=$(ocserv --version | head -1 | awk '{print $4}')
 
-        if [[ "$CURRENT" == "$OCSERV_VERSION" ]]; then
-            ok "Ocserv ${CURRENT} already installed."
-            return
+        CURRENT=$(ocserv --version 2>/dev/null | head -1 || true)
+
+
+        echo
+
+        warn "Existing Ocserv detected"
+
+        echo "$CURRENT"
+
+        echo
+
+
+
+        read -rp "Reinstall Ocserv? (y/n): " REINSTALL
+
+
+        if [[ "$REINSTALL" != "y" ]]; then
+
+            ok "Keeping existing installation."
+
+            return 1
+
         fi
 
-        warn "Removing old version ${CURRENT}"
-        dnf remove -y ocserv || true
+
+        systemctl stop ocserv 2>/dev/null || true
+
+
     fi
 
 
-    ########################################
-    # DOWNLOAD SOURCE (NEW VERSION)
-    ########################################
-
-    info "Downloading Ocserv ${OCSERV_VERSION}..."
-
-    cd /usr/local/src
-
-    rm -rf ocserv-${OCSERV_VERSION}
-    rm -f ocserv.tar.xz
-
-    wget \
-        https://www.infradead.org/ocserv/download/ocserv-${OCSERV_VERSION}.tar.xz \
-        -O ocserv.tar.xz
-
-    tar -xf ocserv.tar.xz
-
-    cd ocserv-${OCSERV_VERSION}
-
-
-    ########################################
-    # MESON BUILD SYSTEM
-    ########################################
-
-    info "Configuring Meson..."
-
-    rm -rf build
-
-    meson setup build \
-        --prefix=/usr \
-        --sysconfdir=/etc/ocserv
-
-    info "Compiling..."
-
-    meson compile -C build
-
-    info "Installing..."
-
-    meson install -C build
-
-    ldconfig
-
-
-    ########################################
-    # VERSION CHECK
-    ########################################
-
-    if ! command -v ocserv >/dev/null 2>&1; then
-        fail "Ocserv installation failed."
-        exit 1
-    fi
-
-    VERSION=$(ocserv --version | head -1)
-
-    ok "$VERSION installed successfully."
+    return 0
 
 }
 
 
-########################################
+
+
+
+#############################################
+# Download Ocserv Source
+#############################################
+
+
+download_source(){
+
+
+    info "Downloading Ocserv ${OCSERV_VERSION}..."
+
+
+    cd "$SOURCE_DIR"
+
+
+
+    rm -rf "ocserv-${OCSERV_VERSION}"
+
+    rm -f ocserv.tar.xz
+
+
+
+    wget \
+    -q \
+    "https://www.infradead.org/ocserv/download/ocserv-${OCSERV_VERSION}.tar.xz" \
+    -O ocserv.tar.xz
+
+
+
+    if [[ ! -f ocserv.tar.xz ]]; then
+
+        fail "Download failed"
+
+        exit 1
+
+    fi
+
+
+
+    tar -xf ocserv.tar.xz
+
+
+
+    if [[ ! -d "ocserv-${OCSERV_VERSION}" ]]; then
+
+        fail "Source extraction failed"
+
+        exit 1
+
+    fi
+
+
+
+    ok "Source downloaded."
+
+}
+
+
+
+
+#############################################
+# Build Ocserv
+#############################################
+
+
+build_ocserv(){
+
+
+    cd "$SOURCE_DIR/ocserv-${OCSERV_VERSION}"
+
+
+
+    info "Configuring build..."
+
+
+
+    rm -rf build
+
+
+
+    meson setup build \
+        --prefix="$INSTALL_PREFIX" \
+        --sysconfdir=/etc/ocserv
+
+
+
+    info "Compiling..."
+
+
+
+    meson compile -C build
+
+
+
+    info "Installing..."
+
+
+
+    meson install -C build
+
+
+
+    ldconfig
+
+
+
+    if ! command -v ocserv >/dev/null 2>&1; then
+
+        fail "Ocserv binary not found"
+
+        exit 1
+
+    fi
+
+
+
+    ok "Ocserv installed."
+
+}#############################################
 # Create Directories
-########################################
+#############################################
 
 create_directories(){
 
+
     info "Creating directories..."
 
+
     mkdir -p "$CONFIG_DIR"
+
     mkdir -p /var/lib/ocserv
+
     mkdir -p /var/log/ocserv
-    mkdir -p /var/run/ocserv
-    mkdir -p /run
+
+    mkdir -p /run/ocserv
+
+    mkdir -p "$LP_CONFIG"
+
+
+
+    chmod 700 "$CONFIG_DIR"
+
+
 
     ok "Directories created."
 
 }
 
 
-########################################
+
+
+
+#############################################
 # Generate Certificates
-########################################
+#############################################
 
 generate_certificates(){
 
-    info "Generating certificates..."
 
-    if [[ -f "$CONFIG_DIR/server-cert.pem" ]]; then
+    info "Generating SSL certificates..."
+
+
+
+    if [[ -f "$CONFIG_DIR/server-cert.pem" ]] && \
+       [[ -f "$CONFIG_DIR/server-key.pem" ]]; then
+
+
         warn "Certificates already exist."
+
         return
+
     fi
 
-    cat > "$CONFIG_DIR/ca.tmpl" <<'EOF'
-cn = L-Panel CA
+
+
+    cat > "$CONFIG_DIR/ca.tmpl" <<EOF
+cn = L-Panel VPN CA
 organization = L-Panel
 serial = 1
 expiration_days = 3650
@@ -214,7 +441,9 @@ cert_signing_key
 crl_signing_key
 EOF
 
-    cat > "$CONFIG_DIR/server.tmpl" <<'EOF'
+
+
+    cat > "$CONFIG_DIR/server.tmpl" <<EOF
 cn = VPN Server
 organization = L-Panel
 expiration_days = 3650
@@ -223,253 +452,396 @@ encryption_key
 tls_www_server
 EOF
 
-    certtool --generate-privkey --outfile "$CONFIG_DIR/ca-key.pem"
+
 
     certtool \
-        --generate-self-signed \
-        --load-privkey "$CONFIG_DIR/ca-key.pem" \
-        --template "$CONFIG_DIR/ca.tmpl" \
-        --outfile "$CONFIG_DIR/ca-cert.pem"
+    --generate-privkey \
+    --outfile "$CONFIG_DIR/ca-key.pem"
 
-    certtool --generate-privkey --outfile "$CONFIG_DIR/server-key.pem"
+
 
     certtool \
-        --generate-certificate \
-        --load-ca-certificate "$CONFIG_DIR/ca-cert.pem" \
-        --load-ca-privkey "$CONFIG_DIR/ca-key.pem" \
-        --load-privkey "$CONFIG_DIR/server-key.pem" \
-        --template "$CONFIG_DIR/server.tmpl" \
-        --outfile "$CONFIG_DIR/server-cert.pem"
+    --generate-self-signed \
+    --load-privkey "$CONFIG_DIR/ca-key.pem" \
+    --template "$CONFIG_DIR/ca.tmpl" \
+    --outfile "$CONFIG_DIR/ca-cert.pem"
+
+
+
+
+    certtool \
+    --generate-privkey \
+    --outfile "$CONFIG_DIR/server-key.pem"
+
+
+
+
+    certtool \
+    --generate-certificate \
+    --load-ca-certificate "$CONFIG_DIR/ca-cert.pem" \
+    --load-ca-privkey "$CONFIG_DIR/ca-key.pem" \
+    --load-privkey "$CONFIG_DIR/server-key.pem" \
+    --template "$CONFIG_DIR/server.tmpl" \
+    --outfile "$CONFIG_DIR/server-cert.pem"
+
+
+
 
     chmod 600 "$CONFIG_DIR"/*key.pem
 
-    ok "Certificates created."
+
+
+    ok "Certificates generated."
 
 }
 
 
-########################################
-# Create Ocserv Config
-########################################
+
+
+
+
+
+#############################################
+# Create Ocserv Configuration
+#############################################
 
 create_config(){
 
+
     info "Creating ocserv configuration..."
+
+
 
     cat > "$CONFIG_FILE" <<EOF
 auth = "plain[passwd=$CONFIG_DIR/ocpasswd]"
 
+
 tcp-port = $PORT
 udp-port = $PORT
+
 
 server-cert = $CONFIG_DIR/server-cert.pem
 server-key = $CONFIG_DIR/server-key.pem
 
-socket-file = /run/ocserv-socket
 
-run-as-user = nobody
-run-as-group = nobody
+auth-timeout = 240
 
-device = vpns
-
-pid-file = /run/ocserv.pid
-
-isolate-workers = true
 
 max-clients = 500
 max-same-clients = 2
 
+
+run-as-user = nobody
+run-as-group = nobody
+
+
+device = vpns
+
+
+socket-file = /run/ocserv-socket
+
+pid-file = /run/ocserv.pid
+
+
+
+isolate-workers = true
+
+
+
 keepalive = 32400
+
 dpd = 90
+
 mobile-dpd = 1800
+
+
 
 try-mtu-discovery = true
 
+
+
 ipv4-network = 10.10.10.0
+
 ipv4-netmask = 255.255.255.0
 
+
+
 dns = 1.1.1.1
+
 dns = 8.8.8.8
+
+
 
 route = default
 
+
+
 compression = true
+
+
+cisco-client-compat = true
+
+dtls-legacy = true
+
 EOF
 
+
+
+
     touch "$CONFIG_DIR/ocpasswd"
+
+
     chmod 600 "$CONFIG_DIR/ocpasswd"
+
+
 
     ok "Configuration created."
 
-}
-
-
-########################################
-# Enable Forwarding
-########################################
+}#############################################
+# Enable IP Forwarding
+#############################################
 
 enable_forwarding(){
 
+
     info "Enabling IP forwarding..."
 
-    cat > /etc/sysctl.d/99-l-panel-vpn.conf <<EOF
-net.ipv4.ip_forward=1
+
+
+    cat > /etc/sysctl.d/99-l-panel-ocserv.conf <<EOF
+net.ipv4.ip_forward = 1
 EOF
 
+
+
     sysctl --system >/dev/null
+
+
 
     ok "IP forwarding enabled."
 
 }
 
 
-########################################
+
+
+
+#############################################
 # Create Systemd Service
-########################################
+#############################################
 
 create_service(){
 
+
     info "Creating systemd service..."
+
+
 
     cat > "$SERVICE_FILE" <<EOF
 [Unit]
-Description=L-Panel Ocserv VPN
+Description=L-Panel Ocserv VPN Server
 After=network.target
 
+
 [Service]
+
 Type=simple
+
 ExecStart=/usr/sbin/ocserv \
-    -c /etc/ocserv/ocserv.conf \
-    --foreground
+-c $CONFIG_FILE \
+--foreground
+
 Restart=always
+
 RestartSec=5
 
+
 RuntimeDirectory=ocserv
-RuntimeDirectoryMode=755
+
+RuntimeDirectoryMode=0755
+
+
+
+LimitNOFILE=65535
+
+
 
 [Install]
+
 WantedBy=multi-user.target
+
 EOF
 
+
+
+
     systemctl daemon-reload
+
+
     systemctl enable ocserv
+
+
 
     ok "Systemd service created."
 
 }
 
 
-########################################
-# Configure Firewall
-########################################
+
+
+
+#############################################
+# Firewall Configuration
+#############################################
 
 configure_firewall(){
 
+
     info "Configuring firewall..."
+
+
 
     if systemctl is-active firewalld >/dev/null 2>&1; then
 
-        firewall-cmd --permanent --add-port=${PORT}/tcp
-        firewall-cmd --permanent --add-port=${PORT}/udp
+
+
+        firewall-cmd \
+        --permanent \
+        --add-port=${PORT}/tcp
+
+
+
+        firewall-cmd \
+        --permanent \
+        --add-port=${PORT}/udp
+
+
+
         firewall-cmd --reload
 
-        ok "Firewall updated."
+
+
+        ok "Firewall configured."
+
+
 
     else
-        warn "Firewalld not running."
+
+
+        warn "Firewalld is not running."
+
     fi
+
 
 }
 
 
-########################################
-# Start Ocserv
-########################################
-
-start_ocserv(){
-
-    info "Starting ocserv..."
-
-    systemctl restart ocserv
-    sleep 3
-
-    if systemctl is-active ocserv >/dev/null 2>&1; then
-        ok "Ocserv is running."
-    else
-        fail "Ocserv failed to start."
-        echo
-        journalctl -u ocserv --no-pager -n 50
-        exit 1
-    fi
-
-}
 
 
-########################################
-# Save Info
-########################################
+
+
+#############################################
+# Save Installation Info
+#############################################
 
 save_info(){
 
-    mkdir -p /etc/l-panel
 
-    cat > /etc/l-panel/ocserv.info <<EOF
+    mkdir -p "$LP_CONFIG"
+
+
+
+    cat > "$INFO_FILE" <<EOF
 VERSION=$OCSERV_VERSION
 PORT=$PORT
+CONFIG=$CONFIG_FILE
 INSTALL_DATE=$(date "+%Y-%m-%d %H:%M:%S")
+STATUS=installed
 EOF
 
-}
 
 
-########################################
-# Final Result
-########################################
+    chmod 600 "$INFO_FILE"
 
-show_result(){
 
-    echo
-    echo "=============================================="
-    ok "Ocserv installation completed"
-    echo "=============================================="
-    echo
 
-    echo "Version : $OCSERV_VERSION"
-    echo "Port    : $PORT"
-    echo "Config  : $CONFIG_FILE"
-    echo
-
-    ocserv --version || true
-    echo
+    ok "Installation information saved."
 
 }
 
 
-########################################
-# Main
-########################################
 
-main(){
 
-    title
 
-    info "Installing Ocserv ${OCSERV_VERSION}"
+#############################################
+# Create Default Admin Password File
+#############################################
 
-    ask_port
-    install_dependencies
-    install_ocserv
-    create_directories
-    generate_certificates
-    create_config
-    enable_forwarding
-    create_service
-    configure_firewall
-    save_info
-    start_ocserv
-    show_result
+create_password_file(){
 
-    pause
+
+    if [[ ! -f "$CONFIG_DIR/ocpasswd" ]]; then
+
+        touch "$CONFIG_DIR/ocpasswd"
+
+    fi
+
+
+    chmod 600 "$CONFIG_DIR/ocpasswd"
+
+
 
 }
 
-main
+
+
+
+
+#############################################
+# Start Ocserv
+#############################################
+
+start_ocserv(){
+
+
+    info "Starting Ocserv..."
+
+
+
+    systemctl restart ocserv
+
+
+
+    sleep 3
+
+
+
+    if systemctl is-active ocserv >/dev/null 2>&1; then
+
+
+        ok "Ocserv is running."
+
+
+
+    else
+
+
+
+        fail "Ocserv failed to start."
+
+
+        echo
+
+        journalctl \
+        -u ocserv \
+        --no-pager \
+        -n 80
+
+
+
+        exit 1
+
+    fi
+
+
+}
