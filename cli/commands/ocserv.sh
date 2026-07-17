@@ -90,6 +90,8 @@ install_dependencies(){
 
 install_ocserv(){
 
+    cd /
+
     info "Checking Ocserv installation..."
 
     if command -v ocserv >/dev/null 2>&1; then
@@ -115,7 +117,7 @@ install_ocserv(){
     rm -rf "ocserv-${OCSERV_VERSION}"
     rm -f ocserv.tar.xz
 
-    wget \
+    wget -4 \
         "https://www.infradead.org/ocserv/download/ocserv-${OCSERV_VERSION}.tar.xz" \
         -O ocserv.tar.xz
 
@@ -124,7 +126,7 @@ install_ocserv(){
     cd "ocserv-${OCSERV_VERSION}"
 
     ########################################
-    # NEW autoreconf SECTION
+    # autoreconf SECTION
     ########################################
 
     if [[ ! -f configure ]]; then
