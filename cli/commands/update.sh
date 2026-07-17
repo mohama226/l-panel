@@ -14,15 +14,13 @@ TMP_DIR="/tmp/l-panel-update"
 ZIP_URL="https://github.com/${REPO}/archive/refs/heads/${BRANCH}.zip"
 
 
-#####################################
-
 pause(){
+
     echo
     read -rp "Press ENTER to continue..."
+
 }
 
-
-#####################################
 
 title(){
 
@@ -37,7 +35,6 @@ echo
 }
 
 
-#####################################
 
 title
 
@@ -58,9 +55,9 @@ fi
 
 
 
-#####################################
+###################################
 # Backup
-#####################################
+###################################
 
 
 mkdir -p "$BACKUP_DIR"
@@ -72,6 +69,7 @@ BACKUP_FILE="$BACKUP_DIR/l-panel-$(date +%Y%m%d-%H%M%S).tar.gz"
 echo
 echo "[+] Creating backup..."
 
+
 tar -czf "$BACKUP_FILE" \
 -C /opt \
 l-panel
@@ -79,19 +77,17 @@ l-panel
 
 
 echo
-
 echo "Backup created:"
 echo "$BACKUP_FILE"
 
 
 
-#####################################
+###################################
 # Download
-#####################################
+###################################
 
 
 echo
-
 echo "[+] Downloading latest version..."
 
 
@@ -112,9 +108,9 @@ unzip -q \
 
 
 
-#####################################
-# Detect Source
-#####################################
+###################################
+# Detect source
+###################################
 
 
 SOURCE=""
@@ -135,7 +131,7 @@ else
     echo
     echo "ERROR: Invalid L-Panel source"
 
-    find "$TMP_DIR" -maxdepth 3 -type f | head -20
+    find "$TMP_DIR" -maxdepth 3 -type f | head -30
 
     exit 1
 
@@ -144,29 +140,37 @@ fi
 
 
 echo
-
 echo "New source directory:"
 echo "$SOURCE"
 
 
 
-#####################################
-# Compare Files
-#####################################
+###################################
+# Compare
+###################################
 
 
 echo
-
 echo "Changed files:"
 echo "--------------------------------"
 
 
-CHANGED=$(rsync \
+CHANGED=$(
+
+rsync \
 -avnc \
 --delete \
+--exclude ".installed" \
+--exclude ".last_update" \
+--exclude ".admin_user" \
+--exclude ".panel_port" \
 "$SOURCE/" \
 "$INSTALL_DIR/" \
-| grep -v '/$' || true)
+| grep -vE \
+'^(sending|sent|received|total|deleting|$|created directory)' \
+|| true
+
+)
 
 
 
@@ -187,7 +191,6 @@ fi
 
 
 echo
-
 echo "Total changed files: $COUNT"
 
 
@@ -205,13 +208,12 @@ fi
 
 
 
-#####################################
-# Update
-#####################################
+###################################
+# Apply update
+###################################
 
 
 echo
-
 echo "[+] Updating files..."
 
 
@@ -219,41 +221,60 @@ echo "[+] Updating files..."
 rsync \
 -av \
 --delete \
---exclude ".admin_user" \
---exclude ".panel_port" \
 --exclude ".installed" \
 --exclude ".last_update" \
+--exclude ".admin_user" \
+--exclude ".panel_port" \
 "$SOURCE/" \
 "$INSTALL_DIR/"
 
 
 
-#####################################
-# Permissions
-#####################################
+###################################
+# Restore required files
+###################################
 
 
 echo
-
 echo "[+] Fix permissions..."
+
 
 
 chmod +x "$INSTALL_DIR/cli/l-panel"
 
+
+
+if compgen -G "$INSTALL_DIR/cli/commands/*.sh" > /dev/null
+then
+
 chmod +x "$INSTALL_DIR/cli/commands/"*.sh
+
+fi
+
+
+
+if compgen -G "$INSTALL_DIR/cli/lib/*.sh" > /dev/null
+then
 
 chmod +x "$INSTALL_DIR/cli/lib/"*.sh
 
+fi
 
 
-#####################################
-# Update Time
-#####################################
+
+###################################
+# Update timestamp
+###################################
 
 
 date "+%Y-%m-%d %H:%M:%S" \
 > "$INSTALL_DIR/.last_update"
 
+
+
+###################################
+# Finish
+###################################
 
 
 echo
