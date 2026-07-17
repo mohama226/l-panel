@@ -104,17 +104,26 @@ install_ocserv(){
 
     info "Checking Ocserv installation..."
 
-    if command -v ocserv >/dev/null 2>&1; then
-        CURRENT=$(ocserv --version | awk '{print $2}')
+    ########################################
+    # REMOVE OLD VERSION IF INSTALLED
+    ########################################
+
+    if command -v ocserv >/dev/null; then
+
+        CURRENT=$(ocserv --version | head -1 | awk '{print $4}')
+
         if [[ "$CURRENT" == "$OCSERV_VERSION" ]]; then
-            ok "Ocserv ${OCSERV_VERSION} already installed."
+            ok "Ocserv ${CURRENT} already installed."
             return
         fi
 
-        warn "Old Ocserv version detected: $CURRENT"
-        info "Removing old package..."
+        warn "Removing old version ${CURRENT}"
         dnf remove -y ocserv || true
     fi
+
+    ########################################
+    # DOWNLOAD SOURCE
+    ########################################
 
     info "Installing Ocserv ${OCSERV_VERSION} from source..."
 
@@ -138,6 +147,8 @@ install_ocserv(){
 
     info "Configuring Meson..."
 
+    rm -rf build
+
     meson setup build \
         --prefix=/usr \
         --sysconfdir=/etc/ocserv
@@ -153,20 +164,22 @@ install_ocserv(){
     ldconfig
 
     ########################################
+    # VERSION CHECK
+    ########################################
 
-    if ! command -v ocserv >/dev/null 2>&1; then
+    if ! command -v ocserv >/dev/null; then
         fail "Ocserv installation failed"
         exit 1
     fi
 
-    INSTALLED=$(ocserv --version | head -1 | grep -oE '[0-9]+\.[0-9]+\.[0-9]+')
+    VERSION=$(ocserv --version | head -1 | awk '{print $4}')
 
-    if [[ "$INSTALLED" != "$OCSERV_VERSION" ]]; then
-        fail "Wrong version installed: $INSTALLED"
+    if [[ "$VERSION" != "$OCSERV_VERSION" ]]; then
+        fail "Installed version is $VERSION"
         exit 1
     fi
 
-    ok "Ocserv ${INSTALLED} installed successfully."
+    ok "Ocserv ${VERSION} installed successfully."
 
 }
 
