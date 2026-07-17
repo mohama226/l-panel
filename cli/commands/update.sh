@@ -132,7 +132,26 @@ curl -fsSL \
 
 tar -xzf "$TMP_DIR/update.tar.gz" -C "$TMP_DIR"
 
-NEW_DIR=$(find "$TMP_DIR" -maxdepth 1 -type d -name "l-panel-*")
+
+#############################################
+# Locate Extracted Project (NEW)
+#############################################
+
+NEW_DIR=$(find "$TMP_DIR" -maxdepth 1 -type d -name "l-panel-*" | head -n1)
+
+if [[ -z "$NEW_DIR" ]]; then
+
+    echo
+    echo "[ERROR] Updated project directory not found."
+    echo
+    ls -lah "$TMP_DIR"
+    exit 1
+
+fi
+
+echo
+echo "New source directory:"
+echo "$NEW_DIR"
 
 
 #############################################
@@ -177,11 +196,17 @@ fi
 
 
 #############################################
-# Update Files (UPDATED)
+# Update Files (UPDATED + CHECK DIR)
 #############################################
 
 echo
 echo "[+] Updating files..."
+
+if [[ ! -d "$NEW_DIR" ]]; then
+    echo "Source directory missing:"
+    echo "$NEW_DIR"
+    exit 1
+fi
 
 rsync -av \
 --exclude=".git" \
