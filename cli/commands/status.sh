@@ -1,35 +1,31 @@
 #!/usr/bin/env bash
 
-source "$(dirname "$0")/../lib/colors.sh"
-source "$(dirname "$0")/../lib/common.sh"
+set -Eeuo pipefail
 
-header "SYSTEM STATUS"
 
-printf "%-20s %s\n" "L-Panel" "$(panel_status)"
-printf "%-20s %s\n" "Version" "$(get_version)"
-printf "%-20s %s\n" "Last Update" "$(get_last_update)"
+clear
+
+title
+
 
 echo
+echo "=============================="
+echo " OCSERV STATUS"
+echo "=============================="
+echo
 
-if command_exists ocserv
+
+if systemctl status ocserv --no-pager >/dev/null 2>&1
 then
-    OCVERSION=$(ocserv -v | head -1)
 
-    printf "%-20s %s\n" "Ocserv" "Installed"
-    printf "%-20s %s\n" "Version" "$OCVERSION"
-    printf "%-20s %s\n" "Service" "$(service_status ocserv)"
+    systemctl status ocserv --no-pager -l
 
 else
 
-    printf "%-20s %s\n" "Ocserv" "Not Installed"
+    fail "Ocserv service not found"
 
 fi
 
-echo
-
-printf "%-20s %s\n" "Firewalld" "$(service_status firewalld)"
-printf "%-20s %s\n" "Fail2Ban" "$(service_status fail2ban)"
-printf "%-20s %s\n" "PostgreSQL" "$(service_status postgresql)"
 
 echo
 
