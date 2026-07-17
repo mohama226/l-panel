@@ -1,14 +1,56 @@
 #!/usr/bin/env bash
 
-SCRIPT_PATH="$(readlink -f "${BASH_SOURCE[0]}")"
-SCRIPT_DIR="$(dirname "$SCRIPT_PATH")"
-CLI_DIR="$(dirname "$SCRIPT_DIR")"
+set -Eeuo pipefail
 
-source "$CLI_DIR/lib/colors.sh"
-source "$CLI_DIR/lib/common.sh"
+
+clear
 
 title
 
-warn "Coming Soon..."
+
+echo
+echo "=============================="
+echo " SERVICE LOGS"
+echo "=============================="
+echo
+
+
+echo "1) Ocserv logs"
+echo "2) System logs"
+echo "0) Back"
+
+echo
+
+read -rp "Select: " LOG
+
+
+case "$LOG" in
+
+1)
+
+journalctl -u ocserv -n 100 --no-pager
+
+;;
+
+2)
+
+journalctl -n 100 --no-pager
+
+;;
+
+0)
+
+exit 0
+
+;;
+
+*)
+
+echo "Invalid option"
+
+;;
+
+esac
+
 
 pause
