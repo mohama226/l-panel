@@ -64,7 +64,7 @@ set_permissions(){
 
 
 #############################################
-# Create Command Link (ONLY THIS PART CHANGED)
+# Create Command Link (UPDATED)
 #############################################
 
 create_command(){
@@ -72,12 +72,13 @@ create_command(){
     echo
     echo "Creating l-panel command..."
 
-    cat > /usr/local/bin/l-panel <<'EOF'
+    cat > "$BIN_PATH" <<EOF
 #!/usr/bin/env bash
-exec /opt/l-panel/cli/l-panel "$@"
+
+exec "$INSTALL_DIR/cli/l-panel" "\$@"
 EOF
 
-    chmod +x /usr/local/bin/l-panel
+    chmod +x "$BIN_PATH"
 }
 
 
