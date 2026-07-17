@@ -4,7 +4,7 @@ set -Eeuo pipefail
 
 
 #####################################
-# L-PANEL INSTALLER
+# L-PANEL INSTALL / REPAIR
 #####################################
 
 
@@ -18,8 +18,9 @@ VERSION_FILE="$INSTALL_DIR/VERSION"
 INSTALLED_FILE="$INSTALL_DIR/.installed"
 LAST_UPDATE="$INSTALL_DIR/.last_update"
 
-clear
 
+
+clear
 
 echo
 echo "==============================================="
@@ -29,179 +30,217 @@ echo
 
 
 #####################################
-# Root check
+# ROOT CHECK
 #####################################
-
 
 if [[ $EUID -ne 0 ]]; then
-    echo "ERROR: Run as root"
+    echo "Please run as root."
     exit 1
 fi
 
 
 
 #####################################
-# Detect package manager
+# Package manager
 #####################################
 
-
-if command -v dnf >/dev/null 2>&1
-then
+if command -v dnf >/dev/null 2>&1; then
     PM="dnf"
-
-elif command -v yum >/dev/null 2>&1
-then
+elif command -v yum >/dev/null 2>&1; then
     PM="yum"
-
 else
-    echo "No supported package manager found"
+    echo "Unsupported system."
     exit 1
 fi
 
 
 
 #####################################
-# Check existing
+# Existing installation
 #####################################
 
+if [[ -f "$INSTALLED_FILE" ]]; then
 
-if [[ -f "$INSTALLED_FILE" ]]
-then
+    echo
+    echo "L-Panel is already installed."
+    echo
 
-echo
-echo "L-Panel is already installed."
-echo
-echo "Use Update option instead."
-echo
+    echo "Current Version:"
+    
+    if [[ -f "$VERSION_FILE" ]]; then
+        cat "$VERSION_FILE"
+    else
+        echo "Unknown"
+    fi
 
-exit 0
+
+    echo
+
+    echo "Last Update:"
+
+    if [[ -f "$LAST_UPDATE" ]]; then
+        cat "$LAST_UPDATE"
+    else
+        echo "Never"
+    fi
+
+
+    echo
+    echo "=============================================="
+    echo
+    echo "1) Repair Installation"
+    echo "2) Reinstall CLI Files"
+    echo "3) Cancel"
+    echo
+
+    read -rp "Select option: " ACTION
+
+
+    case "$ACTION" in
+
+
+        1)
+
+        echo
+        echo "[+] Repairing..."
+
+        mkdir -p \
+        "$CONFIG_DIR" \
+        "$LOG_DIR"
+
+        chmod +x "$INSTALL_DIR/cli/l-panel"
+
+        chmod +x \
+        "$INSTALL_DIR/cli/commands/"*.sh \
+        2>/dev/null || true
+
+
+        ln -sf \
+        "$INSTALL_DIR/cli/l-panel" \
+        "$BIN"
+
+
+        echo
+        echo "Repair completed."
+
+        ;;
+
+
+        2)
+
+        echo
+        echo "Use Update option to download latest files."
+
+        ;;
+
+
+        *)
+
+        echo
+        echo "Cancelled."
+
+        ;;
+
+    esac
+
+
+    exit 0
 
 fi
 
 
 
-#####################################
-# Install dependencies
-#####################################
-
-
-echo
-echo "[+] Installing dependencies..."
-
-
-$PM install -y \
-curl \
-wget \
-unzip \
-tar \
-rsync \
-openssl \
-firewalld
-
-
 
 #####################################
-# Create directories
+# First Installation
 #####################################
 
 
-echo
 echo "[+] Creating directories..."
 
 
-mkdir -p "$INSTALL_DIR"
-mkdir -p "$CONFIG_DIR"
-mkdir -p "$LOG_DIR"
+mkdir -p \
+"$INSTALL_DIR" \
+"$CONFIG_DIR" \
+"$LOG_DIR"
 
 
 
 #####################################
-# Panel settings
+# Dependencies
 #####################################
 
 
 echo
-echo "================================="
-echo " Panel Configuration"
-echo "================================="
-echo
+echo "[+] Checking dependencies..."
 
 
-read -rp "Panel Port [8080]: " PANEL_PORT
-
-PANEL_PORT=${PANEL_PORT:-8080}
-
-
-
-read -rp "Superadmin Username [admin]: " ADMIN_USER
-
-ADMIN_USER=${ADMIN_USER:-admin}
+PACKAGES=(
+curl
+wget
+unzip
+tar
+rsync
+)
 
 
-
-while true
+for pkg in "${PACKAGES[@]}"
 do
 
-read -rsp "Superadmin Password: " ADMIN_PASS
+    if ! command -v "$pkg" >/dev/null 2>&1
+    then
 
-echo
+        echo "Installing $pkg"
 
-read -rsp "Confirm Password: " ADMIN_PASS2
+        $PM install -y "$pkg"
 
-echo
-
-
-if [[ "$ADMIN_PASS" == "$ADMIN_PASS2" ]]
-then
-    break
-fi
-
-
-echo
-echo "Passwords do not match"
-echo
+    fi
 
 done
 
 
 
-#####################################
-# Save configuration
-#####################################
-
-
-echo "$PANEL_PORT" \
-> "$INSTALL_DIR/.panel_port"
-
-
-echo "$ADMIN_USER" \
-> "$INSTALL_DIR/.admin_user"
-
-
-
-cat > "$CONFIG_DIR/config" <<EOF
-PANEL_PORT=$PANEL_PORT
-ADMIN_USER=$ADMIN_USER
-EOF
-
-
 
 #####################################
-# Version
+# Permission
 #####################################
 
 
-if [[ ! -f "$VERSION_FILE" ]]
-then
+echo
+echo "[+] Setting permissions..."
 
-echo "0.0.1" > "$VERSION_FILE"
 
-fi
+chmod +x "$INSTALL_DIR/cli/l-panel"
+
+chmod +x \
+"$INSTALL_DIR/cli/commands/"*.sh \
+2>/dev/null || true
+
+
+chmod +x \
+"$INSTALL_DIR/cli/lib/"*.sh \
+2>/dev/null || true
 
 
 
 #####################################
-# Installed flag
+# Command
+#####################################
+
+
+echo
+echo "[+] Creating command..."
+
+
+ln -sf \
+"$INSTALL_DIR/cli/l-panel" \
+"$BIN"
+
+
+
+
+#####################################
+# Mark installed
 #####################################
 
 
@@ -214,58 +253,6 @@ date "+%Y-%m-%d %H:%M:%S" \
 
 
 #####################################
-# Permissions
-#####################################
-
-
-echo
-echo "[+] Setting permissions..."
-
-
-chmod +x "$INSTALL_DIR/cli/l-panel" 2>/dev/null || true
-
-
-chmod +x "$INSTALL_DIR/cli/commands/"*.sh 2>/dev/null || true
-
-
-chmod +x "$INSTALL_DIR/cli/lib/"*.sh 2>/dev/null || true
-
-
-
-#####################################
-# Create command
-#####################################
-
-
-echo
-echo "[+] Creating l-panel command..."
-
-
-ln -sf \
-"$INSTALL_DIR/cli/l-panel" \
-"$BIN"
-
-
-
-#####################################
-# Firewall
-#####################################
-
-
-systemctl enable firewalld --now >/dev/null 2>&1 || true
-
-
-firewall-cmd \
---permanent \
---add-port="${PANEL_PORT}/tcp" \
->/dev/null 2>&1 || true
-
-
-firewall-cmd --reload >/dev/null 2>&1 || true
-
-
-
-#####################################
 # Finish
 #####################################
 
@@ -273,24 +260,8 @@ firewall-cmd --reload >/dev/null 2>&1 || true
 echo
 
 echo "======================================"
-echo " L-Panel Installed Successfully"
+echo " L-PANEL INSTALL COMPLETED"
 echo "======================================"
-
-echo
-
-echo "Version:"
-cat "$VERSION_FILE"
-
-echo
-
-echo "Panel Port:"
-cat "$INSTALL_DIR/.panel_port"
-
-echo
-
-echo "Admin User:"
-cat "$INSTALL_DIR/.admin_user"
-
 
 echo
 
@@ -300,6 +271,5 @@ echo
 echo "l-panel"
 
 echo
-
 
 read -rp "Press ENTER to continue..."
