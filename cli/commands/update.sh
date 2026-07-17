@@ -3,294 +3,241 @@
 set -Eeuo pipefail
 
 
-#############################################
-# L-PANEL Update Manager
-#############################################
-
+INSTALL_DIR="/opt/l-panel"
+BACKUP_DIR="/opt/l-panel-backups"
 
 REPO="mohama226/l-panel"
 BRANCH="main"
 
-INSTALL_DIR="/opt/l-panel"
+
 TMP_DIR="/tmp/l-panel-update"
-BACKUP_DIR="/opt/l-panel-backups"
+
+DATE=$(date +"%Y%m%d-%H%M%S")
 
 
-#############################################
-# Load Libraries
-#############################################
-
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-BASE_DIR="$(cd "$SCRIPT_DIR/../.." && pwd)"
-
-source "$BASE_DIR/cli/lib/colors.sh"
-source "$BASE_DIR/cli/lib/common.sh"
-
-
-#############################################
-# Start
-#############################################
 
 clear
-title
 
-echo
-echo "=============================================="
+echo "==============================================="
 echo "          L-PANEL UPDATE"
-echo "=============================================="
+echo "==============================================="
+
 echo
 
-
-#############################################
-# Dependencies
-#############################################
-
-install_dependency(){
-
-    if ! command -v "$1" >/dev/null 2>&1; then
-
-        echo "[+] Installing dependency: $2"
-
-        if command -v dnf >/dev/null 2>&1; then
-            dnf install -y "$2"
-        elif command -v yum >/dev/null 2>&1; then
-            yum install -y "$2"
-        fi
-
-    fi
-
-}
-
-install_dependency rsync rsync
-install_dependency curl curl
-install_dependency tar tar
-
-
-#############################################
-# Previous Update
-#############################################
+if [[ -f "$INSTALL_DIR/.last_update" ]]; then
 
 echo "Last Update:"
-if [[ -f "$INSTALL_DIR/.last_update" ]]; then
-    cat "$INSTALL_DIR/.last_update"
+cat "$INSTALL_DIR/.last_update"
+
 else
-    echo "Never"
+
+echo "Last Update: Never"
+
 fi
 
+
 echo
-
-
-#############################################
-# Confirm
-#############################################
 
 read -rp "Continue update? (y/n): " CONFIRM
 
+
 if [[ "$CONFIRM" != "y" ]]; then
-    echo "Cancelled"
-    exit 0
+
+exit 0
+
 fi
 
 
-#############################################
-# Prepare
-#############################################
 
-rm -rf "$TMP_DIR"
-mkdir -p "$TMP_DIR"
-mkdir -p "$BACKUP_DIR"
-
-
-#############################################
+#################################
 # Backup
-#############################################
-
-BACKUP_FILE="$BACKUP_DIR/l-panel-$(date +%Y%m%d-%H%M%S).tar.gz"
+#################################
 
 echo
 echo "[+] Creating backup..."
 
-tar -czf "$BACKUP_FILE" \
-    -C /opt \
-    l-panel
+mkdir -p "$BACKUP_DIR"
+
+
+tar -czf \
+"$BACKUP_DIR/l-panel-$DATE.tar.gz" \
+-C /opt l-panel
+
 
 echo
+
 echo "Backup created:"
-echo "$BACKUP_FILE"
+echo "$BACKUP_DIR/l-panel-$DATE.tar.gz"
 
 
-#############################################
+
+#################################
 # Download
-#############################################
+#################################
 
 echo
 echo "[+] Downloading latest version..."
 
-curl -fsSL \
-"https://github.com/${REPO}/archive/refs/heads/${BRANCH}.tar.gz" \
--o "$TMP_DIR/update.tar.gz"
+
+rm -rf "$TMP_DIR"
+
+mkdir -p "$TMP_DIR"
 
 
-#############################################
-# Extract Update
-#############################################
+wget -q \
+"https://github.com/$REPO/archive/refs/heads/$BRANCH.tar.gz" \
+-O "$TMP_DIR/update.tar.gz"
 
-tar -xzf "$TMP_DIR/update.tar.gz" \
+
+
+tar -xzf \
+"$TMP_DIR/update.tar.gz" \
 -C "$TMP_DIR"
 
 
-#############################################
-# Locate Project Directory
-#############################################
 
-NEW_DIR=$(find "$TMP_DIR" \
-    -maxdepth 2 \
-    -type f \
-    -name "bootstrap.sh" \
-    | head -n1 \
-    | xargs dirname)
+SOURCE=$(find "$TMP_DIR" -maxdepth 1 -type d -name "l-panel-*")
 
 
-if [[ -z "$NEW_DIR" ]]; then
+if [[ -z "$SOURCE" ]]; then
 
-    echo
-    echo "[ERROR] Cannot locate L-Panel source."
-
-    echo
-    find "$TMP_DIR" -maxdepth 2 -type d
-
-    exit 1
+echo "Source not found"
+exit 1
 
 fi
 
 
+
 echo
 echo "New source directory:"
-echo "$NEW_DIR"
+echo "$SOURCE"
 
 
-#############################################
-# Compare Files (NEW RSYNC VERSION)
-#############################################
+
+#################################
+# Compare
+#################################
+
 
 echo
 echo "Changed files:"
 echo "--------------------------------"
 
-RSYNC_OUTPUT=$(rsync -avnc \
---exclude=".git" \
---exclude=".installed" \
---exclude=".last_update" \
---exclude=".admin_user" \
---exclude=".panel_port" \
-"$NEW_DIR/" \
-"$INSTALL_DIR/")
 
-FILES=$(echo "$RSYNC_OUTPUT" | \
-grep -v "^sending" | \
-grep -v "^sent" | \
-grep -v "^total")
+mapfile -t FILES < <(
 
-COUNT=$(echo "$FILES" | grep -c "/" || true)
-
-if [[ "$COUNT" -eq 0 ]]; then
-    echo "No changes detected."
-else
-    echo "Total changed files: $COUNT"
-    echo
-    echo "$FILES"
-fi
-
-echo
-read -rp "Apply update? (y/n): " APPLY
-
-if [[ "$APPLY" != "y" ]]; then
-    echo "Update stopped."
-    exit 0
-fi
+rsync \
+-rcn \
+--out-format="%n" \
+"$SOURCE/" \
+"$INSTALL_DIR/"
 
 
-#############################################
-# Update Files (UPDATED + VALIDATION)
-#############################################
-
-echo
-echo "[+] Updating files..."
-
-#############################################
-# Validate Source
-#############################################
-
-REQUIRED_FILES=(
-"cli/l-panel"
-"cli/lib"
-"cli/commands"
-"bootstrap.sh"
 )
 
-for FILE in "${REQUIRED_FILES[@]}"
+
+
+if [[ ${#FILES[@]} -eq 0 ]]; then
+
+echo "No changes detected."
+
+else
+
+for FILE in "${FILES[@]}"
 do
-    if [[ ! -e "$NEW_DIR/$FILE" ]]; then
-        echo
-        echo "[ERROR] Invalid update package"
-        echo "Missing: $FILE"
-        exit 1
-    fi
+echo "$FILE"
 done
 
-echo "Source validation OK."
-
-
-if [[ ! -d "$NEW_DIR" ]]; then
-    echo "Source directory missing:"
-    echo "$NEW_DIR"
-    exit 1
 fi
 
 
-rsync -av \
---exclude=".git" \
---exclude="update.tar.gz" \
---exclude="rsync.log" \
-"$NEW_DIR/" \
-"$INSTALL_DIR/" \
-| tee "$TMP_DIR/rsync.log"
+echo
 
+echo "Total changed files: ${#FILES[@]}"
 
-#############################################
-# Permissions
-#############################################
 
 echo
+
+read -rp "Apply update? (y/n): " APPLY
+
+
+if [[ "$APPLY" != "y" ]]; then
+
+exit 0
+
+fi
+
+
+
+#################################
+# Update
+#################################
+
+echo
+
+echo "[+] Updating files..."
+
+
+rsync \
+-r \
+--delete \
+"$SOURCE/" \
+"$INSTALL_DIR/"
+
+
+
+#################################
+# Permissions
+#################################
+
+echo
+
 echo "[+] Fix permissions..."
 
+
 chmod +x "$INSTALL_DIR/cli/l-panel"
+
+
 chmod +x "$INSTALL_DIR/cli/commands/"*.sh
+
+
 chmod +x "$INSTALL_DIR/cli/lib/"*.sh
 
 
-#############################################
-# Update Date
-#############################################
 
-save_last_update
+#################################
+# Remove temporary files
+#################################
+
+rm -rf "$TMP_DIR"
 
 
-#############################################
-# Finish
-#############################################
+
+#################################
+# Save update time
+#################################
+
+date "+%Y-%m-%d %H:%M:%S" \
+> "$INSTALL_DIR/.last_update"
+
+
 
 echo
+
 echo "=============================================="
 echo " L-PANEL UPDATED SUCCESSFULLY"
 echo "=============================================="
+
 echo
 
-echo "Updated files: $COUNT"
+echo "Updated files: ${#FILES[@]}"
+
 echo
 
 echo "Time:"
 date
 
+
 echo
-pause
+
+read -rp "Press ENTER to continue..."
