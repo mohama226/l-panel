@@ -250,10 +250,8 @@ fi
 
 rsync -av \
 --exclude=".git" \
---exclude=".installed" \
---exclude=".last_update" \
---exclude=".admin_user" \
---exclude=".panel_port" \
+--exclude="update.tar.gz" \
+--exclude="rsync.log" \
 "$NEW_DIR/" \
 "$INSTALL_DIR/" \
 | tee "$TMP_DIR/rsync.log"
