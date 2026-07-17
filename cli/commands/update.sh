@@ -130,24 +130,39 @@ curl -fsSL \
 "https://github.com/${REPO}/archive/refs/heads/${BRANCH}.tar.gz" \
 -o "$TMP_DIR/update.tar.gz"
 
-tar -xzf "$TMP_DIR/update.tar.gz" -C "$TMP_DIR"
+
+#############################################
+# Extract Update
+#############################################
+
+tar -xzf "$TMP_DIR/update.tar.gz" \
+-C "$TMP_DIR"
 
 
 #############################################
-# Locate Extracted Project (NEW)
+# Locate Project Directory
 #############################################
 
-NEW_DIR=$(find "$TMP_DIR" -maxdepth 1 -type d -name "l-panel-*" | head -n1)
+NEW_DIR=$(find "$TMP_DIR" \
+    -maxdepth 2 \
+    -type f \
+    -name "bootstrap.sh" \
+    | head -n1 \
+    | xargs dirname)
+
 
 if [[ -z "$NEW_DIR" ]]; then
 
     echo
-    echo "[ERROR] Updated project directory not found."
+    echo "[ERROR] Cannot locate L-Panel source."
+
     echo
-    ls -lah "$TMP_DIR"
+    find "$TMP_DIR" -maxdepth 2 -type d
+
     exit 1
 
 fi
+
 
 echo
 echo "New source directory:"
@@ -196,17 +211,42 @@ fi
 
 
 #############################################
-# Update Files (UPDATED + CHECK DIR)
+# Update Files (UPDATED + VALIDATION)
 #############################################
 
 echo
 echo "[+] Updating files..."
+
+#############################################
+# Validate Source
+#############################################
+
+REQUIRED_FILES=(
+"cli/l-panel"
+"cli/lib"
+"cli/commands"
+"bootstrap.sh"
+)
+
+for FILE in "${REQUIRED_FILES[@]}"
+do
+    if [[ ! -e "$NEW_DIR/$FILE" ]]; then
+        echo
+        echo "[ERROR] Invalid update package"
+        echo "Missing: $FILE"
+        exit 1
+    fi
+done
+
+echo "Source validation OK."
+
 
 if [[ ! -d "$NEW_DIR" ]]; then
     echo "Source directory missing:"
     echo "$NEW_DIR"
     exit 1
 fi
+
 
 rsync -av \
 --exclude=".git" \
