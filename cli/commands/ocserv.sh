@@ -844,4 +844,139 @@ start_ocserv(){
     fi
 
 
+}#############################################
+# Show Result
+#############################################
+
+show_result(){
+
+
+    echo
+
+    echo "=============================================="
+
+    echo " OCSERV INSTALLATION COMPLETED"
+
+    echo "=============================================="
+
+    echo
+
+
+    echo "Version : $OCSERV_VERSION"
+
+    echo "Port    : $PORT"
+
+    echo "Config  : $CONFIG_FILE"
+
+    echo "Service : ocserv"
+
+
+
+    echo
+
+
+    if command -v ocserv >/dev/null 2>&1; then
+
+        ocserv --version
+
+    fi
+
+
+
+    echo
+
+
+    echo "Status:"
+
+    systemctl status ocserv \
+    --no-pager \
+    -l | head -20
+
+
+
+    echo
+
+
 }
+
+
+
+
+
+#############################################
+# Main Installer
+#############################################
+
+main(){
+
+
+    title
+
+
+
+    info "Starting Ocserv installation"
+
+    echo
+
+
+
+    ask_port
+
+
+
+    install_dependencies
+
+
+
+    if check_existing_ocserv; then
+
+
+        download_source
+
+        build_ocserv
+
+
+    fi
+
+
+
+    create_directories
+
+
+    generate_certificates
+
+
+    create_config
+
+
+    create_password_file
+
+
+    enable_forwarding
+
+
+    create_service
+
+
+    configure_firewall
+
+
+    save_info
+
+
+    start_ocserv
+
+
+    show_result
+
+
+
+    pause
+
+
+}
+
+
+
+
+main "$@"
