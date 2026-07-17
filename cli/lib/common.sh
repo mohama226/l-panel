@@ -127,3 +127,105 @@ line() {
     printf '%*s\n' "${COLUMNS:-50}" '' | tr ' ' '='
 
 }
+
+########################################
+# Command exists
+########################################
+
+command_exists() {
+    command -v "$1" >/dev/null 2>&1
+}
+
+########################################
+# Service status
+########################################
+
+service_status() {
+
+    local SERVICE="$1"
+
+    if systemctl is-active --quiet "$SERVICE"; then
+        echo "Running"
+    else
+        echo "Stopped"
+    fi
+
+}
+
+########################################
+# Service enabled
+########################################
+
+service_enabled() {
+
+    local SERVICE="$1"
+
+    if systemctl is-enabled --quiet "$SERVICE" 2>/dev/null; then
+        echo "Enabled"
+    else
+        echo "Disabled"
+    fi
+
+}
+
+########################################
+# Print OK
+########################################
+
+ok() {
+
+    echo -e "${GREEN}[ OK ]${NC} $1"
+
+}
+
+########################################
+# Print INFO
+########################################
+
+info() {
+
+    echo -e "${BLUE}[ INFO ]${NC} $1"
+
+}
+
+########################################
+# Print WARN
+########################################
+
+warn() {
+
+    echo -e "${YELLOW}[ WARN ]${NC} $1"
+
+}
+
+########################################
+# Print FAIL
+########################################
+
+fail() {
+
+    echo -e "${RED}[ FAIL ]${NC} $1"
+
+}
+
+########################################
+# Header
+########################################
+
+header() {
+
+clear
+
+title
+
+echo
+
+line
+
+echo "$1"
+
+line
+
+echo
+
+}
