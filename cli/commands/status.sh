@@ -61,3 +61,60 @@ echo "PID     : $PID"
 echo "Uptime  : $UPTIME"
 
 echo
+CPU="-"
+RAM="-"
+
+if [[ "$PID" != "-" ]]; then
+
+    CPU=$(ps -p "$PID" -o %cpu= | xargs)
+
+    RAM=$(ps -p "$PID" -o %mem= | xargs)
+
+fi
+
+echo "CPU Usage : ${CPU}%"
+echo "RAM Usage : ${RAM}%"
+
+echo
+ONLINE=0
+
+if command -v occtl >/dev/null 2>&1; then
+
+    ONLINE=$(occtl show users 2>/dev/null | tail -n +2 | wc -l)
+
+fi
+
+TOTAL_USERS=0
+
+if [[ -f /etc/ocserv/ocpasswd ]]; then
+
+    TOTAL_USERS=$(grep -vc '^$' /etc/ocserv/ocpasswd)
+
+fi
+
+echo "Users"
+echo "----------------------------"
+
+echo "Registered : $TOTAL_USERS"
+
+echo "Online     : $ONLINE"
+
+echo
+echo "System"
+echo "----------------------------"
+
+echo "Hostname : $(hostname)"
+
+echo "Kernel   : $(uname -r)"
+
+echo "OS       : $(grep PRETTY_NAME /etc/os-release | cut -d= -f2 | tr -d '"')"
+
+echo
+
+systemctl --no-pager --full status ocserv | head -20
+
+echo
+
+pause
+
+exit 0
