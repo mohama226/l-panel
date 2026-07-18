@@ -1,13 +1,5 @@
 #!/usr/bin/env bash
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-
-source "$SCRIPT_DIR/lib/colors.sh"
-source "$SCRIPT_DIR/lib/common.sh"
-source "$SCRIPT_DIR/lib/version.sh"
-
-#!/usr/bin/env bash
-
 set -Eeuo pipefail
 
 SCRIPT_PATH="$(readlink -f "${BASH_SOURCE[0]}")"
@@ -17,83 +9,102 @@ CLI_DIR="$(dirname "$SCRIPT_DIR")"
 source "$CLI_DIR/lib/colors.sh"
 source "$CLI_DIR/lib/common.sh"
 
-get_cpu_usage() {
-top -bn1 | awk '/Cpu/ {print int($2+$4)"%"}'
-}
+title
 
-get_ram_usage() {
-free | awk '/Mem:/ {printf "%.0f%%", ($3/$2)*100}'
-}
+INFO_FILE="/etc/l-panel/ocserv.info"
 
-get_disk_usage() {
-df -h / | awk 'NR==2 {print $5}'
-}
+VERSION="-"
+PORT="-"
 
-get_uptime() {
-uptime -p | sed 's/up //'
-}
+[[ -f "$INFO_FILE" ]] && source "$INFO_FILE"
 
-get_load() {
-awk '{print $1" "$2" "$3}' /proc/loadavg
-}
+while true
+do
 
-get_online_users() {
-who | wc -l
-}
-
-get_ip() {
-hostname -I | awk '{print $1}'
-}
-
-get_kernel() {
-uname -r
-}
-
-get_os() {
-source /etc/os-release
-echo "$PRETTY_NAME"
-}
-
-service_status(){
-
-systemctl is-active "$1" >/dev/null 2>&1 \
-&& echo "RUNNING" \
-|| echo "STOPPED"
-
-}
+clear
 
 title
 
 echo
-
 echo "=============================================="
-echo "              L-PANEL DASHBOARD"
+echo "             SYSTEM DASHBOARD"
 echo "=============================================="
+echo
 
-printf "%-28s %s\n" "Hostname"        "$(hostname)"
-printf "%-28s %s\n" "IP Address"      "$(get_ip)"
-printf "%-28s %s\n" "Operating System" "$(get_os)"
-printf "%-28s %s\n" "Kernel"          "$(get_kernel)"
+DATE_NOW="$(date '+%Y-%m-%d %H:%M:%S')"
+
+HOST="$(hostname)"
+
+KERNEL="$(uname -r)"
+
+UPTIME="$(uptime -p)"
+
+LOAD="$(cut -d' ' -f1-3 /proc/loadavg)"
+
+echo "Date      : $DATE_NOW"
+echo "Hostname  : $HOST"
+echo "Kernel    : $KERNEL"
+echo "Uptime    : $UPTIME"
+echo "Load Avg  : $LOAD"
+
+echo
+#############################################
+# CPU
+#############################################
+
+CPU_USAGE=$(top -bn1 | awk '/Cpu/ {print 100-$8}')
+
+echo "CPU"
+echo "------------------------------"
+
+printf "Usage : %.1f%%\n" "$CPU_USAGE"
+
+CORES=$(nproc)
+
+echo "Cores : $CORES"
 
 echo
 
-printf "%-28s %s\n" "CPU Usage"       "$(get_cpu_usage)"
-printf "%-28s %s\n" "RAM Usage"       "$(get_ram_usage)"
-printf "%-28s %s\n" "Disk Usage"      "$(get_disk_usage)"
-printf "%-28s %s\n" "Load Average"    "$(get_load)"
-printf "%-28s %s\n" "Uptime"          "$(get_uptime)"
+
+
+#############################################
+# MEMORY
+#############################################
+
+read MEM_TOTAL MEM_USED <<<$(free -m | awk '/Mem:/ {print $2" "$3}')
+
+MEM_PERCENT=$((MEM_USED*100/MEM_TOTAL))
+
+echo "Memory"
+echo "------------------------------"
+
+echo "Used  : ${MEM_USED} MB"
+
+echo "Total : ${MEM_TOTAL} MB"
+
+echo "Usage : ${MEM_PERCENT}%"
 
 echo
 
-printf "%-28s %s\n" "Ocserv"          "$(service_status ocserv)"
-printf "%-28s %s\n" "Firewalld"       "$(service_status firewalld)"
-printf "%-28s %s\n" "Fail2Ban"        "$(service_status fail2ban)"
-printf "%-28s %s\n" "SSH"             "$(service_status sshd)"
+
+
+#############################################
+# DISK
+#############################################
+
+DISK_USED=$(df -h / | awk 'NR==2 {print $3}')
+
+DISK_TOTAL=$(df -h / | awk 'NR==2 {print $2}')
+
+DISK_PERCENT=$(df -h / | awk 'NR==2 {print $5}')
+
+echo "Disk"
+echo "------------------------------"
+
+echo "Used  : $DISK_USED"
+
+echo "Total : $DISK_TOTAL"
+
+echo "Usage : $DISK_PERCENT"
 
 echo
-
-printf "%-28s %s\n" "Online Users"    "$(get_online_users)"
-
-echo
-
-pause
