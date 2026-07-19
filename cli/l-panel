@@ -42,13 +42,10 @@ MEM_PERCENT=$((MEM_USED*100/MEM_TOTAL))
 ONLINE_USERS=0
 
 if command -v occtl >/dev/null 2>&1; then
-
 ONLINE_USERS="$(
     occtl show users 2>/dev/null || true
 )"
-
 ONLINE_USERS=$(printf "%s\n" "$ONLINE_USERS" | tail -n +2 | wc -l)
-
 fi
 
 TOTAL_USERS=0
@@ -60,50 +57,43 @@ fi
 SERVER_IP=$(hostname -I 2>/dev/null | awk '{print $1}')
 UPTIME=$(uptime -p | sed 's/up //')
 
+#############################################
+# Progress Bar Function
+#############################################
+
+progress_bar(){
+local P=$1
+local F=$((P/10))
+local E=$((10-F))
+printf "%0.s█" $(seq 1 $F)
+printf "%0.s░" $(seq 1 $E)
+}
+
+#############################################
+# HEADER DRAW
+#############################################
+
 draw_header(){
 
 clear
 
 echo
-printf "╔%.0s═" {1..70}
-echo "╗"
-
+echo "╔══════════════════════════════════════════════════════════════════════╗"
 printf "║ %-68s ║\n" "L-PANEL"
-
 printf "║ %-68s ║\n" "Enterprise VPN Management"
+echo "╠══════════════════════════════════════════════════════════════════════╣"
 
-printf "╠%.0s═" {1..70}
-echo "╣"
+printf "║ %-31s %-31s ║\n" "Panel Status : $PANEL_STATUS" "Ocserv Status : $OCSERV_STATUS"
+printf "║ %-31s %-31s ║\n" "Version : $VERSION" "Ocserv : $OCSERV_VERSION"
+printf "║ %-31s %-31s ║\n" "CPU : $(progress_bar "$CPU_USAGE") ${CPU_USAGE}%" "Memory : $(progress_bar "$MEM_PERCENT") ${MEM_PERCENT}%"
+printf "║ %-31s %-31s ║\n" "Users : $TOTAL_USERS" "Online : $ONLINE_USERS"
+printf "║ %-31s %-31s ║\n" "Port : $OCSERV_PORT" "IP : $SERVER_IP"
+printf "║ %-66s ║\n" "Uptime      : $UPTIME"
+printf "║ %-66s ║\n" "Last Update : $LAST_UPDATE"
 
-printf "║ %-30s %-37s║\n" \
-"Panel : $PANEL_STATUS" \
-"Ocserv : $OCSERV_STATUS"
-
-printf "║ %-30s %-37s║\n" \
-"Version : $VERSION" \
-"Ocserv : $OCSERV_VERSION"
-
-printf "║ %-30s %-37s║\n" \
-"CPU : ${CPU_USAGE}%" \
-"Memory : ${MEM_PERCENT}%"
-
-printf "║ %-30s %-37s║\n" \
-"Users : $TOTAL_USERS" \
-"Online : $ONLINE_USERS"
-
-printf "║ %-30s %-37s║\n" \
-"Port : $OCSERV_PORT" \
-"IP : $SERVER_IP"
-
-printf "║ %-68s ║\n" "Uptime : $UPTIME"
-
-printf "║ %-68s ║\n" "Last Update : $LAST_UPDATE"
-
-printf "╚%.0s═" {1..70}
-echo "╝"
-
+echo "╚══════════════════════════════════════════════════════════════════════╝"
 echo
-echo "┌──────────────────────────── Main Menu ───────────────────────────┐"
+echo "┌──────────────────────── Main Menu ───────────────────────────────┐"
 echo
 echo "  [01] Install / Repair          [09] Backup"
 echo "  [02] Install Ocserv            [10] Restore"
@@ -116,20 +106,24 @@ echo "  [08] SSL"
 echo
 echo "└──────────────────────────────────────────────────────────────────┘"
 echo
+echo "────────────────────────────────────────────────────────────────────"
+echo " Enterprise VPN Management Console"
+echo "────────────────────────────────────────────────────────────────────"
+echo
 }
+
+#############################################
+# RUN SCRIPT
+#############################################
 
 run_script(){
 
 local SCRIPT="$1"
 
 if [[ -f "$BASE_DIR/commands/$SCRIPT" ]]; then
-
     bash "$BASE_DIR/commands/$SCRIPT"
-
 else
-
     clear
-
     echo
     echo "=============================================================="
     echo
@@ -139,12 +133,14 @@ else
     echo
     echo "=============================================================="
     echo
-
     read -rp "Press ENTER..."
-
 fi
 
 }
+
+#############################################
+# MAIN MENU LOOP
+#############################################
 
 while true
 do
@@ -155,115 +151,33 @@ read -rp "Select Option : " MENU
 
 case "$MENU" in
 
-1)
-
-run_script install.sh
-
-;;
-
-2)
-
-run_script ocserv.sh
-
-;;
-
-3)
-
-run_script users.sh
-
-;;
-
-4)
-
-run_script dashboard.sh
-
-;;
-
-5)
-
-run_script status.sh
-
-;;
-
-6)
-
-run_script services.sh
-
-;;
-
-7)
-
-run_script firewall.sh
-
-;;
-
-8)
-
-run_script ssl.sh
-
-;;
-
-9)
-
-run_script backup.sh
-
-;;
-
-10)
-
-run_script restore.sh
-
-;;
-
-11)
-
-run_script fail2ban.sh
-
-;;
-
-12)
-
-run_script logs.sh
-
-;;
-13)
-
-run_script info.sh
-
-;;
-
-14)
-
-run_script update.sh
-
-;;
-
-15)
-
-run_script uninstall.sh
-
-;;
-
+1)  run_script install.sh ;;
+2)  run_script ocserv.sh ;;
+3)  run_script users.sh ;;
+4)  run_script dashboard.sh ;;
+5)  run_script status.sh ;;
+6)  run_script services.sh ;;
+7)  run_script firewall.sh ;;
+8)  run_script ssl.sh ;;
+9)  run_script backup.sh ;;
+10) run_script restore.sh ;;
+11) run_script fail2ban.sh ;;
+12) run_script logs.sh ;;
+13) run_script info.sh ;;
+14) run_script update.sh ;;
+15) run_script uninstall.sh ;;
 0)
-
-clear
-
-echo
-echo "Bye..."
-echo
-
-exit 0
-
+    clear
+    echo
+    echo "Bye..."
+    echo
+    exit 0
 ;;
-
 *)
-
-echo
-echo "Invalid option."
-sleep 1
-
+    echo
+    echo "Invalid option."
+    sleep 1
 ;;
-
 esac
 
 done
