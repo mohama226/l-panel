@@ -15,17 +15,18 @@ INFO_FILE="/etc/l-panel/ocserv.info"
 
 PORT=443
 
-[[ -f "$INFO_FILE" ]] && source "$INFO_FILE"
+# 🔥 اصلاح شده طبق درخواست تو
+if [[ -f "$INFO_FILE" ]]; then
+    source "$INFO_FILE" 2>/dev/null || true
+fi
 
 clear
-
 title
 
 while true
 do
 
 clear
-
 title
 
 echo
@@ -35,21 +36,14 @@ echo "=============================================="
 echo
 
 echo "Current VPN Port : $PORT"
-
 echo
 
 echo "1) Show Firewall Status"
-
 echo "2) Open VPN Port"
-
 echo "3) Close VPN Port"
-
 echo "4) Reload Firewall"
-
 echo "5) List Open Ports"
-
 echo "0) Back"
-
 echo
 
 read -rp "Select option: " ACTION
@@ -57,101 +51,64 @@ read -rp "Select option: " ACTION
 case "$ACTION" in
 
 1)
-
     echo
-
     systemctl status firewalld --no-pager
-
     echo
-
     pause
-
     ;;
 
 2)
-        echo
+    echo
+    info "Opening TCP/${PORT}..."
+    firewall-cmd --permanent --add-port=${PORT}/tcp
 
-        info "Opening TCP/${PORT}..."
+    info "Opening UDP/${PORT}..."
+    firewall-cmd --permanent --add-port=${PORT}/udp
 
-        firewall-cmd --permanent --add-port=${PORT}/tcp
+    firewall-cmd --reload
+    echo
+    ok "VPN port opened."
+    pause
+    ;;
 
-        info "Opening UDP/${PORT}..."
+3)
+    echo
+    read -rp "Close TCP/UDP port ${PORT}? (y/n): " CONFIRM
+    [[ "$CONFIRM" != "y" ]] && continue
 
-        firewall-cmd --permanent --add-port=${PORT}/udp
+    firewall-cmd --permanent --remove-port=${PORT}/tcp || true
+    firewall-cmd --permanent --remove-port=${PORT}/udp || true
 
-        firewall-cmd --reload
+    firewall-cmd --reload
+    echo
+    ok "VPN port closed."
+    pause
+    ;;
 
-        echo
+4)
+    echo
+    info "Reloading firewall..."
+    firewall-cmd --reload
+    echo
+    ok "Firewall reloaded."
+    pause
+    ;;
 
-        ok "VPN port opened."
+5)
+    echo
+    firewall-cmd --list-ports
+    echo
+    pause
+    ;;
 
-        pause
+0)
+    break
+    ;;
 
-        ;;
-
-    3)
-
-        echo
-
-        read -rp "Close TCP/UDP port ${PORT}? (y/n): " CONFIRM
-
-        [[ "$CONFIRM" != "y" ]] && continue
-
-        firewall-cmd --permanent --remove-port=${PORT}/tcp || true
-
-        firewall-cmd --permanent --remove-port=${PORT}/udp || true
-
-        firewall-cmd --reload
-
-        echo
-
-        ok "VPN port closed."
-
-        pause
-
-        ;;
-
-    4)
-
-        echo
-
-        info "Reloading firewall..."
-
-        firewall-cmd --reload
-
-        echo
-
-        ok "Firewall reloaded."
-
-        pause
-
-        ;;
-
-    5)
-
-        echo
-
-        firewall-cmd --list-ports
-
-        echo
-
-        pause
-
-        ;;
-
-    0)
-
-        break
-
-        ;;
-
-    *)
-
-        warn "Invalid option."
-
-        sleep 1
-
-        ;;
+*)
+    warn "Invalid option."
+    sleep 1
+    ;;
 
 esac
 
