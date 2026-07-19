@@ -108,3 +108,145 @@ echo "Total : $DISK_TOTAL"
 echo "Usage : $DISK_PERCENT"
 
 echo
+#############################################
+# NETWORK
+#############################################
+
+RX=$(cat /proc/net/dev | \
+awk -F'[: ]+' '/:/ && $1!="lo" {rx+=$3} END {print rx}')
+
+TX=$(cat /proc/net/dev | \
+awk -F'[: ]+' '/:/ && $1!="lo" {tx+=$11} END {print tx}')
+
+echo "Network"
+echo "------------------------------"
+
+echo "Received : $((RX/1024/1024)) MB"
+
+echo "Sent     : $((TX/1024/1024)) MB"
+
+echo
+
+
+
+#############################################
+# OCSERV
+#############################################
+
+STATUS="Stopped"
+
+if systemctl is-active ocserv >/dev/null 2>&1; then
+
+    STATUS="Running"
+
+fi
+
+ONLINE=0
+
+if command -v occtl >/dev/null 2>&1; then
+
+    ONLINE=$(occtl show users 2>/dev/null | tail -n +2 | wc -l)
+
+fi
+
+TOTAL_USERS=0
+
+if [[ -f /etc/ocserv/ocpasswd ]]; then
+
+    TOTAL_USERS=$(grep -vc '^$' /etc/ocserv/ocpasswd)
+
+fi
+
+echo "Ocserv"
+echo "------------------------------"
+
+echo "Version : ${VERSION:-Unknown}"
+
+echo "Port    : ${PORT:-Unknown}"
+
+echo "Status  : $STATUS"
+
+echo "Users   : $TOTAL_USERS"
+
+echo "Online  : $ONLINE"
+
+echo
+
+
+
+#############################################
+# SYSTEM HEALTH
+#############################################
+
+echo "Health"
+echo "------------------------------"
+
+if [[ "$STATUS" == "Running" ]]; then
+
+    echo "Ocserv      : OK"
+
+else
+
+    echo "Ocserv      : DOWN"
+
+fi
+
+ROOT_USE=$(df / | awk 'NR==2 {gsub("%","");print $5}')
+
+if [[ "$ROOT_USE" -gt 90 ]]; then
+
+    echo "Disk Space  : WARNING"
+
+else
+
+    echo "Disk Space  : OK"
+
+fi
+
+if [[ "$MEM_PERCENT" -gt 90 ]]; then
+
+    echo "Memory      : WARNING"
+
+else
+
+    echo "Memory      : OK"
+
+fi
+
+echo
+
+echo "=============================================="
+echo
+
+echo "R = Refresh"
+echo "Q = Back"
+
+echo
+
+read -rn1 KEY
+
+case "$KEY" in
+
+R|r)
+
+continue
+
+;;
+
+Q|q)
+
+break
+
+;;
+
+*)
+
+break
+
+;;
+
+esac
+
+done
+
+exit 0
