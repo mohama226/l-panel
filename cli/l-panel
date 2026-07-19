@@ -8,6 +8,13 @@ VERSION_FILE="/opt/l-panel/VERSION"
 LAST_UPDATE_FILE="/opt/l-panel/.last_update"
 INFO_FILE="/etc/l-panel/ocserv.info"
 
+# Colors (mild pastel theme)
+C_HEADER="\e[38;5;45m"
+C_TITLE="\e[38;5;51m"
+C_OK="\e[32m"
+C_WARN="\e[33m"
+C_RESET="\e[0m"
+
 VERSION="Unknown"
 LAST_UPDATE="Never"
 
@@ -77,21 +84,16 @@ draw_header(){
 
 clear
 
-echo
-echo "╔══════════════════════════════════════════════════════════════════════╗"
-printf "║ %-68s ║\n" "L-PANEL"
-printf "║ %-68s ║\n" "Enterprise VPN Management"
-echo "╠══════════════════════════════════════════════════════════════════════╣"
+echo -e "${C_HEADER}==================== L-PANEL — Enterprise VPN ====================${C_RESET}"
 
-printf "║ %-31s %-31s ║\n" "Panel Status : $PANEL_STATUS" "Ocserv Status : $OCSERV_STATUS"
-printf "║ %-31s %-31s ║\n" "Version : $VERSION" "Ocserv : $OCSERV_VERSION"
-printf "║ %-31s %-31s ║\n" "CPU : $(progress_bar "$CPU_USAGE") ${CPU_USAGE}%" "Memory : $(progress_bar "$MEM_PERCENT") ${MEM_PERCENT}%"
-printf "║ %-31s %-31s ║\n" "Users : $TOTAL_USERS" "Online : $ONLINE_USERS"
-printf "║ %-31s %-31s ║\n" "Port : $OCSERV_PORT" "IP : $SERVER_IP"
-printf "║ %-66s ║\n" "Uptime      : $UPTIME"
-printf "║ %-66s ║\n" "Last Update : $LAST_UPDATE"
+printf "Panel Status : ${C_OK}%s${C_RESET}        Ocserv Status : ${C_OK}%s${C_RESET}\n" "$PANEL_STATUS" "$OCSERV_STATUS"
+printf "CPU : %s %s%%        RAM : %s %s%%\n" "$(progress_bar "$CPU_USAGE")" "$CPU_USAGE" "$(progress_bar "$MEM_PERCENT")" "$MEM_PERCENT"
+printf "Users : %s                      Online : %s\n" "$TOTAL_USERS" "$ONLINE_USERS"
+printf "Port : %s                    IP : %s\n" "$OCSERV_PORT" "$SERVER_IP"
+printf "Uptime      : %s\n" "$UPTIME"
+printf "Last Update : %s\n" "$LAST_UPDATE"
 
-echo "╚══════════════════════════════════════════════════════════════════════╝"
+echo -e "${C_HEADER}==================================================================${C_RESET}"
 echo
 echo "┌──────────────────────── Main Menu ───────────────────────────────┐"
 echo
