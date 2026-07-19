@@ -2,168 +2,107 @@
 
 set -Eeuo pipefail
 
-SOURCE="${BASH_SOURCE[0]}"
 
-while [ -L "$SOURCE" ]; do
-    DIR="$(cd -P "$(dirname "$SOURCE")" && pwd)"
-    SOURCE="$(readlink "$SOURCE")"
+SCRIPT_PATH="$(readlink -f "${BASH_SOURCE[0]}")"
 
-    [[ $SOURCE != /* ]] && SOURCE="$DIR/$SOURCE"
-done
+BASE_DIR="$(dirname "$SCRIPT_PATH")"
 
-SCRIPT_DIR="$(cd -P "$(dirname "$SOURCE")" && pwd)"
 
-source "$SCRIPT_DIR/lib/colors.sh"
-source "$SCRIPT_DIR/lib/common.sh"
-source "$SCRIPT_DIR/lib/version.sh"
-source "$SCRIPT_DIR/commands/menu.sh"
+source "$BASE_DIR/lib/colors.sh"
+source "$BASE_DIR/lib/common.sh"
+source "$BASE_DIR/lib/version.sh"
+
+
+INSTALL_CMD="$BASE_DIR/commands/install.sh"
+UPDATE_CMD="$BASE_DIR/commands/update.sh"
+OCSERV_CMD="$BASE_DIR/commands/ocserv.sh"
+UNINSTALL_CMD="$BASE_DIR/commands/uninstall.sh"
+
+
+check_file(){
+
+    if [[ ! -f "$1" ]]; then
+
+        fail "Missing file: $1"
+
+        exit 1
+
+    fi
+
+}
+
+
+menu(){
+
+clear
+
+show_header
+
+
+echo "1) Install L-Panel"
+
+echo "2) Install Ocserv 1.5.0"
+
+echo "3) Update L-Panel"
+
+echo "4) Uninstall L-Panel"
+
+echo
+
+echo "0) Exit"
+
+echo
+
+
+read -rp "Select option: " OPTION
+
+
+case "$OPTION" in
+
+
+1)
+check_file "$INSTALL_CMD"
+bash "$INSTALL_CMD"
+;;
+
+
+2)
+check_file "$OCSERV_CMD"
+bash "$OCSERV_CMD"
+;;
+
+
+3)
+check_file "$UPDATE_CMD"
+bash "$UPDATE_CMD"
+;;
+
+
+4)
+check_file "$UNINSTALL_CMD"
+bash "$UNINSTALL_CMD"
+;;
+
+
+0)
+exit 0
+;;
+
+
+*)
+fail "Invalid option"
+sleep 2
+;;
+
+esac
+
+
+}
+
 
 while true
 do
-    show_menu
 
-    read -rp "Select option: " OPTION
-
-    case "$OPTION" in
-
-        ########################
-        # SYSTEM
-        ########################
-
-        1)
-            bash "$SCRIPT_DIR/commands/install.sh"
-        ;;
-
-        2)
-            bash "$SCRIPT_DIR/commands/update.sh"
-        ;;
-
-        3)
-            bash "$SCRIPT_DIR/commands/uninstall.sh"
-        ;;
-
-        ########################
-        # VPN
-        ########################
-
-        4)
-            bash "$SCRIPT_DIR/commands/ocserv.sh"
-        ;;
-
-        5)
-            bash "$SCRIPT_DIR/commands/status.sh"
-        ;;
-
-        6)
-            systemctl restart ocserv
-            pause
-        ;;
-
-        7)
-            systemctl stop ocserv
-            pause
-        ;;
-
-        8)
-            systemctl start ocserv
-            pause
-        ;;
-
-        ########################
-        # USERS
-        ########################
-
-        9)
-            echo "Coming Soon"
-            pause
-        ;;
-
-        10)
-            echo "Coming Soon"
-            pause
-        ;;
-
-        11)
-            echo "Coming Soon"
-            pause
-        ;;
-
-        12)
-            echo "Coming Soon"
-            pause
-        ;;
-
-        ########################
-        # SECURITY
-        ########################
-
-        13)
-            echo "Coming Soon"
-            pause
-        ;;
-
-        14)
-            echo "Coming Soon"
-            pause
-        ;;
-
-        15)
-            echo "Coming Soon"
-            pause
-        ;;
-
-        ########################
-        # BACKUP
-        ########################
-
-        16)
-            echo "Coming Soon"
-            pause
-        ;;
-
-        17)
-            echo "Coming Soon"
-            pause
-        ;;
-
-        ########################
-        # MONITORING
-        ########################
-
-        18)
-            bash "$SCRIPT_DIR/commands/dashboard.sh"
-        ;;
-
-        19)
-            echo "Coming Soon"
-            pause
-        ;;
-
-        20)
-            bash "$SCRIPT_DIR/commands/services.sh"
-        ;;
-
-        21)
-            bash "$SCRIPT_DIR/commands/logs.sh"
-        ;;
-        22)
-            echo "Coming Soon"
-            pause
-        ;;
-
-        ########################
-
-        0)
-            clear
-            exit 0
-        ;;
-
-        *)
-            echo
-            echo "Invalid option."
-            pause
-        ;;
-
-    esac
+menu
 
 done
