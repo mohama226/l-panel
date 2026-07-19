@@ -42,7 +42,13 @@ MEM_PERCENT=$((MEM_USED*100/MEM_TOTAL))
 ONLINE_USERS=0
 
 if command -v occtl >/dev/null 2>&1; then
-ONLINE_USERS=$(occtl show users 2>/dev/null | tail -n +2 | wc -l)
+
+ONLINE_USERS="$(
+    occtl show users 2>/dev/null || true
+)"
+
+ONLINE_USERS=$(printf "%s\n" "$ONLINE_USERS" | tail -n +2 | wc -l)
+
 fi
 
 TOTAL_USERS=0
