@@ -1,83 +1,107 @@
 #!/usr/bin/env bash
 
-show_menu(){
+set -Eeuo pipefail
+
+SCRIPT_PATH="$(readlink -f "${BASH_SOURCE[0]}")"
+SCRIPT_DIR="$(dirname "$SCRIPT_PATH")"
+CLI_DIR="$(dirname "$SCRIPT_DIR")"
+
+source "$CLI_DIR/lib/colors.sh"
+source "$CLI_DIR/lib/common.sh"
+
+while true
+do
 
 clear
 
 title
 
-cat <<EOF
+echo
+echo "=============================================="
+echo "              USER MANAGER"
+echo "=============================================="
+echo
 
-==============================================
-Version      : $(get_version)
-Status       : Installed
-Last Update  : $(get_last_update)
-==============================================
+echo "1) Create User"
 
-==============================
- SYSTEM
-==============================
+echo "2) Delete User"
 
-1) Install L-Panel
-2) Update L-Panel
-3) Uninstall L-Panel
+echo "3) Change Password"
 
-==============================
- VPN
-==============================
+echo "4) Lock User"
 
-4) Install Ocserv
-5) Ocserv Status
-6) Restart Ocserv
-7) Stop Ocserv
-8) Start Ocserv
+echo "5) Unlock User"
 
-==============================
- USERS
-==============================
+echo "6) Online Users"
 
-9) User Manager
+echo "7) Disconnect User"
 
-10) Online Users
+echo "0) Back"
 
-11) Disconnect User
+echo
 
-12) User Statistics
+read -rp "Select option: " ACTION
 
-==============================
- SECURITY
-==============================
+case "$ACTION" in
 
-13) SSL Manager
+1)
 
-14) Firewall
+bash "$CLI_DIR/commands/user-add.sh"
 
-15) Fail2Ban
+;;
 
-==============================
- BACKUP
-==============================
+2)
 
-16) Backup
+bash "$CLI_DIR/commands/user-delete.sh"
 
-17) Restore
+;;
 
-==============================
- MONITORING
-==============================
+3)
 
-18) Dashboard
+bash "$CLI_DIR/commands/user-password.sh"
 
-19) Coming Soon
+;;
 
-20) Services
+4)
 
-21) Logs
+bash "$CLI_DIR/commands/user-lock.sh"
 
-22) Coming Soon
+;;
 
-0) Exit
+5)
 
-EOF
+bash "$CLI_DIR/commands/user-unlock.sh"
 
-}
+;;
+
+6)
+
+bash "$CLI_DIR/commands/user-online.sh"
+
+;;
+
+7)
+
+bash "$CLI_DIR/commands/user-disconnect.sh"
+
+;;
+
+0)
+
+break
+
+;;
+
+*)
+
+warn "Invalid option."
+
+sleep 1
+
+;;
+
+esac
+
+done
+
+exit 0
