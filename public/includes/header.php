@@ -21,7 +21,8 @@ L-PANEL
 
 <link rel="stylesheet" href="/assets/css/admin.css">
 
-
+<link rel="stylesheet" href="/assets/css/forms.css">
+  
 </head>
 
 
