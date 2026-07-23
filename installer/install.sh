@@ -15,6 +15,8 @@ BIN_PATH="/usr/local/bin/l-panel"
 
 CURRENT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
+BASE_DIR="$CURRENT_DIR"   # اضافه شد برای استفاده در اسکریپت‌ها
+
 
 
 #############################################
@@ -98,6 +100,36 @@ create_state(){
 
 
 #############################################
+# Install Components (NEW SECTION)
+#############################################
+
+install_components(){
+
+    echo
+    echo "======================================"
+    echo " Installing L-Panel Components"
+    echo "======================================"
+    echo
+
+    bash "$BASE_DIR/scripts/install-node.sh"
+    bash "$BASE_DIR/scripts/install-python.sh"
+    bash "$BASE_DIR/scripts/install-postgresql.sh"
+    bash "$BASE_DIR/scripts/install-redis.sh"
+    bash "$BASE_DIR/scripts/install-backend.sh"
+    bash "$BASE_DIR/scripts/install-frontend.sh"
+    bash "$BASE_DIR/scripts/build-frontend.sh"
+    bash "$BASE_DIR/scripts/install-nginx.sh"
+
+    echo
+    echo "======================================"
+    echo " Installation Completed"
+    echo "======================================"
+    echo
+}
+
+
+
+#############################################
 # Finish
 #############################################
 
@@ -126,6 +158,7 @@ main(){
     set_permissions
     create_command
     create_state
+    install_components   # ← بخش جدید اینجا اضافه شد
     finish
 }
 
