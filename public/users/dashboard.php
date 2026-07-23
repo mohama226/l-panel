@@ -5,18 +5,22 @@ session_start();
 
 if(!isset($_SESSION['vpn_user'])){
 
-header("Location:index.php");
+header("Location: /users");
 
 exit;
 
 }
 
 
+
 require "../../app/database.php";
 
 
+
 $stmt=$db->prepare(
+
 "SELECT * FROM users WHERE id=?"
+
 );
 
 
@@ -26,6 +30,7 @@ $stmt->execute([$_SESSION['vpn_id']]);
 $user=$stmt->fetch();
 
 
+
 ?>
 
 
@@ -33,17 +38,22 @@ $user=$stmt->fetch();
 
 <html lang="fa" dir="rtl">
 
+
 <head>
 
 <meta charset="UTF-8">
 
-<title>User Panel</title>
+
+<title>
+VPN User Panel
+</title>
 
 
-<link rel="stylesheet" href="../assets/css/user.css">
+<link rel="stylesheet" href="/assets/css/user.css">
 
 
 </head>
+
 
 
 <body>
@@ -53,21 +63,22 @@ $user=$stmt->fetch();
 <div class="user-panel">
 
 
+
 <div class="user-card">
 
 
+
 <h2>
-
 پنل کاربری VPN
-
 </h2>
 
 
+
 <h3>
-
-سلام <?= $user['username']; ?>
-
+سلام
+<?= htmlspecialchars($user['username']); ?>
 </h3>
+
 
 
 
@@ -79,7 +90,7 @@ $user=$stmt->fetch();
 
 <div class="title">
 
-وضعیت
+وضعیت حساب
 
 </div>
 
@@ -90,7 +101,10 @@ $user=$stmt->fetch();
 
 </div>
 
+
 </div>
+
+
 
 
 
@@ -109,7 +123,10 @@ $user=$stmt->fetch();
 
 </div>
 
+
 </div>
+
+
 
 
 
@@ -124,11 +141,16 @@ $user=$stmt->fetch();
 
 <div class="value">
 
-<?= $user['total_gb']; ?> GB
+<?= $user['total_gb']; ?>
+
+GB
 
 </div>
 
+
 </div>
+
+
 
 
 
@@ -143,33 +165,72 @@ $user=$stmt->fetch();
 
 <div class="value">
 
-<?= $user['used_gb']; ?> GB
+<?= $user['used_gb']; ?>
+
+GB
 
 </div>
 
+
+</div>
+
+
+
+
+
+<div class="box">
+
+<div class="title">
+
+باقی مانده
+
+</div>
+
+
+<div class="value">
+
+
+<?= 
+$user['total_gb']-$user['used_gb'];
+?>
+
+GB
+
+
+</div>
+
+
 </div>
 
 
 
+
 </div>
+
 
 
 <br>
 
 
-<a href="../logout.php">
 
-خروج
+<a href="/logout.php">
+
+خروج از حساب
 
 </a>
 
 
-</div>
 
 
 </div>
+
+
+
+</div>
+
 
 
 </body>
+
 
 </html>
