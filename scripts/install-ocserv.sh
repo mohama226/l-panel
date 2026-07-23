@@ -97,10 +97,10 @@ echo "Installing version: $VERSION"
 
 git checkout "$VERSION"
 
-chmod +x autogen.sh
-chmod +x configure
+echo "Preparing build system"
 
-./autogen.sh
+
+autoreconf -fi
 
 ./configure \
     --prefix=/usr \
