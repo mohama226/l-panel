@@ -6,12 +6,37 @@ require "../../../app/auth.php";
 checkLogin();
 
 
-
 require "../../../app/database.php";
+
+
+require "../../../app/ocserv.php";
 
 
 
 $id=$_GET['id'];
+
+
+
+$stmt=$db->prepare(
+
+"SELECT username FROM users WHERE id=?"
+
+);
+
+
+$stmt->execute([$id]);
+
+
+$user=$stmt->fetch();
+
+
+
+if($user){
+
+
+ocserv_user_delete(
+$user['username']
+);
 
 
 
@@ -22,12 +47,15 @@ $stmt=$db->prepare(
 );
 
 
-
 $stmt->execute([$id]);
 
 
+}
 
-header("Location: /modiran/users");
+
+
+header("Location:/modiran/users");
+
 
 exit;
 
