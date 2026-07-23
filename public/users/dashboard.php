@@ -1,21 +1,21 @@
 <?php
 
-session_start();
 
+require "../../app/user_auth.php";
 
-if(!isset($_SESSION['vpn_user'])){
-
-header("Location: /users");
-
-exit;
-
-}
-
+checkUserLogin();
 
 
 require "../../app/database.php";
 
+
 require "../../app/jalali.php";
+
+
+
+$id=$_SESSION['vpn_user'];
+
+
 
 $stmt=$db->prepare(
 
@@ -24,218 +24,134 @@ $stmt=$db->prepare(
 );
 
 
-$stmt->execute([$_SESSION['vpn_id']]);
+
+$stmt->execute([$id]);
+
 
 
 $user=$stmt->fetch();
 
 
 
+include "../includes/header.php";
+
+
 ?>
 
 
-<!DOCTYPE html>
-
-<html lang="fa" dir="rtl">
+<div class="content">
 
 
-<head>
-
-<meta charset="UTF-8">
-
-
-<title>
-VPN User Panel
-</title>
-
-
-<link rel="stylesheet" href="/assets/css/user.css">
-
-
-</head>
-
-
-
-<body>
-
-
-
-<div class="user-panel">
-
-
-
-<div class="user-card">
-
+<div class="users-box">
 
 
 <h2>
-پنل کاربری VPN
+
+👤 پنل کاربری
+
 </h2>
 
 
 
-<h3>
-سلام
-<?= htmlspecialchars($user['username']); ?>
-</h3>
+<div class="card">
+
+
+<p>
+
+نام کاربری:
+
+<b>
+
+<?=$user['username']?>
+
+</b>
+
+</p>
 
 
 
 
-<div class="info">
+<p>
+
+تاریخ انقضا میلادی:
+
+<b>
+
+<?=$user['expire_date']?>
+
+</b>
+
+</p>
 
 
 
-<div class="box">
+<p>
 
-<div class="title">
+تاریخ انقضا شمسی:
 
-وضعیت حساب
+<b>
 
-</div>
+<?=jalali_date($user['expire_date'])?>
 
+</b>
 
-<div class="value">
-
-<?= $user['status']; ?>
-
-</div>
-
-
-</div>
-
-
-
-
-
-<div class="box">
-
-<div class="title">
-
-تاریخ انقضا
-
-</div>
-
-
-<div class="value">
-
-<div class="value">
-
-<?= $user['expire_date']; ?>
-
-<br>
-
-<small>
-
-<?= jalali_date($user['expire_date']); ?>
-
-</small>
-
-</div>
-
-</div>
-
-
-</div>
+</p>
 
 
 
 
+<p>
 
-<div class="box">
+حجم کل:
 
-<div class="title">
+<b>
 
-حجم کل
-
-</div>
-
-
-<div class="value">
-
-<?= $user['total_gb']; ?>
+<?=$user['total_gb']?>
 
 GB
 
-</div>
+</b>
 
-
-</div>
-
-
-
-
-
-<div class="box">
-
-<div class="title">
-
-دانلود مصرف شده
-
-</div>
-
-
-<div class="value">
-
-<?= round($user['download_mb']/1024,2); ?>
-
-GB
-
-</div>
-
-
-</div>
+</p>
 
 
 
 
+<p>
 
-<div class="box">
+دانلود:
 
-<div class="title">
+<b>
 
-آپلود مصرف شده
+<?=($user['download'] ?? 0)?>
 
-</div>
+MB
+
+</b>
+
+</p>
 
 
-<div class="value">
 
-<?= round($user['upload_mb']/1024,2); ?>
 
-GB
+<p>
 
-</div>
+آپلود:
+
+<b>
+
+<?=($user['upload'] ?? 0)?>
+
+MB
+
+</b>
+
+</p>
+
 
 
 </div>
 
-
-
-
-
-<div class="box">
-
-<div class="title">
-
-مجموع مصرف
-
-</div>
-
-
-<div class="value">
-
-
-<?=
-
-round(
-($user['download_mb']+$user['upload_mb'])/1024,
-2
-)
-
-?>
-
-GB
 
 
 </div>
@@ -243,129 +159,10 @@ GB
 
 </div>
 
-
-
-
-
-<div class="box">
-
-<div class="title">
-
-باقی مانده
-
-</div>
-
-
-<div class="value">
 
 
 <?php
 
-
-$used=
-
-($user['download_mb']+$user['upload_mb'])/1024;
-
-
-echo
-
-round(
-$user['total_gb']-$used,
-2
-);
-
+include "../includes/footer.php";
 
 ?>
-
-GB
-
-
-</div>
-
-
-</div>
-
-
-
-
-
-<div class="box">
-
-<div class="title">
-
-مصرف شده
-
-</div>
-
-
-<div class="value">
-
-<?= $user['used_gb']; ?>
-
-GB
-
-</div>
-
-
-</div>
-
-
-
-
-
-<div class="box">
-
-<div class="title">
-
-باقی مانده
-
-</div>
-
-
-<div class="value">
-
-
-<?= 
-$user['total_gb']-$user['used_gb'];
-?>
-
-GB
-
-
-</div>
-
-
-</div>
-
-
-
-
-</div>
-
-
-
-<br>
-
-
-
-<a href="/logout.php">
-
-خروج از حساب
-
-</a>
-
-
-
-
-</div>
-
-
-
-</div>
-
-
-
-</body>
-
-
-</html>
