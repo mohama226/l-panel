@@ -17,3 +17,8 @@ EOF
 echo "Updating backend..."
 
 bash /opt/l-panel/scripts/setup-backend.sh
+
+# بخش جدیدی که گفتی در آخر فایل اضافه کنم
+echo "Setting up Backend..."
+
+bash /opt/l-panel/scripts/setup-backend.sh
