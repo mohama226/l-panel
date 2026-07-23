@@ -113,6 +113,9 @@ EOF
 
 
 
+if [ -f /etc/debian_version ]; then
+
+
 cat >/etc/apache2/sites-available/lpanel.conf <<EOF
 
 Listen $PORT
@@ -135,16 +138,44 @@ Require all granted
 EOF
 
 
-
-if command -v a2ensite >/dev/null
-then
-
 a2ensite lpanel.conf
+
 systemctl restart apache2
+
+
 
 else
 
+
+
+cat >/etc/httpd/conf.d/lpanel.conf <<EOF
+
+
+Listen $PORT
+
+
+<VirtualHost *:$PORT>
+
+
+DocumentRoot /var/www/html/l-panel/public
+
+
+<Directory /var/www/html/l-panel/public>
+
+AllowOverride All
+Require all granted
+
+</Directory>
+
+
+</VirtualHost>
+
+
+EOF
+
+
 systemctl restart httpd
+
 
 fi
 
