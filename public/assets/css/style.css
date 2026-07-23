@@ -305,3 +305,48 @@ tr:hover{
 
 
 }
+.content{
+
+    width:100%;
+
+}
+
+
+
+.form-card{
+
+    max-width:800px;
+
+    margin:auto;
+
+}
+
+
+
+.form-card label{
+
+    display:block;
+
+    margin-bottom:8px;
+
+    font-weight:bold;
+
+    color:#334155;
+
+}
+
+
+
+.success{
+
+    background:#dcfce7;
+
+    color:#166534;
+
+    padding:15px;
+
+    border-radius:12px;
+
+    margin-bottom:20px;
+
+}
