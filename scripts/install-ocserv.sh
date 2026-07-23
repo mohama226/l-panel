@@ -18,6 +18,29 @@ if command -v dnf >/dev/null
 then
 
     dnf install -y epel-release
+
+    dnf install -y gperf || {
+        echo "Installing gperf from source"
+
+        cd /usr/local/src
+
+        rm -rf gperf
+
+        wget https://ftp.gnu.org/pub/gnu/gperf/gperf-3.1.tar.gz
+
+        tar xf gperf-3.1.tar.gz
+
+        cd gperf-3.1
+
+        ./configure
+
+        make -j$(nproc)
+
+        make install
+
+        cd /
+    }
+
     dnf config-manager --set-enabled crb || true
 
     dnf install -y \
@@ -37,8 +60,7 @@ then
         ninja-build \
         pkgconf-pkg-config \
         gettext \
-        which \
-        gperf
+        which
 
     echo "Installing missing libraries"
 
@@ -95,6 +117,8 @@ fi
 echo "Installing version: $VERSION"
 
 git checkout "$VERSION"
+
+gperf --version
 
 echo "Building OCServ with meson"
 
