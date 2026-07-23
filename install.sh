@@ -145,17 +145,24 @@ EOF
 
 fi
 
-# 🔥 بخش جدید: نصب Agent
-echo "Installing L-PANEL Agent"
+# 🔥 بخش جدید که خواستی قبل از پیام نهایی اضافه شود
+echo "Installing L-PANEL Agent..."
 
-cp agent/lpanel-agent.php /usr/local/bin/lpanel-agent.php
+mkdir -p /usr/local/bin
+
+cp /var/www/html/l-panel/agent/lpanel-agent.php \
+/usr/local/bin/lpanel-agent.php
+
 chmod +x /usr/local/bin/lpanel-agent.php
 
-cp systemd/lpanel-agent.service /etc/systemd/system/
+cp /var/www/html/l-panel/systemd/lpanel-agent.service \
+/etc/systemd/system/lpanel-agent.service
 
 systemctl daemon-reload
 systemctl enable lpanel-agent
 systemctl restart lpanel-agent
+
+echo "L-PANEL Agent Installed"
 
 echo ""
 echo "=============================="
