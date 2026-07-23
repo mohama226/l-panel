@@ -1,10 +1,6 @@
 <?php
 
-if(session_status()===PHP_SESSION_NONE){
-
 session_start();
-
-}
 
 ?>
 
@@ -16,7 +12,9 @@ session_start();
 
 <meta charset="UTF-8">
 
-<title>L-PANEL</title>
+<title>
+L-PANEL
+</title>
 
 
 <link rel="stylesheet" href="/assets/css/style.css">
@@ -28,4 +26,4 @@ session_start();
 <body>
 
 
-<div class="wrapper">
+<div class="container">
