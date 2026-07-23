@@ -26,7 +26,7 @@ L-PANEL
 </a>
 
 
-<a href="../logout.php">
+<a href="/logout.php">
 🚪 خروج
 </a>
 
