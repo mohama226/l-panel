@@ -15,7 +15,7 @@ function checkUser(){
 if(!isset($_SESSION['vpn_user'])){
 
 
-header("Location: index.php");
+header("Location: /users");
 
 exit;
 
