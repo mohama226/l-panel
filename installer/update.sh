@@ -19,6 +19,6 @@ echo "Updating backend..."
 bash /opt/l-panel/scripts/setup-backend.sh
 
 # بخش جدیدی که گفتی در آخر فایل اضافه کنم
-echo "Setting up Backend..."
+echo "Setting up Nginx..."
 
-bash /opt/l-panel/scripts/setup-backend.sh
+bash /opt/l-panel/scripts/setup-nginx.sh
