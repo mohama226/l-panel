@@ -22,3 +22,11 @@ bash /opt/l-panel/scripts/setup-backend.sh
 echo "Setting up Nginx..."
 
 bash /opt/l-panel/scripts/setup-nginx.sh
+
+# بخش جدیدی که گفتی قبل از restart اضافه کنم
+echo "Testing backend..."
+
+bash /opt/l-panel/scripts/test-backend.sh
+
+# اجرای دوباره backend بعد از تست
+bash /opt/l-panel/scripts/setup-backend.sh
