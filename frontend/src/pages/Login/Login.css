@@ -239,3 +239,29 @@ button:disabled{
     cursor:not-allowed;
 
 }
+.login-error{
+
+    margin-bottom:20px;
+
+    padding:12px 15px;
+
+    border-radius:12px;
+
+
+    background:
+
+    rgba(239,68,68,.12);
+
+
+    border:
+
+    1px solid rgba(239,68,68,.35);
+
+
+    color:#f87171;
+
+    font-size:14px;
+
+    text-align:center;
+
+}
