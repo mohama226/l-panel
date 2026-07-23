@@ -33,16 +33,11 @@ then
         readline-devel \
         zlib-devel \
         gnutls-devel \
-        autoconf \
-        automake \
-        libtool \
+        meson \
+        ninja-build \
+        pkgconf-pkg-config \
         gettext \
-        flex \
-        bison \
-        texinfo \
-        help2man \
-        which \
-        findutils
+        which
 
     echo "Installing missing libraries"
 
@@ -109,19 +104,16 @@ else
     exit 1
 fi
 
-echo "Configuring OCServ"
+echo "Building OCServ with meson"
 
-./configure \
-    --prefix=/usr \
-    --sysconfdir=/etc
+meson setup build \
+    --prefix=/usr
 
-echo "Building OCServ"
+cd build
 
-make -j$(nproc)
+ninja -j$(nproc)
 
-echo "Installing OCServ"
-
-make install
+ninja install
 
 echo "OCServ installed"
 
