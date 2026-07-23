@@ -25,7 +25,8 @@ $stmt->execute([$username]);
 
 $user=$stmt->fetch();
 
-
+var_dump($user);
+exit;
 
 if($user && password_verify($password,$user['password'])){
 
