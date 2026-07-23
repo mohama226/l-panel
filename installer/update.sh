@@ -12,3 +12,8 @@ CONFIG="${CONFIG}"
 INSTALL_DATE="$(date '+%F %T')"
 STATUS="installed"
 EOF
+
+# بخش جدید که خواستی قبل از پایان فایل اضافه شود
+echo "Updating backend..."
+
+bash /opt/l-panel/scripts/setup-backend.sh
