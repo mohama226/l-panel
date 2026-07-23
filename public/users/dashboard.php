@@ -170,6 +170,129 @@ GB
 
 <div class="title">
 
+دانلود مصرف شده
+
+</div>
+
+
+<div class="value">
+
+<?= round($user['download_mb']/1024,2); ?>
+
+GB
+
+</div>
+
+
+</div>
+
+
+
+
+
+<div class="box">
+
+<div class="title">
+
+آپلود مصرف شده
+
+</div>
+
+
+<div class="value">
+
+<?= round($user['upload_mb']/1024,2); ?>
+
+GB
+
+</div>
+
+
+</div>
+
+
+
+
+
+<div class="box">
+
+<div class="title">
+
+مجموع مصرف
+
+</div>
+
+
+<div class="value">
+
+
+<?=
+
+round(
+($user['download_mb']+$user['upload_mb'])/1024,
+2
+)
+
+?>
+
+GB
+
+
+</div>
+
+
+</div>
+
+
+
+
+
+<div class="box">
+
+<div class="title">
+
+باقی مانده
+
+</div>
+
+
+<div class="value">
+
+
+<?php
+
+
+$used=
+
+($user['download_mb']+$user['upload_mb'])/1024;
+
+
+echo
+
+round(
+$user['total_gb']-$used,
+2
+);
+
+
+?>
+
+GB
+
+
+</div>
+
+
+</div>
+
+
+
+
+
+<div class="box">
+
+<div class="title">
+
 مصرف شده
 
 </div>
