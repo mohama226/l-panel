@@ -5,7 +5,7 @@ require "../../../app/auth.php";
 checkLogin();
 
 require "../../../app/database.php";
-
+require "../../../app/jalali.php";
 
 $id=$_GET['id'];
 
