@@ -1,10 +1,7 @@
 <?php
 
-
 require "../../../app/auth.php";
-
 checkLogin();
-
 
 require "../../../app/database.php";
 
@@ -15,9 +12,9 @@ $msg="";
 if($_POST){
 
 
-$prefix=$_POST['prefix'];
+$prefix=trim($_POST['prefix']);
 
-$count=$_POST['count'];
+$count=intval($_POST['count']);
 
 $expire=$_POST['expire_date'];
 
@@ -25,10 +22,14 @@ $volume=$_POST['total_gb'];
 
 
 
+if($prefix && $count>0){
+
+
+
 for($i=1;$i<=$count;$i++){
 
 
-$username=$prefix.str_pad(
+$username=$prefix . str_pad(
 $i,
 3,
 "0",
@@ -73,11 +74,16 @@ $volume
 ]);
 
 
+
 }
 
 
 
-$msg=$count." کاربر ساخته شد";
+$msg=$count." کاربر با موفقیت ساخته شد";
+
+
+
+}
 
 
 }
@@ -88,25 +94,24 @@ include "../../includes/header.php";
 
 include "../../includes/sidebar.php";
 
-
 ?>
 
 
-<main class="content">
+<div class="content">
 
 
-<div class="card form-card">
+<div class="form-box">
 
 
 <h2>
-👥 افزودن گروهی کاربران
+👥 افزودن گروهی کاربران VPN
 </h2>
 
 
 
 <?php if($msg): ?>
 
-<div class="success">
+<div class="alert-success">
 
 <?=$msg?>
 
@@ -116,21 +121,24 @@ include "../../includes/sidebar.php";
 
 
 
+
 <form method="post">
 
 
-
 <label>
-پیشوند کاربران
+پیشوند نام کاربران
 </label>
 
 
 <input
+
 class="form-control"
+
 name="prefix"
+
 placeholder="مثلا user"
-required
->
+
+required>
 
 
 
@@ -140,12 +148,17 @@ required
 
 
 <input
+
 class="form-control"
+
 type="number"
+
 name="count"
+
 placeholder="مثلا 100"
-required
->
+
+required>
+
 
 
 
@@ -155,42 +168,50 @@ required
 
 
 <input
+
 class="form-control"
+
 type="date"
+
 name="expire_date"
-required
->
+
+required>
 
 
 
 <label>
-حجم GB
+حجم هر کاربر (GB)
 </label>
 
 
 <input
+
 class="form-control"
+
 name="total_gb"
-placeholder="مثلا 100"
-required
->
+
+placeholder="مثلا 50">
 
 
 
-<button class="login-btn">
+
+
+<button class="form-btn">
 
 ساخت کاربران
 
 </button>
 
 
+
 </form>
+
 
 
 </div>
 
 
-</main>
+</div>
 
 
 
