@@ -143,7 +143,56 @@ GB
 <td>
 
 
-<a href="delete.php?id=<?= $user['id']; ?>">
+<a href="edit.php?id=<?=$user['id']?>">
+
+ویرایش
+
+</a>
+
+
+
+<br><br>
+
+
+
+<form method="post" action="adjust_date.php">
+
+
+<input type="hidden"
+
+name="id"
+
+value="<?=$user['id']?>">
+
+
+<input
+
+name="days"
+
+placeholder="+30 یا -10"
+
+style="width:100px"
+
+>
+
+
+
+<button>
+
+اعمال
+
+</button>
+
+
+
+</form>
+
+
+
+<br>
+
+
+<a href="delete.php?id=<?=$user['id']?>">
 
 حذف
 
