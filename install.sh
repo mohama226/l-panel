@@ -145,7 +145,7 @@ EOF
 
 fi
 
-# 🔥 بخش جدید که خواستی قبل از پیام نهایی اضافه شود
+# 🔥 نصب Agent
 echo "Installing L-PANEL Agent..."
 
 mkdir -p /usr/local/bin
@@ -163,6 +163,18 @@ systemctl enable lpanel-agent
 systemctl restart lpanel-agent
 
 echo "L-PANEL Agent Installed"
+
+# 🔥 بخش جدید: نصب CLI Manager
+echo "Installing CLI Manager"
+
+mkdir -p /usr/local/bin
+
+cp /var/www/html/l-panel/cli/l-panel /usr/local/bin/l-panel
+
+chmod +x /usr/local/bin/l-panel
+
+echo "Command installed:"
+echo "Type: l-panel"
 
 echo ""
 echo "=============================="
