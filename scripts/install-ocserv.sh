@@ -41,7 +41,6 @@ then
         lz4-devel \
         cyrus-sasl-devel
 
-    # 🔥 بخش جدید: نصب کتابخانه‌های موردنیاز AlmaLinux
     echo "Installing missing libraries"
 
     dnf install -y protobuf-c protobuf protobuf-devel || true
@@ -71,20 +70,30 @@ else
 
 fi
 
+echo "Preparing source directory..."
+
+rm -rf /usr/local/src/ocserv
+mkdir -p /usr/local/src
 cd /usr/local/src
 
-rm -rf ocserv
-
-git clone \
-https://gitlab.com/openconnect/ocserv.git ocserv
-
+echo "Cloning OCServ repository..."
+git clone https://gitlab.com/openconnect/ocserv.git ocserv
 
 cd ocserv
 
+echo "Available versions:"
+git tag | grep 1.5
 
-git checkout ocserv-1.5.0
+VERSION=$(git tag | grep "1.5" | sort -V | tail -1)
 
-cd ocserv
+if [ -z "$VERSION" ]; then
+    echo "OCServ 1.5.x tag not found"
+    exit 1
+fi
+
+echo "Installing version: $VERSION"
+
+git checkout $VERSION
 
 ./autogen.sh
 
@@ -112,5 +121,5 @@ systemctl restart ocserv
 
 echo ""
 echo "=============================="
-echo "OCServ 1.5.0 Installed"
+echo "OCServ $VERSION Installed"
 echo "=============================="
