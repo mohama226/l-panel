@@ -1,124 +1,153 @@
 import { useState } from "react";
 
-import Card from "@components/ui/Card";
-import Input from "@components/ui/Input";
-import Button from "@components/ui/Button";
-
-import Logo from "@components/layout/Logo";
-
 import "./Login.css";
 
-export default function Login() {
 
-    const [username, setUsername] = useState("");
+function Login(){
 
-    const [password, setPassword] = useState("");
+    const [username,setUsername] = useState("");
 
-    const [loading, setLoading] = useState(false);
+    const [password,setPassword] = useState("");
 
-    async function login(e: React.FormEvent) {
+    const [loading,setLoading] = useState(false);
+
+
+    function handleLogin(e:React.FormEvent){
 
         e.preventDefault();
 
         setLoading(true);
 
-        // TODO:
-        // Backend Login API
 
-        setTimeout(() => {
+        setTimeout(()=>{
 
-            setLoading(false);
+            window.location.href="/dashboard";
 
-        },1000);
+        },700);
 
     }
+
 
     return (
 
         <div className="login-page">
 
-            <div className="login-background"/>
 
-            <Card
-                className="login-container"
-            >
+            <div className="login-box">
 
-                <div className="login-logo">
 
-                    <Logo/>
+                <div className="login-header">
 
-                </div>
+                    <div className="logo">
 
-                <div className="login-title">
+                        L
 
-                    <h2>
+                    </div>
 
-                        Welcome Back
 
-                    </h2>
+                    <h1>
+
+                        L-PANEL
+
+                    </h1>
+
 
                     <p>
 
-                        Login to your L-PANEL account
+                        Enterprise VPN Management
 
                     </p>
 
                 </div>
 
-                <form
-                    onSubmit={login}
-                >
 
-                    <Input
 
-                        label="Username"
+                <form onSubmit={handleLogin}>
 
-                        placeholder="Enter username"
 
-                        value={username}
+                    <div className="field">
 
-                        onChange={(e)=>setUsername(e.target.value)}
+                        <label>
 
-                    />
+                            Username
 
-                    <Input
+                        </label>
 
-                        type="password"
 
-                        label="Password"
+                        <input
 
-                        placeholder="Enter password"
+                            value={username}
 
-                        value={password}
+                            onChange={
+                                e=>setUsername(e.target.value)
+                            }
 
-                        onChange={(e)=>setPassword(e.target.value)}
+                            placeholder="admin"
 
-                    />
+                        />
 
-                    <Button
+                    </div>
 
-                        type="submit"
 
-                        loading={loading}
+
+                    <div className="field">
+
+
+                        <label>
+
+                            Password
+
+                        </label>
+
+
+                        <input
+
+                            type="password"
+
+                            value={password}
+
+                            onChange={
+                                e=>setPassword(e.target.value)
+                            }
+
+                            placeholder="••••••••"
+
+                        />
+
+
+                    </div>
+
+
+
+                    <button
+
+                        disabled={loading}
 
                     >
 
-                        Sign In
+                        {
+                            loading
+                            ?
+                            "Loading..."
+                            :
+                            "Login"
+                        }
 
-                    </Button>
+
+                    </button>
+
 
                 </form>
 
-                <div className="login-footer">
 
-                    L-PANEL Enterprise Edition
+            </div>
 
-                </div>
-
-            </Card>
 
         </div>
 
     );
 
 }
+
+
+export default Login;
