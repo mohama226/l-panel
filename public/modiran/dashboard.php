@@ -4,27 +4,60 @@ require "../../app/auth.php";
 
 checkLogin();
 
+include "../includes/header.php";
+
+include "../includes/sidebar.php";
+
 ?>
 
 
-<h1>
+<div class="topbar">
 
-پنل مدیریت
+<h2>
 
-</h1>
+داشبورد مدیریت
 
+</h2>
 
-<p>
 
 سلام
 
 <?= $_SESSION['admin']; ?>
 
+</div>
+
+
+
+<div class="card">
+
+
+<h3>
+
+آمار پنل
+
+</h3>
+
+
+<div class="stat">
+
+0
+
+</div>
+
+
+<p>
+
+کاربر VPN
+
 </p>
 
 
-<a href="../logout.php">
+</div>
 
-خروج
 
-</a>
+
+<?php
+
+include "../includes/footer.php";
+
+?>
