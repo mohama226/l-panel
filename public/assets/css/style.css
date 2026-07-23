@@ -396,3 +396,25 @@ tr:hover{
 }
 
 }
+.content{
+
+margin-right:280px;
+
+padding:30px;
+
+min-height:100vh;
+
+}
+
+
+@media(max-width:900px){
+
+.content{
+
+margin-right:0;
+
+padding:15px;
+
+}
+
+}
