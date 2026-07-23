@@ -350,3 +350,49 @@ tr:hover{
     margin-bottom:20px;
 
 }
+.content{
+
+    width:100%;
+    min-height:80vh;
+
+}
+
+
+
+.form-card{
+
+    width:100%;
+
+    max-width:850px;
+
+    margin:30px auto;
+
+}
+
+
+
+.form-card h2{
+
+    margin-bottom:30px;
+
+}
+
+
+
+.form-card .login-btn{
+
+    width:200px;
+
+}
+
+
+
+@media(max-width:900px){
+
+.form-card{
+
+    max-width:100%;
+
+}
+
+}
