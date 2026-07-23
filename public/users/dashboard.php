@@ -1,43 +1,132 @@
 <?php
 
-session_start();
+
+require "../../app/database.php";
+
+require "../../app/user_auth.php";
 
 
-if(!isset($_SESSION['vpn_user'])){
+checkUser();
 
 
-header("Location: index.php");
 
-exit;
+$stmt=$db->prepare(
+
+"SELECT * FROM users WHERE id=?"
+
+);
 
 
-}
+$stmt->execute([$_SESSION['vpn_id']]);
+
+
+$user=$stmt->fetch();
+
 
 
 ?>
 
 
-<h1>
 
-پنل کاربری VPN
+<!DOCTYPE html>
 
-</h1>
+<html lang="fa" dir="rtl">
+
+
+<head>
+
+<meta charset="UTF-8">
+
+
+<title>
+
+پنل کاربری
+
+</title>
+
+
+<link rel="stylesheet" href="../assets/css/style.css">
+
+
+</head>
+
+
+<body>
+
+
+
+<div class="content">
+
+
+
+<h2>
+
+سلام <?= $user['username']; ?>
+
+</h2>
+
+
+
+<div class="card p-4 shadow">
+
+
+<h4>
+
+اطلاعات حساب
+
+</h4>
+
 
 
 <p>
 
-کاربر:
+وضعیت:
 
-<?= $_SESSION['vpn_user']; ?>
+<?= $user['status']; ?>
 
 </p>
 
 
 
-<div>
+<p>
 
 تاریخ انقضا:
-در آینده از دیتابیس خوانده می‌شود
+
+<?= $user['expire_date']; ?>
+
+</p>
+
+
+
+<p>
+
+حجم کل:
+
+<?= $user['total_gb']; ?> GB
+
+</p>
+
+
+
+<p>
+
+مصرف شده:
+
+<?= $user['used_gb']; ?> GB
+
+</p>
+
+
+
+<p>
+
+باقی مانده:
+
+<?= $user['total_gb']-$user['used_gb']; ?> GB
+
+</p>
+
+
 
 </div>
 
@@ -48,3 +137,13 @@ exit;
 خروج
 
 </a>
+
+
+
+</div>
+
+
+
+</body>
+
+</html>
