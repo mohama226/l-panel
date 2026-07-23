@@ -164,7 +164,7 @@ systemctl restart lpanel-agent
 
 echo "L-PANEL Agent Installed"
 
-# 🔥 بخش جدید: نصب CLI Manager
+# 🔥 نصب CLI Manager
 echo "Installing CLI Manager"
 
 mkdir -p /usr/local/bin
@@ -175,6 +175,15 @@ chmod +x /usr/local/bin/l-panel
 
 echo "Command installed:"
 echo "Type: l-panel"
+
+# 🔥 بخش جدید: کپی اسکریپت‌ها
+echo "Copying scripts..."
+
+mkdir -p /var/www/html/l-panel/scripts
+
+chmod +x /var/www/html/l-panel/scripts/install-ocserv.sh
+
+echo "Scripts installed"
 
 echo ""
 echo "=============================="
