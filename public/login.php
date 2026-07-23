@@ -2,36 +2,32 @@
 
 require "../app/database.php";
 
+session_start();
 
 $error="";
 
 
 if($_POST){
 
-
 $username=$_POST['username'];
-
 $password=$_POST['password'];
-
 
 
 $stmt=$db->prepare(
 "SELECT * FROM admins WHERE username=?"
 );
 
-
 $stmt->execute([$username]);
 
 
 $user=$stmt->fetch();
 
-var_dump($user);
-exit;
 
 if($user && password_verify($password,$user['password'])){
 
 
-$_SESSION['admin']=$user;
+$_SESSION['admin']=$user['username'];
+$_SESSION['role']=$user['role'];
 
 
 header("Location: dashboard.php");
@@ -39,87 +35,47 @@ header("Location: dashboard.php");
 exit;
 
 
-}
+}else{
 
-else{
-
-
-$error="Login failed";
-
+$error="Invalid Login";
 
 }
 
 
-
 }
-
 
 ?>
 
 
 <!DOCTYPE html>
-
-<html dir="rtl">
-
+<html>
 <head>
-
-<title>L-PANEL</title>
-
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-
-
+<title>L-PANEL Login</title>
 </head>
 
+<body>
 
-<body class="bg-dark">
-
-
-<div class="container mt-5">
-
-
-<div class="card p-4">
-
-
-<h3>
-ورود مدیر
-</h3>
+<h2>L-PANEL</h2>
 
 
 <form method="post">
 
+<input name="username" placeholder="Username">
 
-<input class="form-control mb-3"
-name="username"
-placeholder="Username">
+<br>
 
+<input type="password" name="password" placeholder="Password">
 
-<input class="form-control mb-3"
-type="password"
-name="password"
-placeholder="Password">
+<br>
 
-
-<button class="btn btn-primary">
-
-ورود
-
+<button type="submit">
+Login
 </button>
-
 
 </form>
 
 
-<p class="text-danger">
-
-<?=$error?>
-
-</p>
-
-
-</div>
-
-
-</div>
+<?php echo $error; ?>
 
 
 </body>
