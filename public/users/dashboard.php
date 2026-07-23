@@ -1,19 +1,22 @@
 <?php
 
+session_start();
+
+
+if(!isset($_SESSION['vpn_user'])){
+
+header("Location:index.php");
+
+exit;
+
+}
+
 
 require "../../app/database.php";
 
-require "../../app/user_auth.php";
-
-
-checkUser();
-
-
 
 $stmt=$db->prepare(
-
 "SELECT * FROM users WHERE id=?"
-
 );
 
 
@@ -23,29 +26,21 @@ $stmt->execute([$_SESSION['vpn_id']]);
 $user=$stmt->fetch();
 
 
-
 ?>
-
 
 
 <!DOCTYPE html>
 
 <html lang="fa" dir="rtl">
 
-
 <head>
 
 <meta charset="UTF-8">
 
-
-<title>
-
-پنل کاربری
-
-</title>
+<title>User Panel</title>
 
 
-<link rel="stylesheet" href="../assets/css/style.css">
+<link rel="stylesheet" href="../assets/css/user.css">
 
 
 </head>
@@ -55,81 +50,111 @@ $user=$stmt->fetch();
 
 
 
-<div class="content">
+<div class="user-panel">
 
+
+<div class="user-card">
 
 
 <h2>
 
-سلام <?= $user['username']; ?>
+پنل کاربری VPN
 
 </h2>
 
 
+<h3>
 
-<div class="card p-4 shadow">
+سلام <?= $user['username']; ?>
 
-
-<h4>
-
-اطلاعات حساب
-
-</h4>
+</h3>
 
 
 
-<p>
+<div class="info">
 
-وضعیت:
+
+
+<div class="box">
+
+<div class="title">
+
+وضعیت
+
+</div>
+
+
+<div class="value">
 
 <?= $user['status']; ?>
 
-</p>
+</div>
+
+</div>
 
 
 
-<p>
+<div class="box">
 
-تاریخ انقضا:
+<div class="title">
+
+تاریخ انقضا
+
+</div>
+
+
+<div class="value">
 
 <?= $user['expire_date']; ?>
 
-</p>
+</div>
+
+</div>
 
 
 
-<p>
+<div class="box">
 
-حجم کل:
+<div class="title">
+
+حجم کل
+
+</div>
+
+
+<div class="value">
 
 <?= $user['total_gb']; ?> GB
 
-</p>
+</div>
+
+</div>
 
 
 
-<p>
+<div class="box">
 
-مصرف شده:
+<div class="title">
+
+مصرف شده
+
+</div>
+
+
+<div class="value">
 
 <?= $user['used_gb']; ?> GB
 
-</p>
+</div>
 
-
-
-<p>
-
-باقی مانده:
-
-<?= $user['total_gb']-$user['used_gb']; ?> GB
-
-</p>
+</div>
 
 
 
 </div>
 
+
+<br>
 
 
 <a href="../logout.php">
@@ -139,9 +164,10 @@ $user=$stmt->fetch();
 </a>
 
 
-
 </div>
 
+
+</div>
 
 
 </body>
