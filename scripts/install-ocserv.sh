@@ -36,10 +36,10 @@ then
         autoconf \
         automake \
         libtool \
-        pkgconf-pkg-config \
-        libtasn1-devel \
-        lz4-devel \
-        cyrus-sasl-devel
+        gettext \
+        flex \
+        bison \
+        texinfo
 
     echo "Installing missing libraries"
 
@@ -98,7 +98,6 @@ echo "Installing version: $VERSION"
 git checkout "$VERSION"
 
 echo "Preparing build system"
-
 
 autoreconf -fi
 
