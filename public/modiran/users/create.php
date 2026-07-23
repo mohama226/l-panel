@@ -52,7 +52,7 @@ $volume
 
 
 
-$msg="کاربر ساخته شد";
+$msg="کاربر با موفقیت ساخته شد";
 
 
 }
@@ -63,64 +63,132 @@ include "../../includes/header.php";
 
 include "../../includes/sidebar.php";
 
-
 ?>
 
 
-<div class="card">
+<div class="container">
 
 
-<h2>
+<div class="page-title">
 
 افزودن کاربر VPN
 
-</h2>
+</div>
 
 
-<p>
+
+<div class="panel-card">
+
+
+
+<?php if($msg): ?>
+
+<div class="success-message">
 
 <?=$msg?>
 
-</p>
+</div>
+
+<?php endif; ?>
+
 
 
 
 <form method="post">
 
 
-<input class="form-control"
+
+<div class="grid-form">
+
+
+<div class="form-group">
+
+<label>
+نام کاربری
+</label>
+
+<input 
+class="form-input"
 name="username"
 placeholder="نام کاربری">
 
 
+</div>
 
-<input class="form-control"
+
+
+
+
+<div class="form-group">
+
+<label>
+رمز عبور
+</label>
+
+<input 
+class="form-input"
 name="password"
 placeholder="رمز عبور">
 
 
+</div>
 
-<input class="form-control"
+
+
+
+
+<div class="form-group">
+
+<label>
+تاریخ انقضا
+</label>
+
+<input 
+class="form-input"
 type="date"
 name="expire_date">
 
 
+</div>
 
-<input class="form-control"
+
+
+
+
+<div class="form-group">
+
+<label>
+حجم مجاز (GB)
+</label>
+
+<input 
+class="form-input"
 name="total_gb"
-placeholder="حجم GB">
+placeholder="مثال 50">
+
+
+</div>
+
+
+</div>
 
 
 
-<button class="login-btn">
+<br>
 
-ذخیره
+
+<button class="btn">
+
+ذخیره کاربر
 
 </button>
 
 
+
 </form>
 
+
+</div>
 
 
 </div>
