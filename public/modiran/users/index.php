@@ -4,7 +4,7 @@ require "../../../app/auth.php";
 checkLogin();
 
 require "../../../app/database.php";
-
+require "../../../app/jalali.php";
 
 $search="";
 
@@ -210,6 +210,16 @@ ID
 <td>
 
 <?=$u['expire_date']?>
+
+
+<br>
+
+<small>
+
+<?=jalali_date($u['expire_date'])?>
+
+</small>
+
 
 </td>
 
