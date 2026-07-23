@@ -5,6 +5,7 @@ checkLogin();
 
 require "../../../app/database.php";
 require "../../../app/jalali.php";
+require "../../../app/ocserv.php";   // ← اضافه شد
 
 $id = $_GET['id'];
 
@@ -34,6 +35,14 @@ if($_POST){
         $total,
         $id
     ]);
+
+    // 🔥 تغییر رمز در ocserv (اگر رمز جدید ارسال شده باشد)
+    if(isset($_POST['password']) && trim($_POST['password']) !== ""){
+        ocserv_user_password(
+            $user['username'],
+            $_POST['password']
+        );
+    }
 
     $msg = "اطلاعات کاربر بروزرسانی شد";
 }
@@ -65,16 +74,16 @@ include "../../includes/sidebar.php";
 <label>تاریخ انقضا</label>
 <input class="form-control" type="date" name="expire_date" value="<?=$user['expire_date']?>">
 
-<!-- 🔥 بخش جدید: نمایش تاریخ شمسی -->
 <p>
 تاریخ شمسی:
-<b>
-<?= jalali_date($user['expire_date']) ?>
-</b>
+<b><?= jalali_date($user['expire_date']) ?></b>
 </p>
 
 <label>حجم مجاز GB</label>
 <input class="form-control" name="total_gb" value="<?=$user['total_gb']?>">
+
+<label>رمز جدید (اختیاری)</label>
+<input class="form-control" name="password" placeholder="اگر می‌خواهی رمز تغییر کند">
 
 <button class="login-btn">
 ذخیره تغییرات
