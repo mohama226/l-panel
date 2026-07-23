@@ -1,26 +1,21 @@
-import { Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter } from "react-router-dom";
 
-import Login from "@pages/Login/Login";
+import AppRouter from "./router/AppRouter";
 
-export default function App() {
+
+function App(){
+
     return (
-        <Routes>
 
-            <Route
-                path="/"
-                element={<Navigate to="/login" replace />}
-            />
+        <BrowserRouter>
 
-            <Route
-                path="/login"
-                element={<Login />}
-            />
+            <AppRouter />
 
-            <Route
-                path="*"
-                element={<Navigate to="/login" replace />}
-            />
+        </BrowserRouter>
 
-        </Routes>
     );
+
 }
+
+
+export default App;
