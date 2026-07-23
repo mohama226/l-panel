@@ -1,15 +1,10 @@
 <?php
 
 
-if(session_status() === PHP_SESSION_NONE){
+function checkUserLogin(){
+
 
 session_start();
-
-}
-
-
-
-function checkUser(){
 
 
 if(!isset($_SESSION['vpn_user'])){
@@ -21,6 +16,7 @@ exit;
 
 
 }
+
 
 
 }
