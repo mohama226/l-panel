@@ -95,15 +95,6 @@ echo "Installing version: $VERSION"
 
 git checkout "$VERSION"
 
-echo "Checking configure script"
-
-if [ -f "./configure" ]; then
-    echo "configure found"
-else
-    echo "configure missing"
-    exit 1
-fi
-
 echo "Building OCServ with meson"
 
 meson setup build \
