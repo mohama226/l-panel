@@ -38,3 +38,7 @@ bash /opt/l-panel/scripts/setup-backend.sh
 systemctl daemon-reload
 
 systemctl restart l-panel-backend
+
+echo "Building frontend..."
+
+bash /opt/l-panel/scripts/setup-frontend.sh
