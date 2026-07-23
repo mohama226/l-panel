@@ -13,46 +13,107 @@ include "../includes/sidebar.php";
 
 <div class="topbar">
 
-<h2>
-
-داشبورد مدیریت
-
-</h2>
+    <h2>
+        داشبورد مدیریت
+    </h2>
 
 
-سلام
+    <p>
+        خوش آمدید
+        <?= $_SESSION['admin']; ?>
+    </p>
 
-<?= $_SESSION['admin']; ?>
 
 </div>
+
+
+
+<div class="row">
+
+
+<div class="card">
+
+    <h3>
+        کاربران VPN
+    </h3>
+
+
+    <div class="stat">
+        0
+    </div>
+
+
+    <p>
+        تعداد کاربران
+    </p>
+
+
+</div>
+
+
+
+<br>
 
 
 
 <div class="card">
 
-
-<h3>
-
-آمار پنل
-
-</h3>
+    <h3>
+        کاربران فعال
+    </h3>
 
 
-<div class="stat">
+    <div class="stat">
+        0
+    </div>
 
-0
+
+    <p>
+        اتصال فعال
+    </p>
+
+
+</div>
+
+
+
+<br>
+
+
+
+<div class="card">
+
+    <h3>
+        سرورها
+    </h3>
+
+
+    <div class="stat">
+        1
+    </div>
+
+
+    <p>
+        سرورهای متصل
+    </p>
+
 
 </div>
 
 
-<p>
-
-کاربر VPN
-
-</p>
-
 
 </div>
+
+
+
+<br>
+
+
+<a href="/logout.php">
+
+    خروج از پنل
+
+</a>
 
 
 
