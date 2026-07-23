@@ -76,9 +76,13 @@ cd /usr/local/src
 rm -rf ocserv
 
 git clone \
-    --depth 1 \
-    --branch v1.5.0 \
-    https://gitlab.com/openconnect/ocserv.git ocserv
+https://gitlab.com/openconnect/ocserv.git ocserv
+
+
+cd ocserv
+
+
+git checkout ocserv-1.5.0
 
 cd ocserv
 
