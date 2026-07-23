@@ -148,3 +148,24 @@ grid-template-columns:1fr;
 
 
 }
+.success-message{
+
+background:#dcfce7;
+
+color:#166534;
+
+padding:15px;
+
+border-radius:12px;
+
+margin-bottom:20px;
+
+}
+
+
+
+.panel-card h2{
+
+margin-top:0;
+
+}
