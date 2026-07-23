@@ -212,3 +212,45 @@ box-shadow:
 0 10px 25px rgba(0,0,0,.08);
 
 }
+.progress{
+
+height:20px;
+
+background:#e5e7eb;
+
+border-radius:20px;
+
+overflow:hidden;
+
+margin:15px 0;
+
+}
+
+
+.progress-bar{
+
+height:100%;
+
+background:#2563eb;
+
+transition:.3s;
+
+}
+
+
+
+.users-box{
+
+max-width:900px;
+
+margin:auto;
+
+}
+
+
+
+.users-box .card{
+
+margin-bottom:20px;
+
+}
