@@ -39,7 +39,10 @@ then
         gettext \
         flex \
         bison \
-        texinfo
+        texinfo \
+        help2man \
+        which \
+        findutils
 
     echo "Installing missing libraries"
 
@@ -97,9 +100,12 @@ echo "Installing version: $VERSION"
 
 git checkout "$VERSION"
 
-echo "Preparing build system"
+echo "Preparing OCServ build"
 
-autoreconf -fi
+if [ ! -f "./configure" ]; then
+    echo "Generating configure script"
+    ./bootstrap
+fi
 
 ./configure \
     --prefix=/usr \
