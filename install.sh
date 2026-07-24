@@ -95,7 +95,7 @@ TO 'lpanel'@'localhost';
 FLUSH PRIVILEGES;
 EOF
 
-mysql lpanel < /var/www/html/l-panel/database/schema.sql
+mysql -u root lpanel < database/schema.sql
 
 HASH=$(php -r 'echo password_hash($argv[1], PASSWORD_DEFAULT);' "$ADMIN_PASS")
 
