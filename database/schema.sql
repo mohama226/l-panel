@@ -25,3 +25,12 @@ CREATE TABLE admin_logs (
     description TEXT,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+CREATE TABLE IF NOT EXISTS admin_logs (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    admin VARCHAR(100),
+    action VARCHAR(255),
+    target_user VARCHAR(100),
+    ip VARCHAR(50),
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
