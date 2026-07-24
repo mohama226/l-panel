@@ -117,13 +117,13 @@ include "../../includes/sidebar.php";
 
 <td>
 
-<div class="dropdown">
+<div class="action-wrapper">
 
-<button class="dots-btn">
+<button class="action-btn">
 ⋮
 </button>
 
-<div class="dropdown-menu">
+<div class="action-menu">
 
 <a href="/modiran/users/edit.php?id=<?=$u['id']?>">
 ✏ ویرایش
@@ -133,15 +133,13 @@ include "../../includes/sidebar.php";
 ⏱ تمدید
 </a>
 
-<a href="/modiran/users/logs.php?id=<?=$u['id']?>">
-📊 لاگ کاربر
-</a>
-
-<a 
-class="danger"
-href="/modiran/users/delete.php?id=<?=$u['id']?>"
+<a href="/modiran/users/delete.php?id=<?=$u['id']?>"
 onclick="return confirm('حذف شود؟')">
 🗑 حذف
+</a>
+
+<a href="/modiran/users/logs.php?id=<?=$u['id']?>">
+📄 لاگ کاربر
 </a>
 
 </div>
