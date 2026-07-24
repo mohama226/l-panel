@@ -1,36 +1,52 @@
 <?php
 
-session_start();
+require_once "session.php";
 
 
 function checkLogin(){
 
-if(!isset($_SESSION['admin'])){
+    if(!isset($_SESSION['admin'])){
 
-header("Location:/modiran/");
-exit;
+        header("Location:/modiran/");
+        exit;
+
+    }
 
 }
 
-}
 
 
 function isSuperAdmin(){
 
-return isset($_SESSION['role'])
-&&
-$_SESSION['role']=="superadmin";
+    if(!isset($_SESSION['role'])){
+        return false;
+    }
+
+
+    return $_SESSION['role']=="superadmin";
 
 }
+
+
 
 
 function requireSuperAdmin(){
 
-if(!isSuperAdmin()){
+    if(!isSuperAdmin()){
 
-die("Access Denied");
+        http_response_code(403);
+
+        die("Access Denied");
+
+    }
 
 }
+
+
+
+function adminName(){
+
+    return $_SESSION['admin'] ?? '';
 
 }
 
