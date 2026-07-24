@@ -1,5 +1,5 @@
 <?php
-
+require_once "../../../app/session.php";
 require "../../app/database.php";
 require "../../app/logger.php";
 require "../../app/auth.php";
