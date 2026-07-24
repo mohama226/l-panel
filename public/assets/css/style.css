@@ -400,3 +400,242 @@ grid-template-columns:1fr;
 
 
 }
+/* =========================
+   L-PANEL Dashboard Theme
+========================= */
+
+
+.dashboard-card{
+
+    position:relative;
+    overflow:hidden;
+
+    border-radius:22px;
+
+    padding:28px;
+
+    color:white;
+
+    min-height:190px;
+
+    border:1px solid rgba(255,255,255,.15);
+
+    box-shadow:
+    0 15px 35px rgba(0,0,0,.12);
+
+    transition:.3s;
+
+}
+
+
+
+.dashboard-card:hover{
+
+    transform:translateY(-6px);
+
+    box-shadow:
+    0 25px 45px rgba(0,0,0,.18);
+
+}
+
+
+
+.dashboard-card:before{
+
+    content:"";
+
+    position:absolute;
+
+    width:140px;
+
+    height:140px;
+
+    background:rgba(255,255,255,.12);
+
+    border-radius:50%;
+
+    top:-50px;
+
+    left:-40px;
+
+}
+
+
+
+
+
+.dashboard-card .icon{
+
+    position:relative;
+
+    font-size:38px;
+
+    margin-bottom:15px;
+
+}
+
+
+
+.dashboard-card h3{
+
+    position:relative;
+
+    font-size:18px;
+
+    font-weight:600;
+
+    opacity:.95;
+
+}
+
+
+
+.dashboard-card strong{
+
+    position:relative;
+
+    font-size:45px;
+
+    font-weight:800;
+
+}
+
+
+
+
+/* کاربران */
+
+.blue{
+
+background:
+
+linear-gradient(
+135deg,
+#2563eb,
+#1d4ed8
+)!important;
+
+}
+
+
+
+/* فعال */
+
+.green{
+
+background:
+
+linear-gradient(
+135deg,
+#10b981,
+#047857
+)!important;
+
+}
+
+
+
+/* مسدود */
+
+.red{
+
+background:
+
+linear-gradient(
+135deg,
+#ef4444,
+#b91c1c
+)!important;
+
+}
+
+
+
+/* مدیران */
+
+.purple{
+
+background:
+
+linear-gradient(
+135deg,
+#8b5cf6,
+#6d28d9
+)!important;
+
+}
+
+
+
+/* پنل های پایین */
+
+
+.panel-box{
+
+background:#ffffff;
+
+border-radius:22px;
+
+border:1px solid #e5e7eb;
+
+box-shadow:
+
+0 10px 30px rgba(15,23,42,.08);
+
+}
+
+
+
+.panel-box h2{
+
+color:#111827;
+
+font-size:22px;
+
+margin-bottom:20px;
+
+}
+
+
+
+
+/* جدول */
+
+
+.panel-box table th{
+
+background:#f8fafc;
+
+color:#475569;
+
+font-weight:bold;
+
+}
+
+
+
+.panel-box table tr:hover{
+
+background:#f8fafc;
+
+}
+
+
+
+
+/* وضعیت آنلاین */
+
+
+.system-status{
+
+background:#ecfdf5;
+
+color:#047857;
+
+padding:15px;
+
+border-radius:14px;
+
+font-weight:bold;
+
+}
