@@ -50,7 +50,19 @@ if($_POST){
             $username
         );
 
+        // 🔥 لاگ قبل از ریدایرکت
+        if(function_exists('writeLog')){
+            writeLog(
+                $_SESSION['admin'],
+                "ایجاد کاربر VPN: ".$username
+            );
+        }
+
         $msg = "کاربر با موفقیت ساخته شد";
+
+        // اگر قرار بود ریدایرکت داشته باشی، اینجا قرار می‌گیرد:
+        // header("Location: index.php");
+        // exit;
     }
 }
 
