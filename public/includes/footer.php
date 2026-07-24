@@ -1,48 +1,45 @@
 <?php
-
-require_once __DIR__ . "/../../app/auth.php";
-
 ?>
 
 </div>
 
-</div>
+<footer class="footer">
+
+
+</footer>
+
 
 <script>
 
-function updateClock(){
 
-    let now = new Date();
+// حذف ساعت و تاریخ سایدبار
+document.addEventListener("DOMContentLoaded", function(){
 
-    let time = now.toLocaleTimeString('fa-IR');
+    let clock = document.getElementById("live-time");
+    let gdate = document.getElementById("gregorian-date");
+    let sdate = document.getElementById("shamsi-date");
 
-    let gregorian = now.toLocaleDateString('en-US');
 
-    document.getElementById("live-time").innerHTML = time;
+    if(clock){
+        clock.remove();
+    }
 
-    document.getElementById("gregorian-date").innerHTML =
-        "میلادی : " + gregorian;
 
-    let shamsi =
-        new Intl.DateTimeFormat(
-            'fa-IR-u-ca-persian',
-            {
-                year:'numeric',
-                month:'long',
-                day:'numeric'
-            }
-        ).format(now);
+    if(gdate){
+        gdate.remove();
+    }
 
-    document.getElementById("shamsi-date").innerHTML =
-        "شمسی : " + shamsi;
 
-}
+    if(sdate){
+        sdate.remove();
+    }
 
-setInterval(updateClock, 1000);
 
-updateClock();
+});
+
 
 </script>
+
 
 </body>
 
