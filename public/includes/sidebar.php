@@ -58,7 +58,9 @@ L-PANEL
 👑 مدیران
 </a>
 
-
+<a href="/modiran/services/">
+⚙️ تنظیمات سرویس‌ها
+</a>
 
 <a href="/modiran/logs.php">
 📋 لاگ مدیران
