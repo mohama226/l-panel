@@ -4,15 +4,15 @@ require "../../../app/auth.php";
 checkLogin();
 
 require "../../../app/database.php";
-require "../../../app/jalali.php";
-
 
 $id=$_GET['id'] ?? 0;
 
 
-$stmt=$db->prepare(
-"SELECT * FROM users WHERE id=?"
-);
+$stmt=$db->prepare("
+SELECT *
+FROM users
+WHERE id=?
+");
 
 $stmt->execute([$id]);
 
@@ -20,15 +20,14 @@ $user=$stmt->fetch();
 
 
 if(!$user){
-
-die("User not found");
-
+    die("User not found");
 }
-
 
 
 include "../../includes/header.php";
 include "../../includes/sidebar.php";
+
+$username=$user['username'];
 
 ?>
 
@@ -39,86 +38,96 @@ include "../../includes/sidebar.php";
 
 
 <h2>
-📋 لاگ کاربر:
-<?=$user['username']?>
+📊 لاگ کاربر:
+<?=$username?>
 </h2>
 
 
-<div class="log-box">
+<div class="table-box">
 
 
 <h3>
-پنل L-PANEL
+لاگ OCServ
 </h3>
 
 
-<p>
-نام کاربر:
-<?=$user['username']?>
-</p>
+<pre style="
+background:#111;
+color:#0f0;
+padding:20px;
+border-radius:10px;
+direction:ltr;
+text-align:left;
+max-height:500px;
+overflow:auto;
+">
 
-
-<p>
-حجم:
-<?=$user['total_gb']?> GB
-</p>
-
-
-<p>
-دانلود:
-<?=$user['download'] ?? 0?> MB
-</p>
-
-
-<p>
-آپلود:
-<?=$user['upload'] ?? 0?> MB
-</p>
-
-
-
-</div>
-
-
-
-<div class="log-box">
-
-
-<h3>
-OCSERV LOG
-</h3>
-
-
-<pre>
 
 <?php
 
 
-$cmd="journalctl -u ocserv --no-pager | grep "
-.escapeshellarg($user['username'])
-." | tail -100";
+$log=shell_exec(
+"journalctl -u ocserv --no-pager | grep ".escapeshellarg($username)." | tail -100"
+);
 
 
-echo htmlspecialchars(shell_exec($cmd));
+echo htmlspecialchars(
+$log ?: "No logs found"
+);
 
 
 ?>
 
+
 </pre>
 
 
-</div>
+
+<h3>
+لاگ پنل
+</h3>
 
 
-
-</div>
-
-</div>
-
+<pre style="
+background:#111;
+color:#0ff;
+padding:20px;
+border-radius:10px;
+direction:ltr;
+text-align:left;
+max-height:500px;
+overflow:auto;
+">
 
 
 <?php
 
-include "../../includes/footer.php";
 
+$log=shell_exec(
+"grep ".escapeshellarg($username)." /var/log/httpd/error_log | tail -100"
+);
+
+
+echo htmlspecialchars(
+$log ?: "No panel logs found"
+);
+
+
+?>
+
+
+</pre>
+
+
+
+</div>
+
+
+</div>
+
+</div>
+
+
+<?php
+include "../../includes/footer.php";
 ?>
