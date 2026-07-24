@@ -33,9 +33,7 @@ then
         cd gperf-3.1
 
         ./configure
-
         make -j$(nproc)
-
         make install
 
         cd /
@@ -135,12 +133,23 @@ meson setup build \
 cd build
 
 ninja -j$(nproc)
-
 ninja install
 
 echo "OCServ installed"
 
 mkdir -p /etc/ocserv
+
+echo "Generating OCServ certificate..."
+
+openssl req -x509 \
+-newkey rsa:4096 \
+-keyout /etc/ocserv/server-key.pem \
+-out /etc/ocserv/server-cert.pem \
+-days 3650 \
+-nodes \
+-subj "/CN=$(hostname)"
+
+chmod 600 /etc/ocserv/server-key.pem
 
 cp /var/www/html/l-panel/scripts/ocserv.conf \
     /etc/ocserv/ocserv.conf
@@ -182,7 +191,6 @@ chmod 440 /etc/sudoers.d/l-panel-ocserv
 
 echo "OCServ integration completed"
 
-# 🔥 اجرای OCServ post-install
 echo "Running OCServ post installation..."
 bash /var/www/html/l-panel/scripts/post-install.sh
 
