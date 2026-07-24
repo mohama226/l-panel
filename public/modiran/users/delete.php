@@ -19,17 +19,23 @@ $user = $stmt->fetch();
 
 if($user){
 
-    // 🔥 ثبت لاگ قبل از حذف (طبق دستور قبلی)
+    $username = $user['username'];
+
+    // 🔥 ثبت لاگ قبل از حذف (طبق دستور جدید)
+    writeLog(
+        "admin.log",
+        "مدیر ".$_SESSION['admin']." کاربر ".$username." را حذف کرد"
+    );
+
+    // 🔥 ثبت لاگ قبلی
     admin_log(
         "حذف کاربر",
-        $user['username'],
+        $username,
         "کاربر از پنل حذف شد"
     );
 
     // حذف از ocserv
-    ocserv_delete_user(
-        $user['username']
-    );
+    ocserv_delete_user($username);
 
     // حذف از دیتابیس
     $stmt = $db->prepare(
@@ -41,7 +47,7 @@ if($user){
     admin_log(
         $db,
         "حذف کاربر",
-        $user['username']
+        $username
     );
 }
 
