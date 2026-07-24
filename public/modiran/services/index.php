@@ -1,91 +1,241 @@
 <?php
 
-ini_set('display_errors',1);
-ini_set('display_startup_errors',1);
-error_reporting(E_ALL);
 
-/* 🔥 مسیرهای جدید و استاندارد */
-require_once dirname(__DIR__,3)."/app/init.php";
+require "../../../app/database.php";
+require "../../../app/auth.php";
+require "../../../app/permissions.php";
+require "../../../app/services.php";
 
-require_once BASE_PATH."/app/database.php";
-require_once BASE_PATH."/app/auth.php";
-require_once BASE_PATH."/app/permissions.php";
-require_once BASE_PATH."/app/service_manager.php";
 
 checkLogin();
 
-$services = getServices();
 
-/* 🔥 include های استاندارد */
-include BASE_PATH."/public/includes/header.php";
-include BASE_PATH."/public/includes/sidebar.php";
+if(isset($_POST['action'])){
+
+
+    serviceAction(
+        $_POST['service'],
+        $_POST['action']
+    );
+
+
+    header(
+        "Location:index.php"
+    );
+
+    exit;
+
+}
+
+
+$services=getServices();
+
+
+
+include "../../includes/header.php";
+include "../../includes/sidebar.php";
+
 
 ?>
 
+
 <div class="main">
 
-<h1 class="title">
+
+<div class="service-container">
+
+
+<h1>
 ⚙️ مدیریت سرویس‌های سرور
 </h1>
 
-<div class="panel-box">
 
-<table class="service-table">
+
+<input 
+id="serviceSearch"
+type="text"
+placeholder="جستجوی سرویس..."
+>
+
+
+
+<table id="serviceTable">
+
+
+<thead>
 
 <tr>
-    <th>سرویس</th>
-    <th>وضعیت</th>
-    <th>نوع</th>
-    <th>عملیات</th>
+
+<th>
+سرویس
+</th>
+
+<th>
+وضعیت
+</th>
+
+
+<th>
+آپتایم
+</th>
+
+
+<th>
+عملیات
+</th>
+
+
 </tr>
+
+
+</thead>
+
+
+
+<tbody>
+
 
 <?php foreach($services as $s): ?>
 
+
 <tr>
 
-<td>
-    <?= htmlspecialchars($s['name']) ?>
-</td>
 
 <td>
-<?php if($s['active'] == "active"): ?>
-    <span class="running">فعال</span>
+<?=$s['name']?>
+</td>
+
+
+
+<td>
+
+
+<?php if($s['status']=="running"): ?>
+
+
+<span class="service-on">
+فعال
+</span>
+
+
 <?php else: ?>
-    <span class="stopped">متوقف</span>
+
+
+<span class="service-off">
+متوقف
+</span>
+
+
 <?php endif; ?>
+
+
 </td>
+
+
+
 
 <td>
-    <?= $s['sub'] ?>
+
+<?=$s['uptime'] ?: "نامشخص"?>
+
 </td>
+
+
 
 <td>
 
-    <a class="btn green"
-       href="action.php?service=<?= $s['name'] ?>&action=start">
-       Start
-    </a>
 
-    <a class="btn red"
-       href="action.php?service=<?= $s['name'] ?>&action=stop">
-       Stop
-    </a>
+<form method="post">
 
-    <a class="btn orange"
-       href="action.php?service=<?= $s['name'] ?>&action=restart">
-       Restart
-    </a>
+
+<input 
+type="hidden"
+name="service"
+value="<?=$s['name']?>"
+>
+
+
+<button name="action" value="start" class="start">
+Start
+</button>
+
+
+<button name="action" value="restart" class="restart">
+Restart
+</button>
+
+
+<button name="action" value="stop" class="stop">
+Stop
+</button>
+
+
+</form>
+
 
 </td>
+
 
 </tr>
 
+
 <?php endforeach; ?>
+
+
+</tbody>
+
 
 </table>
 
-</div>
 
 </div>
 
-<?php include BASE_PATH."/public/includes/footer.php"; ?>
+
+</div>
+
+
+
+<script>
+
+document
+.getElementById("serviceSearch")
+.addEventListener(
+"keyup",
+function(){
+
+let value=this.value.toLowerCase();
+
+
+document
+.querySelectorAll("#serviceTable tbody tr")
+.forEach(
+row=>{
+
+row.style.display=
+row.innerText
+.toLowerCase()
+.includes(value)
+?
+""
+:
+"none";
+
+
+}
+
+);
+
+
+}
+
+);
+
+</script>
+
+
+
+<?php
+
+include "../../includes/footer.php";
+
+?>
