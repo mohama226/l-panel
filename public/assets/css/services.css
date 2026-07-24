@@ -3,22 +3,34 @@
 width:100%;
 border-collapse:collapse;
 
+background:white;
+
 }
 
 
 .service-table th{
 
-background:#f1f5f9;
+background:#0f172a;
+color:white;
 padding:15px;
 
 }
+
 
 
 .service-table td{
 
 padding:15px;
 
-border-bottom:1px solid #eee;
+border-bottom:1px solid #e5e7eb;
+
+}
+
+
+
+.service-table tr:hover{
+
+background:#f8fafc;
 
 }
 
@@ -26,10 +38,10 @@ border-bottom:1px solid #eee;
 
 .running{
 
-background:#22c55e;
+background:#16a34a;
 color:white;
 
-padding:7px 15px;
+padding:6px 15px;
 
 border-radius:20px;
 
@@ -39,10 +51,10 @@ border-radius:20px;
 
 .stopped{
 
-background:#ef4444;
+background:#dc2626;
 color:white;
 
-padding:7px 15px;
+padding:6px 15px;
 
 border-radius:20px;
 
@@ -52,7 +64,9 @@ border-radius:20px;
 
 .btn{
 
-padding:8px 15px;
+display:inline-block;
+
+padding:8px 14px;
 
 border-radius:10px;
 
@@ -60,7 +74,7 @@ color:white;
 
 text-decoration:none;
 
-margin:3px;
+font-size:13px;
 
 }
 
@@ -73,11 +87,13 @@ background:#16a34a;
 }
 
 
+
 .red{
 
 background:#dc2626;
 
 }
+
 
 
 .orange{
