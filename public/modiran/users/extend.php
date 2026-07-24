@@ -5,6 +5,7 @@ checkLogin();
 
 require "../../../app/database.php";
 require "../../../app/jalali.php";   // ← اضافه شد
+require "../../../app/logger.php";   // ← اضافه شد
 
 $id = $_GET['id'];
 
@@ -39,6 +40,13 @@ if($_POST){
         $id
     ]);
 
+    // 🔥 ثبت لاگ تمدید
+    admin_log(
+        "تمدید کاربر",
+        $user['username'],
+        "تاریخ انقضا تمدید شد"
+    );
+
     $msg = "اعتبار کاربر تغییر کرد";
 
     $user['expire_date'] = $new_date;
@@ -66,7 +74,6 @@ include "../../includes/sidebar.php";
 </b>
 </p>
 
-<!-- 🔥 بخش جدید: تاریخ میلادی + تاریخ شمسی -->
 <p>
 تاریخ میلادی:
 <b>
@@ -129,5 +136,3 @@ include "../../includes/sidebar.php";
 <?php
 include "../../includes/footer.php";
 ?>
-
-
