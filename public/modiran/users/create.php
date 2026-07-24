@@ -4,6 +4,7 @@ require "../../../app/auth.php";
 checkLogin();
 
 require "../../../app/database.php";
+require "../../../app/logger.php";
 require "../../../app/ocserv.php";   // ← اضافه شد
 
 $msg = "";
@@ -33,8 +34,15 @@ if($_POST){
             $volume
         ]);
 
-        // 🔥 اضافه شد: ساخت کاربر در ocserv
+        // 🔥 ساخت کاربر در ocserv
         ocserv_add_user($username, $password);
+
+        // 🔥 ثبت لاگ ساخت کاربر جدید
+        admin_log(
+            $db,
+            "ساخت کاربر جدید",
+            $username
+        );
 
         $msg = "کاربر با موفقیت ساخته شد";
     }
