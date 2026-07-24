@@ -1,57 +1,42 @@
 <?php
 
+
 session_start();
+
 
 
 function checkLogin(){
 
-    if(!isset($_SESSION['admin_id'])){
 
-        header("Location: /modiran/");
-        exit;
+if(
+!isset($_SESSION['admin'])
+){
 
-    }
+header(
+"Location: /modiran/"
+);
 
-}
-
-
-
-function isSuperAdmin(){
-
-    return (
-        isset($_SESSION['role']) &&
-        $_SESSION['role']=="superadmin"
-    );
+exit;
 
 }
 
 
 
-function requireSuperAdmin(){
-
-    if(!isSuperAdmin()){
-
-        die("Access Denied");
-
-    }
-
 }
 
 
 
-function currentAdmin(){
 
-    return $_SESSION['admin'] ?? null;
+function logout(){
+
+session_destroy();
+
+
+header(
+"Location: /modiran/"
+);
+
+exit;
+
 
 }
-
-
-
-function currentRole(){
-
-    return $_SESSION['role'] ?? null;
-
-}
-
-
-?>
