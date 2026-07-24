@@ -54,7 +54,9 @@ $_SESSION['role']=$user['role'];
 
 $_SESSION['admin_id']=$user['id'];
 
+$_SESSION['role']=$user['role'];
 
+$_SESSION['login_time']=time();
 
 writeLog(
 
