@@ -10,8 +10,8 @@ $totalUsers = 0;
 $activeUsers = 0;
 $totalAdmins = 0;
 
-$topUsers = [];          // ← اضافه شد
-$recentUsers = [];       // ← اضافه شد
+$topUsers = [];
+$recentUsers = [];
 
 $chartLabels = [];
 $downloadData = [];
@@ -19,19 +19,11 @@ $uploadData = [];
 
 try {
 
-    $totalUsers = $db->query(
-        "SELECT COUNT(*) FROM users"
-    )->fetchColumn();
+    $totalUsers = $db->query("SELECT COUNT(*) FROM users")->fetchColumn();
+    $activeUsers = $db->query("SELECT COUNT(*) FROM users WHERE status='active'")->fetchColumn();
+    $totalAdmins = $db->query("SELECT COUNT(*) FROM admins")->fetchColumn();
 
-    $activeUsers = $db->query(
-        "SELECT COUNT(*) FROM users WHERE status='active'"
-    )->fetchColumn();
-
-    $totalAdmins = $db->query(
-        "SELECT COUNT(*) FROM admins"
-    )->fetchColumn();
-
-    /* 🔥 مرحله ۲ — دریافت ۲۰ کاربر پرمصرف */
+    /* 20 کاربر پرمصرف */
     $topUsers = $db->query("
         SELECT
         users.username,
@@ -45,7 +37,7 @@ try {
         LIMIT 20
     ")->fetchAll();
 
-    /* 🔥 مرحله ۲ — دریافت ۲۰ کاربر اخیراً متصل شده */
+    /* آخرین کاربران متصل شده */
     $recentUsers = $db->query("
         SELECT
         users.username,
@@ -58,7 +50,7 @@ try {
         LIMIT 20
     ")->fetchAll();
 
-    /* 🔥 دریافت ترافیک ۷ روز اخیر */
+    /* نمودار ۷ روز اخیر */
     $stmt = $db->query("
         SELECT 
         DATE(created_at) as day,
@@ -70,8 +62,7 @@ try {
         LIMIT 7
     ");
 
-    $traffic = $stmt->fetchAll();
-    $traffic = array_reverse($traffic);
+    $traffic = array_reverse($stmt->fetchAll());
 
     foreach($traffic as $row){
         $chartLabels[] = $row['day'];
@@ -88,9 +79,7 @@ include "../includes/sidebar.php";
 
 <div class="main">
 
-<h1 class="title">
-داشبورد مدیریت L-PANEL
-</h1>
+<h1 class="title">داشبورد مدیریت L-PANEL</h1>
 
 <div class="cards">
 
@@ -121,18 +110,16 @@ include "../includes/sidebar.php";
 </div>
 
 
-<!-- 🔥 نمودار مصرف روزانه -->
+<!-- نمودار -->
 <div class="panel-box">
-
 <h2>📊 مصرف روزانه آپلود و دانلود</h2>
-
 <canvas id="trafficChart" style="max-height:320px;"></canvas>
-
 </div>
 
-</div> <!-- پایان بخش نمودار -->
+</div> <!-- پایان نمودار -->
 
-<!-- 🔥 بخش جدید — جدول‌های داشبورد -->
+
+<!-- جدول‌ها -->
 <div class="dashboard-tables">
 
 <div class="panel-box">
@@ -151,18 +138,19 @@ include "../includes/sidebar.php";
 <?php foreach($topUsers as $u): ?>
 
 <tr>
-
 <td><?= $u['username'] ?></td>
-
 <td><?= $u['download_mb'] ?> MB</td>
-
 <td><?= $u['upload_mb'] ?> MB</td>
-
 <td><?= $u['total_mb'] ?> MB</td>
-
 </tr>
 
 <?php endforeach; ?>
+
+<?php if(empty($topUsers)): ?>
+<tr>
+<td colspan="4">هنوز اطلاعات مصرف ثبت نشده است</td>
+</tr>
+<?php endif; ?>
 
 </table>
 
@@ -183,14 +171,17 @@ include "../includes/sidebar.php";
 <?php foreach($recentUsers as $u): ?>
 
 <tr>
-
 <td><?= $u['username'] ?></td>
-
 <td><?= $u['last_online'] ?></td>
-
 </tr>
 
 <?php endforeach; ?>
+
+<?php if(empty($recentUsers)): ?>
+<tr>
+<td colspan="2">هنوز اتصال ثبت نشده است</td>
+</tr>
+<?php endif; ?>
 
 </table>
 
@@ -217,7 +208,8 @@ include "../includes/sidebar.php";
 
 </div>
 
-<!-- 🔥 نمودار Chart.js -->
+
+<!-- Chart.js -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <script>
@@ -243,12 +235,8 @@ new Chart(ctx, {
     },
     options:{
         responsive:true,
-        plugins:{
-            legend:{ position:'top' }
-        },
-        scales:{
-            y:{ beginAtZero:true }
-        }
+        plugins:{ legend:{ position:'top' } },
+        scales:{ y:{ beginAtZero:true } }
     }
 });
 
