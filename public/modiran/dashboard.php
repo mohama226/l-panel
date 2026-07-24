@@ -1,194 +1,200 @@
 <?php
 
+require "../../app/database.php";
 require "../../app/auth.php";
+
 checkLogin();
 
-require "../../app/database.php";
+
+$totalUsers = 0;
+$activeUsers = 0;
+$totalAdmins = 0;
+$totalTraffic = 0;
+
+
+try {
+
+
+$totalUsers =
+$db->query(
+"SELECT COUNT(*) FROM users"
+)->fetchColumn();
+
+
+
+$activeUsers =
+$db->query(
+"SELECT COUNT(*) FROM users WHERE status='active'"
+)->fetchColumn();
+
+
+
+$totalAdmins =
+$db->query(
+"SELECT COUNT(*) FROM admins"
+)->fetchColumn();
+
+
+
+$totalTraffic =
+$db->query(
+"SELECT COALESCE(SUM(total_gb),0) FROM users"
+)->fetchColumn();
+
+
+
+}catch(Exception $e){}
+
+
 
 include "../includes/header.php";
 include "../includes/sidebar.php";
 
 
-// آمار کاربران
-
-$totalUsers = 0;
-$activeUsers = 0;
-$totalTraffic = 0;
-$totalAdmins = 0;
-
-
-try {
-
-    $q = $db->query(
-        "SELECT COUNT(*) FROM users"
-    );
-
-    $totalUsers = $q->fetchColumn();
-
-
-    $q = $db->query(
-        "SELECT COUNT(*) FROM users WHERE status='active'"
-    );
-
-    $activeUsers = $q->fetchColumn();
-
-
-    $q = $db->query(
-        "SELECT SUM(total_gb) FROM users"
-    );
-
-    $totalTraffic = $q->fetchColumn() ?: 0;
-
-
-    $q = $db->query(
-        "SELECT COUNT(*) FROM admins"
-    );
-
-    $totalAdmins = $q->fetchColumn();
-
-
-}catch(Exception $e){
-
-}
-
-
-
 ?>
 
 
-<div class="container">
+<div class="main">
 
 
-<div class="page-title">
+<h1 class="title">
 داشبورد مدیریت L-PANEL
-</div>
+</h1>
 
 
 
-<div class="dashboard-grid">
+<div class="cards">
 
 
-<div class="dashboard-card blue">
+<div class="card blue">
 
 <h3>
 کل کاربران
 </h3>
 
-<div class="dashboard-number">
+<strong>
 <?=$totalUsers?>
+</strong>
+
+<p>
+VPN Users
+</p>
+
 </div>
 
-<span>
-کاربر ثبت شده
-</span>
-
-</div>
 
 
 
-
-<div class="dashboard-card green">
+<div class="card green">
 
 <h3>
 کاربران فعال
 </h3>
 
-<div class="dashboard-number">
+<strong>
 <?=$activeUsers?>
+</strong>
+
+<p>
+Active
+</p>
+
 </div>
 
-<span>
-اتصال فعال
-</span>
-
-</div>
 
 
 
 
-
-<div class="dashboard-card orange">
+<div class="card orange">
 
 <h3>
-مصرف کل
+مصرف ترافیک
 </h3>
 
-<div class="dashboard-number">
+<strong>
 <?=$totalTraffic?>
-GB
+ GB
+</strong>
+
+<p>
+Traffic
+</p>
+
 </div>
 
-<span>
-ترافیک مصرفی
-</span>
-
-</div>
 
 
 
 
+<?php if(isSuperAdmin()): ?>
 
-<div class="dashboard-card purple">
+
+<div class="card purple">
 
 <h3>
 مدیران
 </h3>
 
-<div class="dashboard-number">
+<strong>
 <?=$totalAdmins?>
-</div>
+</strong>
 
-<span>
-اکانت مدیریتی
-</span>
-
-</div>
+<p>
+Administrators
+</p>
 
 
 </div>
 
 
+<?php endif; ?>
 
 
-<div class="status-box">
+</div>
 
 
-<h3>
+
+
+
+<div class="panel-box">
+
+
+<h2>
 وضعیت سیستم
-</h3>
+</h2>
+
+
+<div class="status">
+
+<span></span>
+
+پنل آنلاین است
+
+</div>
+
 
 
 <p>
-وضعیت پنل:
 
-<span class="status-online">
-فعال
-</span>
+مدیر:
+
+<b>
+<?=htmlspecialchars(currentAdmin())?>
+</b>
 
 </p>
 
 
 
 <p>
-مدیر وارد شده:
 
-<strong>
-<?=htmlspecialchars($_SESSION['admin'])?>
-</strong>
+سطح:
 
-</p>
-
-
-
-<p>
-سطح دسترسی:
-
-<strong>
-<?=htmlspecialchars($_SESSION['role'] ?? 'admin')?>
-</strong>
+<b>
+<?=htmlspecialchars(currentRole())?>
+</b>
 
 </p>
-
 
 
 </div>
@@ -196,6 +202,7 @@ GB
 
 
 </div>
+
 
 
 <?php
