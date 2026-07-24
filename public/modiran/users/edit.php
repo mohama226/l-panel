@@ -5,7 +5,7 @@ checkLogin();
 
 require "../../../app/database.php";
 require "../../../app/jalali.php";
-require "../../../app/ocserv.php";   // ← اضافه شد
+require "../../../app/ocserv.php";
 
 $id = $_GET['id'];
 
@@ -38,7 +38,7 @@ if($_POST){
 
     // 🔥 تغییر رمز در ocserv (اگر رمز جدید ارسال شده باشد)
     if(isset($_POST['password']) && trim($_POST['password']) !== ""){
-        ocserv_user_password(
+        ocserv_change_password(
             $user['username'],
             $_POST['password']
         );
