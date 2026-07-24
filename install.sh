@@ -44,9 +44,8 @@ git clone \
 https://github.com/mohama226/l-panel.git \
 /var/www/html/l-panel
 
+cd /var/www/html/l-panel || exit 1
 
-
-cd /var/www/html/l-panel
 
 
 
