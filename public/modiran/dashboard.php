@@ -23,7 +23,6 @@ try {
     $activeUsers = $db->query("SELECT COUNT(*) FROM users WHERE status='active'")->fetchColumn();
     $totalAdmins = $db->query("SELECT COUNT(*) FROM admins")->fetchColumn();
 
-    /* 20 کاربر پرمصرف */
     $topUsers = $db->query("
         SELECT
         users.username,
@@ -37,7 +36,6 @@ try {
         LIMIT 20
     ")->fetchAll();
 
-    /* آخرین کاربران متصل شده */
     $recentUsers = $db->query("
         SELECT
         users.username,
@@ -50,7 +48,6 @@ try {
         LIMIT 20
     ")->fetchAll();
 
-    /* نمودار ۷ روز اخیر */
     $stmt = $db->query("
         SELECT 
         DATE(created_at) as day,
@@ -116,7 +113,7 @@ include "../includes/sidebar.php";
 <canvas id="trafficChart" style="max-height:320px;"></canvas>
 </div>
 
-</div> <!-- پایان نمودار -->
+<!-- ❗ این div اشتباه بود و حذف شد -->
 
 
 <!-- جدول‌ها -->
