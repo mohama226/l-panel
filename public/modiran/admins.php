@@ -1,20 +1,19 @@
 <?php
 
-require "../../app/auth.php";
-require "../../app/permissions.php";
 require "../../app/database.php";
+require "../../app/auth.php";
 
 
 checkLogin();
 requireSuperAdmin();
 
 
-$admins =
-$db
-->query(
-"SELECT id,username,role,created_at FROM admins"
-)
-->fetchAll();
+$admins=$db->query(
+
+"SELECT * FROM admins ORDER BY id DESC"
+
+)->fetchAll();
+
 
 
 include "../includes/header.php";
@@ -24,33 +23,37 @@ include "../includes/header.php";
 
 <div class="container">
 
+
 <h2>
 مدیریت مدیران
 </h2>
 
 
 <a href="admin_create.php">
-ایجاد مدیر جدید
++ ایجاد مدیر
 </a>
 
 
-<table border="1" width="100%">
+
+<table>
+
 
 <tr>
 
 <th>
-نام کاربری
+نام
 </th>
 
 <th>
-سطح
+نقش
 </th>
 
 <th>
-تاریخ
+وضعیت
 </th>
 
 </tr>
+
 
 
 <?php foreach($admins as $a): ?>
@@ -69,8 +72,9 @@ include "../includes/header.php";
 
 
 <td>
-<?=$a['created_at']?>
+<?=$a['status']?>
 </td>
+
 
 </tr>
 
@@ -82,3 +86,7 @@ include "../includes/header.php";
 
 
 </div>
+
+
+
+<?php include "../includes/footer.php"; ?>
