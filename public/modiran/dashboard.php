@@ -10,7 +10,9 @@ $totalUsers = 0;
 $activeUsers = 0;
 $totalAdmins = 0;
 
-$topUsers = [];          // ← اضافه شد
+$topUsers = [];        // ← اضافه شد
+$recentUsers = [];     // ← اضافه شد
+
 $chartLabels = [];
 $downloadData = [];
 $uploadData = [];
@@ -32,13 +34,27 @@ try {
     /* 🔥 مرحله ۲ — دریافت ۲۰ کاربر پرمصرف */
     $topUsers = $db->query("
         SELECT
-        username,
-        download_gb,
-        upload_gb,
-        (download_gb + upload_gb) AS total_gb,
-        status
+        users.username,
+        user_traffic.download_mb,
+        user_traffic.upload_mb,
+        user_traffic.total_mb
         FROM users
-        ORDER BY total_gb DESC
+        LEFT JOIN user_traffic
+        ON users.id=user_traffic.user_id
+        ORDER BY user_traffic.total_mb DESC
+        LIMIT 20
+    ")->fetchAll();
+
+    /* 🔥 مرحله ۲ — دریافت ۲۰ کاربر اخیراً آنلاین */
+    $recentUsers = $db->query("
+        SELECT
+        users.username,
+        user_traffic.last_online
+        FROM users
+        LEFT JOIN user_traffic
+        ON users.id=user_traffic.user_id
+        WHERE user_traffic.last_online IS NOT NULL
+        ORDER BY user_traffic.last_online DESC
         LIMIT 20
     ")->fetchAll();
 
@@ -115,7 +131,7 @@ include "../includes/sidebar.php";
 </div>
 
 
-<!-- 🔥 مرحله ۳ — جدول ۲۰ کاربر پرمصرف -->
+<!-- 🔥 جدول ۲۰ کاربر پرمصرف -->
 <div class="panel-box">
 
 <h2>🔥 ۲۰ کاربر پرمصرف</h2>
@@ -138,11 +154,11 @@ include "../includes/sidebar.php";
 
 <td><?=htmlspecialchars($u['username'])?></td>
 
-<td><?=$u['download_gb']?> GB</td>
+<td><?=$u['download_mb']?> MB</td>
 
-<td><?=$u['upload_gb']?> GB</td>
+<td><?=$u['upload_mb']?> MB</td>
 
-<td><b><?=$u['total_gb']?> GB</b></td>
+<td><b><?=$u['total_mb']?> MB</b></td>
 
 <td>
 <?php if($u['status']=="active"): ?>
@@ -151,6 +167,39 @@ include "../includes/sidebar.php";
     <span class="blocked-status">غیرفعال</span>
 <?php endif; ?>
 </td>
+
+</tr>
+
+<?php endforeach; ?>
+
+</table>
+
+</div>
+
+</div>
+
+
+<!-- 🔥 جدول ۲۰ کاربر اخیراً آنلاین -->
+<div class="panel-box">
+
+<h2>🕒 آخرین کاربران آنلاین</h2>
+
+<div class="table-responsive">
+
+<table class="users-table">
+
+<tr>
+    <th>کاربر</th>
+    <th>آخرین اتصال</th>
+</tr>
+
+<?php foreach($recentUsers as $u): ?>
+
+<tr>
+
+<td><?=htmlspecialchars($u['username'])?></td>
+
+<td><?=$u['last_online']?></td>
 
 </tr>
 
