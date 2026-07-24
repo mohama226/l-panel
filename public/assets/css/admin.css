@@ -265,3 +265,32 @@ margin-top:0;
     transform:translateX(-5px);
 
 }
+.status-box{
+
+background:white;
+
+border-radius:20px;
+
+padding:30px;
+
+
+box-shadow:
+0 10px 30px rgba(0,0,0,.08);
+
+}
+
+
+
+.status-online{
+
+background:#dcfce7;
+
+color:#16a34a;
+
+padding:6px 15px;
+
+border-radius:20px;
+
+font-weight:bold;
+
+}
