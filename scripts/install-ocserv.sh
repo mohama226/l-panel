@@ -182,6 +182,10 @@ chmod 440 /etc/sudoers.d/l-panel-ocserv
 
 echo "OCServ integration completed"
 
+# 🔥 اجرای OCServ post-install
+echo "Running OCServ post installation..."
+bash /var/www/html/l-panel/scripts/post-install.sh
+
 echo ""
 echo "=============================="
 echo "OCServ $VERSION Installed"
