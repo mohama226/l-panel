@@ -6,12 +6,12 @@ username VARCHAR(50) UNIQUE NOT NULL,
 
 password VARCHAR(255) NOT NULL,
 
-role VARCHAR(50)
-DEFAULT 'admin',
+role VARCHAR(50) DEFAULT 'admin',
 
 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 
 );
+
 
 
 CREATE TABLE users (
@@ -22,8 +22,7 @@ username VARCHAR(100) UNIQUE NOT NULL,
 
 password VARCHAR(255) NOT NULL,
 
-status ENUM('active','blocked')
-DEFAULT 'active',
+status ENUM('active','blocked') DEFAULT 'active',
 
 expire_date DATE NULL,
 
