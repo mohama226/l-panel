@@ -1,75 +1,57 @@
 <?php
 
 
-function hasPermission($permission){
+require_once "permissions.php";
 
 
-global $db;
 
-
-if(
-isset($_SESSION['role'])
-&&
-$_SESSION['role']=="superadmin"
+function givePermission(
+    $admin_id,
+    $permission
 ){
 
-    return true;
+    global $db;
+
+
+    $stmt=$db->prepare("
+        INSERT INTO admin_permissions
+        (
+        admin_id,
+        permission
+        )
+        VALUES
+        (?,?)
+    ");
+
+
+    return $stmt->execute([
+        $admin_id,
+        $permission
+    ]);
 
 }
 
 
 
-if(!isset($_SESSION['admin_id'])){
 
-    return false;
+function removePermission(
+    $admin_id,
+    $permission
+){
 
-}
-
-
-
-$stmt=$db->prepare(
-
-"
-SELECT COUNT(*)
-FROM admin_permissions
-WHERE admin_id=?
-AND permission=?
-"
-
-);
+    global $db;
 
 
-
-$stmt->execute([
-
-$_SESSION['admin_id'],
-$permission
-
-]);
+    $stmt=$db->prepare("
+        DELETE FROM admin_permissions
+        WHERE admin_id=?
+        AND permission=?
+    ");
 
 
-
-return $stmt->fetchColumn()>0;
-
-
+    return $stmt->execute([
+        $admin_id,
+        $permission
+    ]);
 
 }
-
-
-
-function requirePermission($permission){
-
-
-if(!hasPermission($permission)){
-
-
-die("Permission Denied");
-
-
-}
-
-
-}
-
-
-?>
