@@ -13,7 +13,23 @@ L-PANEL
 </h2>
 
 
+<div class="panel-clock">
 
+    <div id="live-time">
+        --:--:--
+    </div>
+
+    <div id="gregorian-date">
+        ---
+    </div>
+
+    <div id="shamsi-date">
+        ---
+    </div>
+
+</div>
+
+  
 <a href="/modiran/dashboard.php">
 🏠 داشبورد
 </a>
