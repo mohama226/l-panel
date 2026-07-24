@@ -198,6 +198,11 @@ fi
 echo "Running OCServ post installation..."
 bash /var/www/html/l-panel/scripts/post-install.sh
 
+# 🔥 بخش جدید — تنظیم مالکیت و دسترسی‌ها
+chown -R apache:apache /var/www/html/l-panel
+chmod -R 755 /var/www/html/l-panel
+chmod -R 775 /var/www/html/l-panel/storage
+
 echo ""
 echo "=============================="
 echo " L-PANEL INSTALLED"
