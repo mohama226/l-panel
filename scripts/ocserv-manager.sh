@@ -2,30 +2,26 @@
 
 
 ACTION=$1
+USERNAME=$2
+PASSWORD=$3
 
 
-USER=$2
-
-PASS=$3
+PASSFILE="/etc/ocserv/ocpasswd"
 
 
-OCUSER="/etc/ocserv/ocpasswd"
-
-
-
-case $ACTION in
+case "$ACTION" in
 
 
 add)
 
-if [ -z "$USER" ] || [ -z "$PASS" ]; then
+if [ -z "$USERNAME" ] || [ -z "$PASSWORD" ]; then
 exit 1
 fi
 
 
-echo "$PASS" | /usr/bin/ocpasswd \
--c "$OCUSER" \
-"$USER"
+echo "$PASSWORD" | /usr/bin/ocpasswd \
+-c "$PASSFILE" \
+"$USERNAME"
 
 
 systemctl restart ocserv
@@ -34,11 +30,26 @@ systemctl restart ocserv
 ;;
 
 
-
 delete)
 
 
-sed -i "/^$USER:/d" "$OCUSER"
+/usr/bin/ocpasswd \
+-c "$PASSFILE" \
+-d "$USERNAME"
+
+
+systemctl restart ocserv
+
+
+;;
+
+
+password)
+
+
+echo "$PASSWORD" | /usr/bin/ocpasswd \
+-c "$PASSFILE" \
+"$USERNAME"
 
 
 systemctl restart ocserv
@@ -49,15 +60,9 @@ systemctl restart ocserv
 
 *)
 
-echo "Usage:"
-echo "add username password"
-echo "delete username"
-
+echo "invalid action"
 exit 1
-
 
 ;;
 
 esac
-
-exit 0
