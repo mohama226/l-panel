@@ -1,0 +1,15 @@
+CREATE TABLE admin_logs (
+
+id INT AUTO_INCREMENT PRIMARY KEY,
+
+admin_id INT,
+
+action VARCHAR(100),
+
+description TEXT,
+
+ip VARCHAR(50),
+
+created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+
+);
