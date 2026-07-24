@@ -1,15 +1,27 @@
 CREATE TABLE admins (
+    id INT AUTO_INCREMENT PRIMARY KEY,
 
-id INT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(50) UNIQUE NOT NULL,
 
-username VARCHAR(50) UNIQUE NOT NULL,
+    password VARCHAR(255) NOT NULL,
 
-password VARCHAR(255) NOT NULL,
+    fullname VARCHAR(100),
 
-role VARCHAR(50) DEFAULT 'admin',
+    role ENUM(
+        'superadmin',
+        'admin'
+    ) DEFAULT 'admin',
 
-created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    status ENUM(
+        'active',
+        'blocked'
+    ) DEFAULT 'active',
 
+    permissions TEXT,
+
+    last_login DATETIME NULL,
+
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 
