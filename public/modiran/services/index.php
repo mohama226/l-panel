@@ -10,6 +10,9 @@ checkLogin();
 
 $services=getServices();
 
+echo "<pre>";
+print_r($services);
+echo "</pre>";
 
 include "../../includes/header.php";
 include "../../includes/sidebar.php";
