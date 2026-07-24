@@ -57,7 +57,7 @@ overflow:auto;
 <?php
 
 $log = shell_exec(
-    "grep " . escapeshellarg($username) . " /var/log/ocserv.log | tail -100"
+    "grep " . escapeshellarg($username) . " /storage/logs/user.log | tail -100"
 );
 
 echo htmlspecialchars(
@@ -85,30 +85,13 @@ overflow:auto;
 
 <?php
 
-$stmt = $db->prepare("
-SELECT *
-FROM admin_logs
-WHERE target_user=?
-ORDER BY id DESC
-LIMIT 100
-");
+$log = shell_exec(
+    "grep " . escapeshellarg($username) . " /storage/logs/admin.log | tail -100"
+);
 
-$stmt->execute([$username]);
-
-$logs = $stmt->fetchAll();
-
-if(!$logs){
-    echo "No panel logs found";
-} else {
-    foreach($logs as $l){
-        echo htmlspecialchars(
-            "[".$l['created_at']."] ".
-            $l['admin']." — ".
-            $l['action']." — ".
-            $l['description']
-        ) . "\n";
-    }
-}
+echo htmlspecialchars(
+    $log ?: "No panel logs found"
+);
 
 ?>
 
