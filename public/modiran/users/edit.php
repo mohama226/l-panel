@@ -6,6 +6,7 @@ checkLogin();
 require "../../../app/database.php";
 require "../../../app/jalali.php";
 require "../../../app/ocserv.php";
+require "../../../app/logger.php";   // ← اضافه شد
 
 $id = $_GET['id'];
 
@@ -35,6 +36,13 @@ if($_POST){
         $total,
         $id
     ]);
+
+    // 🔥 ثبت لاگ مدیریت
+    admin_log(
+        "ویرایش کاربر",
+        $username,
+        "ویرایش مشخصات کاربر انجام شد"
+    );
 
     // 🔥 تغییر رمز در ocserv (اگر رمز جدید ارسال شده باشد)
     if(isset($_POST['password']) && trim($_POST['password']) !== ""){
