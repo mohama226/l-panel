@@ -10,9 +10,10 @@ $totalUsers = 0;
 $activeUsers = 0;
 $totalAdmins = 0;
 
+$topUsers = [];          // ← اضافه شد
 $chartLabels = [];
 $downloadData = [];
-$uploadData = [];   // ← اضافه شد
+$uploadData = [];
 
 try {
 
@@ -28,9 +29,20 @@ try {
         "SELECT COUNT(*) FROM admins"
     )->fetchColumn();
 
+    /* 🔥 مرحله ۲ — دریافت ۲۰ کاربر پرمصرف */
+    $topUsers = $db->query("
+        SELECT
+        username,
+        download_gb,
+        upload_gb,
+        (download_gb + upload_gb) AS total_gb,
+        status
+        FROM users
+        ORDER BY total_gb DESC
+        LIMIT 20
+    ")->fetchAll();
 
-    /* 🔥 بخش جدید: دریافت ترافیک ۷ روز اخیر */
-
+    /* 🔥 دریافت ترافیک ۷ روز اخیر */
     $stmt = $db->query("
         SELECT 
         DATE(created_at) as day,
@@ -43,7 +55,6 @@ try {
     ");
 
     $traffic = $stmt->fetchAll();
-
     $traffic = array_reverse($traffic);
 
     foreach($traffic as $row){
@@ -104,6 +115,54 @@ include "../includes/sidebar.php";
 </div>
 
 
+<!-- 🔥 مرحله ۳ — جدول ۲۰ کاربر پرمصرف -->
+<div class="panel-box">
+
+<h2>🔥 ۲۰ کاربر پرمصرف</h2>
+
+<div class="table-responsive">
+
+<table class="users-table">
+
+<tr>
+    <th>کاربر</th>
+    <th>دانلود</th>
+    <th>آپلود</th>
+    <th>مجموع</th>
+    <th>وضعیت</th>
+</tr>
+
+<?php foreach($topUsers as $u): ?>
+
+<tr>
+
+<td><?=htmlspecialchars($u['username'])?></td>
+
+<td><?=$u['download_gb']?> GB</td>
+
+<td><?=$u['upload_gb']?> GB</td>
+
+<td><b><?=$u['total_gb']?> GB</b></td>
+
+<td>
+<?php if($u['status']=="active"): ?>
+    <span class="active-status">فعال</span>
+<?php else: ?>
+    <span class="blocked-status">غیرفعال</span>
+<?php endif; ?>
+</td>
+
+</tr>
+
+<?php endforeach; ?>
+
+</table>
+
+</div>
+
+</div>
+
+
 <div class="panel-box">
 
 <h2>وضعیت حساب مدیر</h2>
@@ -122,7 +181,7 @@ include "../includes/sidebar.php";
 
 </div>
 
-<!-- 🔥 اضافه‌شده: Chart.js -->
+<!-- 🔥 نمودار Chart.js -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <script>
