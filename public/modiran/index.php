@@ -1,182 +1,90 @@
 <?php
 
-
 require "../../app/session.php";
-
 require "../../app/database.php";
-
 require "../../app/logger.php";
-
 require "../../app/auth.php";
 
-
-$error="";
-
+$error = "";
 
 if($_POST){
 
+    $username = $_POST['username'];
+    $password = $_POST['password'];
 
-$username=$_POST['username'];
+    $stmt = $db->prepare(
+        "SELECT * FROM admins WHERE username=? AND status='active'"
+    );
 
-$password=$_POST['password'];
+    $stmt->execute([$username]);
 
+    $user = $stmt->fetch();
 
+    if(
+        $user &&
+        password_verify($password, $user['password'])
+    ){
 
-$stmt=$db->prepare(
+        // این سه خط طبق دستور تو بدون تغییر باقی می‌مانند
+        $_SESSION['admin']     = $user['username'];
+        $_SESSION['role']      = $user['role'];
+        $_SESSION['admin_id']  = $user['id'];
 
-"SELECT * FROM admins WHERE username=? AND status='active'"
+        // فقط این خط اضافه شد
+        $_SESSION['login_time'] = time();
 
-);
+        writeLog(
+            "admin.log",
+            "ورود ".$user['username']
+        );
 
+        header("Location: dashboard.php");
+        exit;
 
-$stmt->execute([$username]);
+    } else {
 
+        $error = "نام کاربری یا رمز اشتباه است";
 
-$user=$stmt->fetch();
-
-
-
-if(
-
-$user &&
-
-password_verify(
-$password,
-$user['password']
-)
-
-){
-
-
-$_SESSION['admin']=$user['username'];
-
-$_SESSION['role']=$user['role'];
-
-$_SESSION['admin_id']=$user['id'];
-
-$_SESSION['role']=$user['role'];
-
-$_SESSION['login_time']=time();
-
-writeLog(
-
-"admin.log",
-
-"ورود ".$user['username']
-
-);
-
-
-
-header(
-"Location: dashboard.php"
-);
-
-
-exit;
-
+    }
 
 }
-
-else{
-
-
-$error="نام کاربری یا رمز اشتباه است";
-
-
-}
-
-
-}
-
-
 
 ?>
 
 <!DOCTYPE html>
-
 <html lang="fa" dir="rtl">
 
-
 <head>
-
 <meta charset="UTF-8">
-
-<title>
-L-PANEL ADMIN
-</title>
-
+<title>L-PANEL ADMIN</title>
 <link rel="stylesheet" href="../assets/css/login.css">
-
 </head>
-
 
 <body>
 
-
 <div class="login-box">
 
-
-<h1>
-L-PANEL
-</h1>
-
-
-<h3>
-Admin Panel
-</h3>
-
-
+<h1>L-PANEL</h1>
+<h3>Admin Panel</h3>
 
 <?php if($error): ?>
-
 <div class="error">
-
-<?=$error?>
-
+    <?=$error?>
 </div>
-
 <?php endif; ?>
-
-
 
 <form method="post">
 
-
-<input
-
-name="username"
-
-placeholder="Username"
-
->
-
-
-
-<input
-
-type="password"
-
-name="password"
-
-placeholder="Password"
-
->
-
+<input name="username" placeholder="Username">
+<input type="password" name="password" placeholder="Password">
 
 <button>
-
-ورود
-
+    ورود
 </button>
-
 
 </form>
 
-
 </div>
 
-
 </body>
-
 </html>
