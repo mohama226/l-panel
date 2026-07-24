@@ -2,6 +2,7 @@
 
 require "../../app/database.php";
 require "../../app/auth.php";
+require "../../app/permissions.php";
 
 checkLogin();
 
@@ -9,95 +10,136 @@ checkLogin();
 $totalUsers = 0;
 $activeUsers = 0;
 $totalAdmins = 0;
-$totalTraffic = 0;
+$totalBlocked = 0;
+$recentUsers = [];
 
 
 try {
 
 
-$totalUsers =
-$db->query(
-"SELECT COUNT(*) FROM users"
-)->fetchColumn();
+    $totalUsers =
+    $db->query(
+        "SELECT COUNT(*) FROM users"
+    )->fetchColumn();
 
 
 
-$activeUsers =
-$db->query(
-"SELECT COUNT(*) FROM users WHERE status='active'"
-)->fetchColumn();
+    $activeUsers =
+    $db->query(
+        "SELECT COUNT(*) FROM users WHERE status='active'"
+    )->fetchColumn();
 
 
 
-$totalAdmins =
-$db->query(
-"SELECT COUNT(*) FROM admins"
-)->fetchColumn();
+    $totalBlocked =
+    $db->query(
+        "SELECT COUNT(*) FROM users WHERE status='blocked'"
+    )->fetchColumn();
 
 
 
-$totalTraffic =
-$db->query(
-"SELECT COALESCE(SUM(total_gb),0) FROM users"
-)->fetchColumn();
+    $totalAdmins =
+    $db->query(
+        "SELECT COUNT(*) FROM admins"
+    )->fetchColumn();
 
 
 
-}catch(Exception $e){}
+    $recentUsers =
+    $db->query(
+        "
+        SELECT username,status,created_at
+        FROM users
+        ORDER BY id DESC
+        LIMIT 10
+        "
+    )->fetchAll();
+
+
+
+}catch(Exception $e){
+
+}
 
 
 
 include "../includes/header.php";
 include "../includes/sidebar.php";
 
-
 ?>
 
 
-<div class="main">
+<div class="content">
 
 
-<h1 class="title">
-داشبورد مدیریت L-PANEL
+<div class="page-title">
+
+<h1>
+داشبورد مدیریت
 </h1>
 
+<p>
+نمای کلی وضعیت پنل L-PANEL
+</p>
+
+</div>
 
 
-<div class="cards">
+
+<div class="dashboard-grid">
 
 
-<div class="card blue">
+<div class="dashboard-card blue">
+
+
+<div class="icon">
+👥
+</div>
+
 
 <h3>
 کل کاربران
 </h3>
 
+
 <strong>
 <?=$totalUsers?>
 </strong>
 
-<p>
-VPN Users
-</p>
+
+<span>
+کاربر ثبت شده
+</span>
+
 
 </div>
 
 
 
 
-<div class="card green">
+
+<div class="dashboard-card green">
+
+
+<div class="icon">
+✅
+</div>
+
 
 <h3>
 کاربران فعال
 </h3>
 
+
 <strong>
 <?=$activeUsers?>
 </strong>
 
-<p>
-Active
-</p>
+
+<span>
+اکانت فعال
+</span>
+
 
 </div>
 
@@ -105,22 +147,32 @@ Active
 
 
 
-<div class="card orange">
+
+<div class="dashboard-card red">
+
+
+<div class="icon">
+🚫
+</div>
+
 
 <h3>
-مصرف ترافیک
+کاربران مسدود
 </h3>
 
+
 <strong>
-<?=$totalTraffic?>
- GB
+<?=$totalBlocked?>
 </strong>
 
-<p>
-Traffic
-</p>
+
+<span>
+Blocked
+</span>
+
 
 </div>
+
 
 
 
@@ -129,25 +181,123 @@ Traffic
 <?php if(isSuperAdmin()): ?>
 
 
-<div class="card purple">
+<div class="dashboard-card purple">
+
+
+<div class="icon">
+👑
+</div>
+
 
 <h3>
 مدیران
 </h3>
 
+
 <strong>
 <?=$totalAdmins?>
 </strong>
 
-<p>
-Administrators
-</p>
+
+<span>
+Admin Accounts
+</span>
 
 
 </div>
 
 
 <?php endif; ?>
+
+
+</div>
+
+
+
+
+
+<div class="dashboard-two">
+
+
+<div class="panel-box">
+
+
+<h2>
+آخرین کاربران ساخته شده
+</h2>
+
+
+
+<table>
+
+
+<tr>
+
+<th>
+نام کاربری
+</th>
+
+
+<th>
+وضعیت
+</th>
+
+
+<th>
+تاریخ
+</th>
+
+
+</tr>
+
+
+
+<?php foreach($recentUsers as $u): ?>
+
+
+<tr>
+
+<td>
+<?=htmlspecialchars($u['username'])?>
+</td>
+
+
+<td>
+
+
+<?php if($u['status']=="active"): ?>
+
+<span class="badge green-badge">
+فعال
+</span>
+
+
+<?php else: ?>
+
+
+<span class="badge red-badge">
+مسدود
+</span>
+
+
+<?php endif; ?>
+
+
+</td>
+
+
+<td>
+<?=$u['created_at']?>
+</td>
+
+
+</tr>
+
+
+<?php endforeach; ?>
+
+
+</table>
 
 
 </div>
@@ -164,22 +314,28 @@ Administrators
 </h2>
 
 
-<div class="status">
 
-<span></span>
+<div class="system-status">
+
+
+<span class="online-dot"></span>
 
 پنل آنلاین است
+
 
 </div>
 
 
 
+<hr>
+
+
 <p>
 
-مدیر:
+مدیر وارد شده:
 
 <b>
-<?=htmlspecialchars(currentAdmin())?>
+<?=htmlspecialchars($_SESSION['admin'])?>
 </b>
 
 </p>
@@ -188,13 +344,18 @@ Administrators
 
 <p>
 
-سطح:
+سطح دسترسی:
 
 <b>
-<?=htmlspecialchars(currentRole())?>
+<?=htmlspecialchars($_SESSION['role'])?>
 </b>
 
 </p>
+
+
+
+</div>
+
 
 
 </div>
