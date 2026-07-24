@@ -1,32 +1,34 @@
-CREATE TABLE admins (
-    id INT AUTO_INCREMENT PRIMARY KEY,
+CREATE TABLE IF NOT EXISTS admins (
 
-    username VARCHAR(50) UNIQUE NOT NULL,
+id INT AUTO_INCREMENT PRIMARY KEY,
 
-    password VARCHAR(255) NOT NULL,
+username VARCHAR(50) UNIQUE NOT NULL,
 
-    fullname VARCHAR(100),
+password VARCHAR(255) NOT NULL,
 
-    role ENUM(
-        'superadmin',
-        'admin'
-    ) DEFAULT 'admin',
+fullname VARCHAR(100),
 
-    status ENUM(
-        'active',
-        'blocked'
-    ) DEFAULT 'active',
+role ENUM(
+'superadmin',
+'admin'
+) DEFAULT 'admin',
 
-    permissions TEXT,
+status ENUM(
+'active',
+'blocked'
+) DEFAULT 'active',
 
-    last_login DATETIME NULL,
+permissions TEXT,
 
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+last_login DATETIME NULL,
+
+created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+
 );
 
 
 
-CREATE TABLE users (
+CREATE TABLE IF NOT EXISTS users (
 
 id INT AUTO_INCREMENT PRIMARY KEY,
 
@@ -48,15 +50,15 @@ created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 
 
 
-CREATE TABLE admin_logs (
+CREATE TABLE IF NOT EXISTS admin_logs (
 
 id INT AUTO_INCREMENT PRIMARY KEY,
 
-admin VARCHAR(100),
+admin_id INT,
 
-action VARCHAR(255),
+action VARCHAR(100),
 
-target_user VARCHAR(100),
+description TEXT,
 
 ip VARCHAR(50),
 
