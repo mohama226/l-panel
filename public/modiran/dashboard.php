@@ -10,8 +10,8 @@ $totalUsers = 0;
 $activeUsers = 0;
 $totalAdmins = 0;
 
-$topUsers = [];        // ← اضافه شد
-$recentUsers = [];     // ← اضافه شد
+$topUsers = [];          // ← اضافه شد
+$recentUsers = [];       // ← اضافه شد
 
 $chartLabels = [];
 $downloadData = [];
@@ -45,7 +45,7 @@ try {
         LIMIT 20
     ")->fetchAll();
 
-    /* 🔥 مرحله ۲ — دریافت ۲۰ کاربر اخیراً آنلاین */
+    /* 🔥 مرحله ۲ — دریافت ۲۰ کاربر اخیراً متصل شده */
     $recentUsers = $db->query("
         SELECT
         users.username,
@@ -130,43 +130,35 @@ include "../includes/sidebar.php";
 
 </div>
 
+</div> <!-- پایان بخش نمودار -->
 
-<!-- 🔥 جدول ۲۰ کاربر پرمصرف -->
+<!-- 🔥 بخش جدید — جدول‌های داشبورد -->
+<div class="dashboard-tables">
+
 <div class="panel-box">
 
-<h2>🔥 ۲۰ کاربر پرمصرف</h2>
+<h2>🔥 20 کاربر پر مصرف</h2>
 
-<div class="table-responsive">
-
-<table class="users-table">
+<table class="dashboard-table">
 
 <tr>
     <th>کاربر</th>
     <th>دانلود</th>
     <th>آپلود</th>
     <th>مجموع</th>
-    <th>وضعیت</th>
 </tr>
 
 <?php foreach($topUsers as $u): ?>
 
 <tr>
 
-<td><?=htmlspecialchars($u['username'])?></td>
+<td><?= $u['username'] ?></td>
 
-<td><?=$u['download_mb']?> MB</td>
+<td><?= $u['download_mb'] ?> MB</td>
 
-<td><?=$u['upload_mb']?> MB</td>
+<td><?= $u['upload_mb'] ?> MB</td>
 
-<td><b><?=$u['total_mb']?> MB</b></td>
-
-<td>
-<?php if($u['status']=="active"): ?>
-    <span class="active-status">فعال</span>
-<?php else: ?>
-    <span class="blocked-status">غیرفعال</span>
-<?php endif; ?>
-</td>
+<td><?= $u['total_mb'] ?> MB</td>
 
 </tr>
 
@@ -176,17 +168,12 @@ include "../includes/sidebar.php";
 
 </div>
 
-</div>
 
-
-<!-- 🔥 جدول ۲۰ کاربر اخیراً آنلاین -->
 <div class="panel-box">
 
-<h2>🕒 آخرین کاربران آنلاین</h2>
+<h2>🟢 آخرین کاربران متصل شده</h2>
 
-<div class="table-responsive">
-
-<table class="users-table">
+<table class="dashboard-table">
 
 <tr>
     <th>کاربر</th>
@@ -197,9 +184,9 @@ include "../includes/sidebar.php";
 
 <tr>
 
-<td><?=htmlspecialchars($u['username'])?></td>
+<td><?= $u['username'] ?></td>
 
-<td><?=$u['last_online']?></td>
+<td><?= $u['last_online'] ?></td>
 
 </tr>
 
@@ -209,7 +196,7 @@ include "../includes/sidebar.php";
 
 </div>
 
-</div>
+</div> <!-- پایان dashboard-tables -->
 
 
 <div class="panel-box">
