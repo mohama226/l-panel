@@ -169,3 +169,26 @@ margin-bottom:20px;
 margin-top:0;
 
 }
+.sidebar{
+
+    width:280px;
+
+    position:fixed;
+
+    right:0;
+
+    top:0;
+
+    height:100vh;
+
+}
+
+
+
+.content{
+
+    margin-right:280px;
+
+    padding:30px;
+
+}
