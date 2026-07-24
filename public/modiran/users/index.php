@@ -45,17 +45,38 @@ include "../../includes/sidebar.php";
 
 <div class="users-header">
 
+
+<div class="users-title-box">
+
 <h2 class="users-title">
 👥 مدیریت کاربران VPN
 </h2>
 
-<a class="btn btn-primary" href="/modiran/users/create.php">
+</div>
+
+
+
+<div class="users-actions">
+
+
+<a class="btn btn-primary"
+href="/modiran/users/create.php">
+
 ➕ افزودن کاربر
+
 </a>
 
-<a class="btn btn-success" href="/modiran/users/bulk.php">
+
+<a class="btn btn-success"
+href="/modiran/users/bulk.php">
+
 👥 افزودن گروهی
+
 </a>
+
+
+</div>
+
 
 </div>
 
