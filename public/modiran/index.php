@@ -1,46 +1,74 @@
 <?php
 
-require_once "../../app/session.php";
-require_once "../../app/database.php";
-require_once "../../app/logger.php";
-require_once "../../app/auth.php";
-
-$error = "";
-
-if($_SERVER['REQUEST_METHOD'] === 'POST'){
-
-    $username = trim($_POST['username']);
-    $password = $_POST['password'];
-
-    $stmt = $db->prepare(
-        "SELECT * FROM admins WHERE username=?"
-    );
-
-    $stmt->execute([$username]);
-
-    $user = $stmt->fetch(PDO::FETCH_ASSOC);
+require "../../app/session.php";
+require "../../app/database.php";
+require "../../app/logger.php";
 
 
-    if($user && password_verify($password,$user['password'])){
-
-        $_SESSION['admin'] = $user['username'];
-        $_SESSION['role']  = $user['role'];
+$error="";
 
 
-        writeLog(
-            "admin.log",
-            "ورود مدیر ".$user['username']
-        );
+if($_POST){
 
 
-        header("Location: dashboard.php");
-        exit;
+$username=$_POST['username'];
 
-    }else{
+$password=$_POST['password'];
 
-        $error="نام کاربری یا رمز عبور اشتباه است";
 
-    }
+
+$stmt=$db->prepare(
+"SELECT * FROM admins WHERE username=? AND status='active'"
+);
+
+
+$stmt->execute([$username]);
+
+
+$user=$stmt->fetch();
+
+
+
+if($user && password_verify($password,$user['password'])){
+
+
+$_SESSION['admin']=$user['username'];
+
+$_SESSION['role']=$user['role'];
+
+
+
+$db->prepare(
+"UPDATE admins SET last_login=NOW() WHERE id=?"
+)
+->execute([$user['id']]);
+
+
+
+writeLog(
+"admin.log",
+"ورود ".$user['username']
+);
+
+
+
+header(
+"Location: dashboard.php"
+);
+
+exit;
+
+
+
+}else{
+
+
+$error="نام کاربری یا رمز اشتباه است";
+
+
+}
+
+
 
 }
 
@@ -48,14 +76,17 @@ if($_SERVER['REQUEST_METHOD'] === 'POST'){
 
 
 <!DOCTYPE html>
+
 <html lang="fa" dir="rtl">
 
 <head>
 
 <meta charset="UTF-8">
-<title>L-PANEL Admin</title>
 
-<link rel="stylesheet" href="/assets/css/login.css">
+<title>L-PANEL LOGIN</title>
+
+<link rel="stylesheet" href="../assets/css/login.css">
+
 </head>
 
 
@@ -65,47 +96,34 @@ if($_SERVER['REQUEST_METHOD'] === 'POST'){
 <div class="login-box">
 
 
-<div class="logo">
-
 <h1>L-PANEL</h1>
-
-<span>Admin Login</span>
-
-</div>
-
 
 
 <?php if($error): ?>
 
 <div class="error">
+
 <?=$error?>
+
 </div>
 
 <?php endif; ?>
 
 
-
 <form method="post">
 
 
-<input 
-class="form-control"
-name="username"
-placeholder="نام کاربری"
-required>
+<input name="username"
+placeholder="نام کاربری">
 
 
-<input 
-class="form-control"
-type="password"
+<input type="password"
 name="password"
-placeholder="رمز عبور"
-required>
+placeholder="رمز عبور">
 
 
-
-<button class="login-btn">
-ورود مدیر
+<button>
+ورود
 </button>
 
 
