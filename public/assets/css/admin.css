@@ -398,3 +398,109 @@ grid-template-columns:1fr;
 }
 
 }
+/* Fix dashboard layout */
+
+.main{
+    width:100%;
+    box-sizing:border-box;
+    direction:rtl;
+}
+
+
+.cards{
+    width:100%;
+}
+
+
+/* dashboard tables */
+
+.dashboard-tables{
+
+    display:block;
+
+    margin-top:30px;
+
+}
+
+
+.dashboard-tables .panel-box{
+
+    margin-bottom:30px;
+
+    width:100%;
+
+    box-sizing:border-box;
+
+}
+
+
+.dashboard-table{
+
+    width:100%;
+
+    table-layout:fixed;
+
+}
+
+
+
+.dashboard-table th,
+.dashboard-table td{
+
+    text-align:center;
+
+    padding:14px;
+
+}
+
+
+
+.dashboard-table tbody:empty{
+
+    display:none;
+
+}
+
+
+
+.dashboard-table tr:hover{
+
+    background:#f8fafc;
+
+}
+
+
+/* empty table */
+
+.dashboard-table td[colspan]{
+
+    color:#94a3b8;
+
+    padding:40px;
+
+}
+
+
+
+/* keep chart */
+
+.chart-box,
+.panel-box{
+
+    direction:rtl;
+
+}
+
+
+
+/* responsive */
+
+@media(min-width:1200px){
+
+.dashboard-tables{
+
+    max-width:100%;
+
+}
+
+}
