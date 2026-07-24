@@ -1,11 +1,13 @@
 <?php
 
-require "../../app/auth.php";
-require "../../app/permissions.php";
+
 require "../../app/database.php";
+
+require "../../app/auth.php";
 
 
 checkLogin();
+
 requireSuperAdmin();
 
 
@@ -16,64 +18,59 @@ if($_POST){
 $username=$_POST['username'];
 
 $password=password_hash(
+
 $_POST['password'],
+
 PASSWORD_DEFAULT
+
 );
-
-
-$role=$_POST['role'];
 
 
 
 $stmt=$db->prepare(
-"INSERT INTO admins
+
+"
+INSERT INTO admins
 (username,password,role)
-VALUES(?,?,?)"
+
+VALUES
+(?,?,?)
+
+"
+
 );
+
 
 
 $stmt->execute([
+
 $username,
+
 $password,
-$role
+
+$_POST['role']
+
 ]);
 
 
-header(
-"Location: admins.php"
-);
 
-exit;
+echo "Admin Created";
+
 
 }
 
 
 
-include "../includes/header.php";
-
-
 ?>
-
-
-<div class="container">
-
-
-<h2>
-ایجاد مدیر
-</h2>
 
 
 <form method="post">
 
 
-<input name="username"
-placeholder="نام کاربری">
+<input name="username" placeholder="username">
 
 
-<input 
-type="password"
-name="password"
-placeholder="رمز">
+<input name="password" placeholder="password">
 
 
 <select name="role">
@@ -93,11 +90,8 @@ Super Admin
 
 
 <button>
-ذخیره
+Create
 </button>
 
 
 </form>
-
-
-</div>
