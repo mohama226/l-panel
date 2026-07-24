@@ -51,6 +51,12 @@ if($_POST){
         $username
     );
 
+    // 🔥 لاگ فایل admin.log
+    writeLog(
+        "admin.log",
+        "مدیر ".$_SESSION['admin']." کاربر ".$username." را ویرایش کرد"
+    );
+
     // 🔥 تغییر رمز در ocserv (اگر رمز جدید ارسال شده باشد)
     if(isset($_POST['password']) && trim($_POST['password']) !== ""){
         ocserv_change_password(
