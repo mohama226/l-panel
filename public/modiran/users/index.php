@@ -117,22 +117,36 @@ include "../../includes/sidebar.php";
 
 <td>
 
-<a class="btn btn-primary"
-href="/modiran/users/edit.php?id=<?=$u['id']?>">
+<div class="dropdown">
+
+<button class="dots-btn">
+⋮
+</button>
+
+<div class="dropdown-menu">
+
+<a href="/modiran/users/edit.php?id=<?=$u['id']?>">
 ✏ ویرایش
 </a>
 
-<a class="btn btn-success"
-href="/modiran/users/extend.php?id=<?=$u['id']?>">
+<a href="/modiran/users/extend.php?id=<?=$u['id']?>">
 ⏱ تمدید
 </a>
 
-<!-- 🔥 لینک حذف جدید -->
-<a class="btn btn-danger"
+<a href="/modiran/users/logs.php?id=<?=$u['id']?>">
+📊 لاگ کاربر
+</a>
+
+<a 
+class="danger"
 href="/modiran/users/delete.php?id=<?=$u['id']?>"
 onclick="return confirm('حذف شود؟')">
 🗑 حذف
 </a>
+
+</div>
+
+</div>
 
 </td>
 
