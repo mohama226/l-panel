@@ -277,3 +277,62 @@ color:#0f172a;
 max-height:350px;
 
 }
+.table-responsive{
+    overflow-x:auto;
+}
+
+
+.users-table{
+    width:100%;
+    border-collapse:collapse;
+    margin-top:20px;
+}
+
+
+.users-table th{
+
+    background:#f1f5f9;
+    padding:15px;
+    text-align:right;
+
+}
+
+
+.users-table td{
+
+    padding:14px;
+    border-bottom:1px solid #e2e8f0;
+
+}
+
+
+
+.users-table tr:hover{
+
+    background:#f8fafc;
+
+}
+
+
+
+.active-status{
+
+background:#dcfce7;
+color:#166534;
+padding:6px 14px;
+border-radius:20px;
+font-size:13px;
+
+}
+
+
+
+.blocked-status{
+
+background:#fee2e2;
+color:#991b1b;
+padding:6px 14px;
+border-radius:20px;
+font-size:13px;
+
+}
