@@ -1,68 +1,57 @@
 #!/bin/bash
 
+OCSERV_PASS="/etc/ocserv/ocpasswd"
+SERVICE="ocserv"
 
 ACTION=$1
+
+
+if [ "$ACTION" = "add" ]; then
+
 USERNAME=$2
 PASSWORD=$3
 
 
-PASSFILE="/etc/ocserv/ocpasswd"
-
-
-case "$ACTION" in
-
-
-add)
-
 if [ -z "$USERNAME" ] || [ -z "$PASSWORD" ]; then
-exit 1
+    exit 1
 fi
 
 
-echo "$PASSWORD" | /usr/bin/ocpasswd \
--c "$PASSFILE" \
-"$USERNAME"
+/usr/bin/ocpasswd \
+-c "$OCSERV_PASS" \
+-g users \
+"$USERNAME" <<EOF
+$PASSWORD
+$PASSWORD
+EOF
 
 
-systemctl restart ocserv
+systemctl restart $SERVICE
 
 
-;;
+exit 0
+
+fi
 
 
-delete)
+
+if [ "$ACTION" = "delete" ]; then
+
+USERNAME=$2
 
 
 /usr/bin/ocpasswd \
--c "$PASSFILE" \
+-c "$OCSERV_PASS" \
 -d "$USERNAME"
 
 
-systemctl restart ocserv
+systemctl restart $SERVICE
 
 
-;;
+exit 0
+
+fi
 
 
-password)
 
-
-echo "$PASSWORD" | /usr/bin/ocpasswd \
--c "$PASSFILE" \
-"$USERNAME"
-
-
-systemctl restart ocserv
-
-
-;;
-
-
-*)
-
-echo "invalid action"
 exit 1
-
-;;
-
-esac
