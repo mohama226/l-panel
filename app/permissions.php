@@ -1,57 +1,23 @@
 <?php
 
-function isSuperAdmin(){
 
-    if(!isset($_SESSION['role'])){
-        return false;
-    }
-
-    return $_SESSION['role'] === 'superadmin';
-}
+$permissions=[
 
 
+"user_create"=>"ساخت کاربر",
 
-function isAdmin(){
+"user_edit"=>"ویرایش کاربر",
 
-    if(!isset($_SESSION['role'])){
-        return false;
-    }
+"user_delete"=>"حذف کاربر",
 
-    return in_array(
-        $_SESSION['role'],
-        [
-            'admin',
-            'superadmin'
-        ]
-    );
-}
+"user_view"=>"مشاهده کاربران",
+
+"traffic_view"=>"مشاهده مصرف",
+
+"log_view"=>"مشاهده لاگ ها"
 
 
+];
 
-function requireSuperAdmin(){
-
-    if(!isSuperAdmin()){
-
-        header(
-            "Location: dashboard.php"
-        );
-
-        exit;
-    }
-}
-
-
-function requireAdmin(){
-
-    if(!isAdmin()){
-
-        header(
-            "Location: index.php"
-        );
-
-        exit;
-    }
-
-}
 
 ?>
