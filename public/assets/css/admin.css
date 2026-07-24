@@ -336,3 +336,65 @@ border-radius:20px;
 font-size:13px;
 
 }
+.dashboard-tables{
+
+display:grid;
+
+grid-template-columns:repeat(auto-fit,minmax(400px,1fr));
+
+gap:25px;
+
+margin-top:30px;
+
+}
+
+
+.dashboard-table{
+
+width:100%;
+
+border-collapse:collapse;
+
+}
+
+
+
+.dashboard-table th{
+
+background:#f1f5f9;
+
+padding:12px;
+
+text-align:right;
+
+}
+
+
+
+.dashboard-table td{
+
+padding:12px;
+
+border-bottom:1px solid #e2e8f0;
+
+}
+
+
+
+.dashboard-table tr:hover{
+
+background:#f8fafc;
+
+}
+
+
+
+@media(max-width:700px){
+
+.dashboard-tables{
+
+grid-template-columns:1fr;
+
+}
+
+}
