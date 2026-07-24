@@ -3,61 +3,25 @@
 require_once __DIR__ . "/../../app/auth.php";
 
 ?>
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
 
-<div class="sidebar">
+<head>
 
-<h2>
-L-PANEL
-</h2>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 
-<div class="panel-clock">
+<title>L-PANEL</title>
 
-    <div id="live-time">
-        --:--:--
-    </div>
+<!-- ترتیب صحیح و بدون تداخل -->
+<link rel="stylesheet" href="/assets/css/style.css">
+<link rel="stylesheet" href="/assets/css/admin.css">
+<link rel="stylesheet" href="/assets/css/services.css">
 
-    <div id="gregorian-date">
-        ---
-    </div>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-    <div id="shamsi-date">
-        ---
-    </div>
+</head>
 
-</div>
+<body>
 
-<a href="/modiran/dashboard.php">
-🏠 داشبورد
-</a>
-
-<a href="/modiran/users/">
-👥 کاربران VPN
-</a>
-
-<?php if(isSuperAdmin()): ?>
-
-<hr>
-
-<h4>
-مدیریت سیستم
-</h4>
-
-<a href="/modiran/admins.php">
-👑 مدیران
-</a>
-
-<a href="/modiran/services/">
-⚙️ تنظیمات سرویس‌ها
-</a>
-
-<a href="/modiran/logs.php">
-📋 لاگ مدیران
-</a>
-
-<?php endif; ?>
-
-<a href="/logout.php">
-🚪 خروج
-</a>
-
-</div>
+<div class="layout">
