@@ -4,17 +4,21 @@ ini_set('display_errors',1);
 ini_set('display_startup_errors',1);
 error_reporting(E_ALL);
 
-require "../../../app/database.php";
-require "../../../app/auth.php";
-require "../../../app/permissions.php";
-require "../../../app/service_manager.php";
+/* 🔥 مسیرهای جدید و استاندارد */
+require_once dirname(__DIR__,3)."/app/init.php";
+
+require_once BASE_PATH."/app/database.php";
+require_once BASE_PATH."/app/auth.php";
+require_once BASE_PATH."/app/permissions.php";
+require_once BASE_PATH."/app/service_manager.php";
 
 checkLogin();
 
 $services = getServices();
 
-include "../../includes/header.php";
-include "../../includes/sidebar.php";
+/* 🔥 include های استاندارد */
+include BASE_PATH."/public/includes/header.php";
+include BASE_PATH."/public/includes/sidebar.php";
 
 ?>
 
@@ -84,4 +88,4 @@ include "../../includes/sidebar.php";
 
 </div>
 
-<?php include "../../includes/footer.php"; ?>
+<?php include BASE_PATH."/public/includes/footer.php"; ?>
