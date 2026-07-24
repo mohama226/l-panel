@@ -2,14 +2,10 @@
 
 session_start();
 
-
 session_unset();
-
 session_destroy();
 
-
-header("Location: /modiran");
-
+header("Location: /modiran/index.php");
 exit;
 
 ?>
