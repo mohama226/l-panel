@@ -130,9 +130,4 @@ include "../../includes/sidebar.php";
 include "../../includes/footer.php";
 ?>
 
-<?php
-// 🔥 بخش جدید: آپدیت پنل بعد از تغییر اعتبار
-cd /var/www/html/l-panel;
-git pull;
-systemctl restart httpd;
-?>
+
