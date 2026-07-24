@@ -185,6 +185,14 @@ chmod +x /var/www/html/l-panel/scripts/install-ocserv.sh
 
 echo "Scripts installed"
 
+# 🔥 اجرای post-install
+if [ -f /var/www/html/l-panel/scripts/post-install.sh ]; then
+    echo "Running post-install..."
+    bash /var/www/html/l-panel/scripts/post-install.sh
+else
+    echo "post-install.sh not found — skipping"
+fi
+
 echo ""
 echo "=============================="
 echo " L-PANEL INSTALLED"
