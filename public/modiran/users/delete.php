@@ -5,6 +5,7 @@ checkLogin();
 
 require "../../../app/database.php";
 require "../../../app/ocserv.php";
+require "../../../app/logger.php";   // ← اضافه شد
 
 $id = $_GET['id'];
 
@@ -18,7 +19,13 @@ $user = $stmt->fetch();
 
 if($user){
 
-    // 🔥 تغییر داده شد
+    // 🔥 ثبت لاگ قبل از حذف
+    admin_log(
+        "حذف کاربر",
+        $username,   // ← طبق دستور تو، ولی اگر خواستی بگم اصلاحش کنم
+        "کاربر از پنل حذف شد"
+    );
+
     ocserv_delete_user(
         $user['username']
     );
