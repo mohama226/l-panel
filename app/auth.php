@@ -1,32 +1,21 @@
 <?php
 
-if(session_status() === PHP_SESSION_NONE){
 
-    session_set_cookie_params([
-        'path' => '/',
-        'httponly' => true,
-        'samesite' => 'Lax'
-    ]);
-
-    session_start();
-
-}
+require_once __DIR__."/session.php";
 
 
 function checkLogin(){
 
 
-    if(!isset($_SESSION['admin'])){
+if(!isset($_SESSION['admin'])){
 
+header("Location: /modiran/");
+exit;
 
-        header("Location: /modiran/index.php");
-
-        exit;
-
-
-    }
+}
 
 
 }
+
 
 ?>
