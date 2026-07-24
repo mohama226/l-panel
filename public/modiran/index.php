@@ -1,141 +1,80 @@
 <?php
 
 require "../../app/database.php";
+require "../../app/auth.php";
 
-session_start();
-
-$error="";
-
+$error = "";
 
 if($_POST){
 
+    $username = $_POST['username'];
+    $password = $_POST['password'];
 
-$username=$_POST['username'];
+    $stmt = $db->prepare(
+        "SELECT * FROM admins WHERE username=?"
+    );
 
-$password=$_POST['password'];
+    $stmt->execute([$username]);
 
+    $user = $stmt->fetch();
 
+    if($user && password_verify($password, $user['password'])){
 
-$stmt=$db->prepare(
-"SELECT * FROM admins WHERE username=?"
-);
+        $_SESSION['admin'] = $user['username'];
+        $_SESSION['role']  = $user['role'];
 
+        header("Location: dashboard.php");
+        exit;
 
-$stmt->execute([$username]);
-
-
-$user=$stmt->fetch();
-
-
-
-if($user && password_verify($password,$user['password'])){
-
-
-$_SESSION['admin']=$user['username'];
-
-$_SESSION['role']=$user['role'];
-
-
-
-header("Location: dashboard.php");
-
-exit;
-
-
-}else{
-
-
-$error="نام کاربری یا رمز عبور اشتباه است";
-
-
+    } else {
+        $error = "نام کاربری یا رمز عبور اشتباه است";
+    }
 }
-
-
-}
-
 
 ?>
 
-
 <!DOCTYPE html>
-
 <html lang="fa" dir="rtl">
 
 <head>
-
 <meta charset="UTF-8">
-
-<title>
-مدیریت L-PANEL
-</title>
-
-
+<title>مدیریت L-PANEL</title>
 <link rel="stylesheet" href="../assets/css/login.css">
-
-
 </head>
-
 
 <body>
 
-
 <div class="login-box">
 
-
 <div class="logo">
-
-<h1>
-L-PANEL
-</h1>
-
-<span>
-Admin Login
-</span>
-
-
+    <h1>L-PANEL</h1>
+    <span>Admin Login</span>
 </div>
-
-
 
 <?php if($error): ?>
-
 <div class="error">
-
-<?=$error?>
-
+    <?=$error?>
 </div>
-
 <?php endif; ?>
-
-
 
 <form method="post">
 
+<input class="form-control"
+       name="username"
+       placeholder="نام کاربری">
 
 <input class="form-control"
-name="username"
-placeholder="نام کاربری">
-
-
-<input class="form-control"
-type="password"
-name="password"
-placeholder="رمز عبور">
-
+       type="password"
+       name="password"
+       placeholder="رمز عبور">
 
 <button class="login-btn">
-
-ورود مدیر
-
+    ورود مدیر
 </button>
-
 
 </form>
 
-
 </div>
 
-
 </body>
-
 </html>
