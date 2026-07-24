@@ -1,17 +1,14 @@
 <?php
 
-require_once "../../app/auth.php";
+require_once __DIR__ . "/../../app/auth.php";
 
 ?>
 
-
 <div class="sidebar">
-
 
 <h2>
 L-PANEL
 </h2>
-
 
 <div class="panel-clock">
 
@@ -29,30 +26,21 @@ L-PANEL
 
 </div>
 
-  
 <a href="/modiran/dashboard.php">
 🏠 داشبورد
 </a>
-
-
 
 <a href="/modiran/users/">
 👥 کاربران VPN
 </a>
 
-
-
 <?php if(isSuperAdmin()): ?>
 
-
 <hr>
-
 
 <h4>
 مدیریت سیستم
 </h4>
-
-
 
 <a href="/modiran/admins.php">
 👑 مدیران
@@ -66,14 +54,10 @@ L-PANEL
 📋 لاگ مدیران
 </a>
 
-
 <?php endif; ?>
-
-
 
 <a href="/logout.php">
 🚪 خروج
 </a>
-
 
 </div>
