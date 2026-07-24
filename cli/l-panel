@@ -79,7 +79,56 @@ TOTAL=$(git diff --name-only $OLD $NEW | wc -l)
 echo "Files changed: $TOTAL"
 
 
-git pull
+echo "Checking local changes..."
+
+CHANGED=$(git status --porcelain)
+
+if [ -n "$CHANGED" ]; then
+
+echo "Local changes detected:"
+echo "$CHANGED"
+
+mkdir -p storage/update-backup
+
+DATE=$(date +"%Y-%m-%d_%H-%M-%S")
+
+git diff > storage/update-backup/local-$DATE.patch
+
+echo "Backup created:"
+echo "storage/update-backup/local-$DATE.patch"
+
+fi
+
+
+echo "Fetching updates..."
+
+git fetch origin
+
+
+OLD=$(git rev-parse HEAD)
+
+NEW=$(git rev-parse origin/main)
+
+
+echo "Updating files..."
+
+git checkout -- .
+
+git pull origin main
+
+
+echo "Changed files:"
+
+git diff --name-only $OLD $NEW
+
+
+date +"%Y-%m-%d %H:%M:%S" > storage/last_update.txt
+
+
+echo "Update finished"
+
+echo "Last update:"
+cat storage/last_update.txt
 
 
 echo "$(date '+%Y-%m-%d %H:%M:%S') Updated $TOTAL files" >> $LOG
