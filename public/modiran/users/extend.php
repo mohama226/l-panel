@@ -54,6 +54,12 @@ if($_POST){
         $user['username']
     );
 
+    // 🔥 لاگ فایل admin.log
+    writeLog(
+        "admin.log",
+        "مدیر ".$_SESSION['admin']." کاربر ".$user['username']." را تمدید کرد"
+    );
+
     $msg = "اعتبار کاربر تغییر کرد";
 
     $user['expire_date'] = $new_date;
