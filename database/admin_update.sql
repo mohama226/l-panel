@@ -1,9 +1,15 @@
-ALTER TABLE admins
-ADD COLUMN email VARCHAR(100) NULL AFTER username,
-ADD COLUMN status ENUM('active','disabled') DEFAULT 'active',
-ADD COLUMN permissions TEXT NULL AFTER role;
+CREATE TABLE IF NOT EXISTS admin_permissions (
 
+id INT AUTO_INCREMENT PRIMARY KEY,
 
-UPDATE admins
-SET role='superadmin'
-WHERE role='admin';
+admin_id INT NOT NULL,
+
+permission VARCHAR(100) NOT NULL,
+
+created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+
+FOREIGN KEY(admin_id)
+REFERENCES admins(id)
+ON DELETE CASCADE
+
+);
