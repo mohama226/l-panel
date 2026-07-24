@@ -152,6 +152,36 @@ systemctl daemon-reload
 systemctl enable ocserv
 systemctl restart ocserv
 
+echo "Configuring L-PANEL OCServ integration..."
+
+# create ocserv directory
+mkdir -p /etc/ocserv
+
+# create password database
+touch /etc/ocserv/ocpasswd
+chmod 600 /etc/ocserv/ocpasswd
+
+# copy config if exists
+if [ -f /var/www/html/l-panel/config/ocserv.conf ]; then
+    cp /var/www/html/l-panel/config/ocserv.conf \
+    /etc/ocserv/ocserv.conf
+fi
+
+# fix permissions
+chown root:root /etc/ocserv/ocpasswd
+
+echo "Installing sudo permission..."
+
+cat >/etc/sudoers.d/l-panel-ocserv <<EOF
+apache ALL=(root) NOPASSWD: /usr/bin/ocpasswd
+apache ALL=(root) NOPASSWD: /bin/systemctl restart ocserv
+apache ALL=(root) NOPASSWD: /bin/systemctl reload ocserv
+EOF
+
+chmod 440 /etc/sudoers.d/l-panel-ocserv
+
+echo "OCServ integration completed"
+
 echo ""
 echo "=============================="
 echo "OCServ $VERSION Installed"
