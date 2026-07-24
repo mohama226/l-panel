@@ -14,7 +14,7 @@
 L-PANEL
 </title>
 
-
+<link rel="stylesheet" href="/assets/css/services.css">
 <link rel="stylesheet" href="/assets/css/admin.css">
 <link rel="stylesheet" href="/assets/css/style.css">
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
