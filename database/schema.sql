@@ -6,21 +6,11 @@ username VARCHAR(50) UNIQUE NOT NULL,
 
 password VARCHAR(255) NOT NULL,
 
-fullname VARCHAR(100),
-
 role ENUM(
 'superadmin',
 'admin'
-) DEFAULT 'admin',
-
-status ENUM(
-'active',
-'blocked'
-) DEFAULT 'active',
-
-permissions TEXT,
-
-last_login DATETIME NULL,
+)
+DEFAULT 'admin',
 
 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 
