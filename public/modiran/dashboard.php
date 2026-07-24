@@ -1,8 +1,10 @@
 <?php
 
-require "../../app/database.php";
-require "../../app/auth.php";
-require "../../app/permissions.php";
+require_once dirname(__DIR__,2)."/app/init.php";
+
+require_once BASE_PATH."/app/database.php";
+require_once BASE_PATH."/app/auth.php";
+require_once BASE_PATH."/app/permissions.php";
 
 checkLogin();
 
@@ -69,8 +71,8 @@ try {
 
 } catch(Exception $e){}
 
-include "../includes/header.php";
-include "../includes/sidebar.php";
+include BASE_PATH."/public/includes/header.php";
+include BASE_PATH."/public/includes/sidebar.php";
 
 ?>
 
@@ -106,15 +108,11 @@ include "../includes/sidebar.php";
 
 </div>
 
-
 <!-- نمودار -->
 <div class="panel-box">
 <h2>📊 مصرف روزانه آپلود و دانلود</h2>
 <canvas id="trafficChart" style="max-height:320px;"></canvas>
 </div>
-
-<!-- ❗ این div اشتباه بود و حذف شد -->
-
 
 <!-- جدول‌ها -->
 <div class="dashboard-tables">
@@ -153,7 +151,6 @@ include "../includes/sidebar.php";
 
 </div>
 
-
 <div class="panel-box">
 
 <h2>🟢 آخرین کاربران متصل شده</h2>
@@ -186,7 +183,6 @@ include "../includes/sidebar.php";
 
 </div> <!-- پایان dashboard-tables -->
 
-
 <div class="panel-box">
 
 <h2>وضعیت حساب مدیر</h2>
@@ -205,8 +201,6 @@ include "../includes/sidebar.php";
 
 </div>
 
-
-<!-- Chart.js -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <script>
@@ -240,5 +234,5 @@ new Chart(ctx, {
 </script>
 
 <?php
-include "../includes/footer.php";
+include BASE_PATH."/public/includes/footer.php";
 ?>
