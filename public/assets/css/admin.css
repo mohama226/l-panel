@@ -211,3 +211,35 @@ linear-gradient(
         padding:20px;
     }
 }
+.chart-box{
+
+margin-top:30px;
+
+background:white;
+
+padding:25px;
+
+border-radius:18px;
+
+box-shadow:
+0 10px 30px rgba(0,0,0,.08);
+
+}
+
+
+
+.chart-box h2{
+
+margin-bottom:25px;
+
+font-size:22px;
+
+}
+
+
+
+#trafficChart{
+
+max-height:350px;
+
+}
