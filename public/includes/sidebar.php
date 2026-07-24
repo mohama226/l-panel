@@ -1,88 +1,62 @@
 <?php
-
-require_once dirname(__DIR__,2)."/app/init.php";
-require_once BASE_PATH."/app/auth.php";
-
 ?>
-
-<!DOCTYPE html>
-<html lang="fa" dir="rtl">
-
-<head>
-
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-
-<title>L-PANEL</title>
-
-<link rel="stylesheet" href="/assets/css/style.css">
-<link rel="stylesheet" href="/assets/css/admin.css">
-<link rel="stylesheet" href="/assets/css/services.css">
-
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-</head>
-
-
-<body>
-
-
-<div class="layout">
-
 
 <aside class="sidebar">
 
-
-<h2>
-L-PANEL
-</h2>
-
-
-
-<a href="/modiran/dashboard.php">
-🏠 داشبورد
-</a>
+    <div class="sidebar-brand">
+        <h2>
+            L-PANEL
+        </h2>
+    </div>
 
 
-
-<a href="/modiran/users/">
-👥 کاربران VPN
-</a>
+    <nav>
 
 
+        <a href="/modiran/dashboard.php">
+            🏠 داشبورد
+        </a>
 
-<hr>
+
+        <a href="/modiran/users/">
+            👥 کاربران VPN
+        </a>
 
 
 
-<h3>
-مدیریت سیستم
-</h3>
+        <hr>
 
 
 
-<a href="/modiran/admins.php">
-👑 مدیران
-</a>
+        <h4>
+            مدیریت سیستم
+        </h4>
 
 
 
-<a href="/modiran/logs.php">
-📋 لاگ مدیران
-</a>
+        <a href="/modiran/admins/">
+            👑 مدیران
+        </a>
+
+
+        <a href="/modiran/admin_logs.php">
+            📋 لاگ مدیران
+        </a>
 
 
 
-<a href="/modiran/services/">
-⚙️ تنظیمات سرویس‌ها
-</a>
+        <a href="/modiran/services/">
+            ⚙️ تنظیمات سرویس‌ها
+        </a>
 
 
 
-<a href="/modiran/logout.php">
-🚪 خروج
-</a>
+        <a href="/logout.php">
+            🚪 خروج
+        </a>
 
+
+    </nav>
 
 
 </aside>
