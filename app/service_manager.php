@@ -1,11 +1,10 @@
 <?php
 
 
-function getServices(){
+function getServices()
+{
 
-
-    $output=[];
-
+    $output = [];
 
     exec(
         "systemctl list-units --type=service --all --no-pager --no-legend",
@@ -16,26 +15,62 @@ function getServices(){
     foreach($lines as $line){
 
 
-        $parts=preg_split('/\s+/',trim($line));
+        $line = trim($line);
 
 
-        if(isset($parts[0])){
-
-
-            $output[]=[
-
-                "name"=>$parts[0],
-
-                "load"=>$parts[1] ?? '',
-
-                "active"=>$parts[2] ?? '',
-
-                "sub"=>$parts[3] ?? ''
-
-            ];
-
-
+        if(empty($line)){
+            continue;
         }
+
+
+        $parts = preg_split('/\s+/', $line);
+
+
+        if(count($parts) < 4){
+            continue;
+        }
+
+
+        $name = $parts[0];
+
+
+        /*
+            حذف خطوط خراب مثل:
+            ● httpd-init.service
+        */
+
+        if($name=="●"){
+            continue;
+        }
+
+
+        if(
+            !str_ends_with(
+                $name,
+                ".service"
+            )
+        ){
+            continue;
+        }
+
+
+
+        $output[]=[
+
+            "name"=>str_replace(
+                ".service",
+                "",
+                $name
+            ),
+
+            "load"=>$parts[1] ?? '',
+
+            "active"=>$parts[2] ?? '',
+
+            "sub"=>$parts[3] ?? ''
+
+        ];
+
 
     }
 
@@ -46,32 +81,62 @@ function getServices(){
 
 
 
-function serviceAction($service,$action){
+
+function serviceAction(
+    $service,
+    $action
+){
 
 
-    $allow=[
-        "start",
-        "stop",
-        "restart",
-        "reload"
+    $allowed=[
+
+        "ocserv",
+        "httpd",
+        "php-fpm",
+        "mariadb",
+        "lpanel-agent",
+        "sshd",
+        "crond"
+
     ];
 
 
-    if(!in_array($action,$allow)){
+    if(!in_array($service,$allowed)){
 
-        return false;
+        die(
+            "Service not allowed"
+        );
 
     }
 
 
-    $service=escapeshellarg($service);
+
+    $actions=[
+
+        "start",
+        "stop",
+        "restart"
+
+    ];
+
+
+
+    if(!in_array($action,$actions)){
+
+        die(
+            "Action not allowed"
+        );
+
+    }
+
 
 
     exec(
-        "systemctl $action $service"
+        "sudo systemctl $action $service"
     );
 
 
-    return true;
-
 }
+
+
+?>
