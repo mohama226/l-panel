@@ -97,9 +97,18 @@ FLUSH PRIVILEGES;
 
 EOF
 
+SCHEMA_FILE=$(find /var/www/html/l-panel -name schema.sql | head -1)
 
+if [ -z "$SCHEMA_FILE" ]; then
+    echo "ERROR: schema.sql not found"
+    find /var/www/html/l-panel -maxdepth 3 -type f
+    exit 1
+fi
 
-mysql lpanel < database/schema.sql
+echo "Using schema:"
+echo $SCHEMA_FILE
+
+mysql lpanel < "$SCHEMA_FILE"
 
 
 
