@@ -3,7 +3,7 @@
 set -e
 
 echo "=============================="
-echo " Installing OCServ 1.5.0"
+echo " Installing OCServ 1.5.0 (Correct Build)"
 echo "=============================="
 
 if [ -f /etc/os-release ]; then
@@ -18,29 +18,6 @@ if command -v dnf >/dev/null
 then
 
     dnf install -y epel-release
-
-    dnf install -y gperf || {
-        echo "Installing gperf from source"
-
-        cd /usr/local/src
-
-        rm -rf gperf
-
-        wget https://ftp.gnu.org/pub/gnu/gperf/gperf-3.1.tar.gz
-
-        tar xf gperf-3.1.tar.gz
-
-        cd gperf-3.1
-
-        ./configure
-
-        make -j$(nproc)
-
-        make install
-
-        cd /
-    }
-
     dnf config-manager --set-enabled crb || true
 
     dnf install -y \
@@ -56,11 +33,17 @@ then
         readline-devel \
         zlib-devel \
         gnutls-devel \
-        meson \
-        ninja-build \
+        autoconf \
+        automake \
+        libtool \
         pkgconf-pkg-config \
         gettext \
+        flex \
+        bison \
+        texinfo \
+        help2man \
         which \
+        findutils \
         gperf
 
     echo "Installing missing libraries"
@@ -75,27 +58,8 @@ then
     dnf install -y libev libev-devel || true
 
 else
-
-    apt update
-
-    apt install -y \
-        gcc \
-        make \
-        git \
-        wget \
-        openssl-dev \
-        libnl3-dev \
-        libseccomp-dev \
-        libpam-dev \
-        libreadline-dev \
-        zlib1g-dev \
-        libgnutls28-dev \
-        protobuf-c-compiler \
-        libev-dev \
-        autoconf \
-        automake \
-        libtool
-
+    echo "This installer is for AlmaLinux only."
+    exit 1
 fi
 
 echo "Preparing source directory..."
@@ -111,42 +75,39 @@ cd ocserv
 
 git fetch --tags
 
-echo "Available versions:"
-git tag | grep 1.5
-
-VERSION=$(git tag | grep -E "^1\.5\.0$")
-
-if [ -z "$VERSION" ]; then
-    echo "OCServ 1.5.0 tag not found"
-    exit 1
-fi
+VERSION="1.5.0"
 
 echo "Installing version: $VERSION"
 
 git checkout "$VERSION"
 
-gperf --version
+echo "Running autogen.sh"
 
-echo "Building OCServ with meson"
+chmod +x autogen.sh
+./autogen.sh
 
-meson setup build \
-    --prefix=/usr
+echo "Running configure"
 
-cd build
+chmod +x configure
 
-ninja -j$(nproc)
+./configure \
+    --prefix=/usr \
+    --sysconfdir=/etc
 
-ninja install
+echo "Building OCServ"
+
+make -j$(nproc)
+
+echo "Installing OCServ"
+
+make install
 
 echo "OCServ installed"
 
 mkdir -p /etc/ocserv
 
-cp /var/www/html/l-panel/scripts/ocserv.conf \
-    /etc/ocserv/ocserv.conf
-
-cp /var/www/html/l-panel/scripts/ocserv.service \
-    /etc/systemd/system/ocserv.service
+cp /var/www/html/l-panel/scripts/ocserv.conf /etc/ocserv/ocserv.conf
+cp /var/www/html/l-panel/scripts/ocserv.service /etc/systemd/system/ocserv.service
 
 systemctl daemon-reload
 systemctl enable ocserv
@@ -154,5 +115,5 @@ systemctl restart ocserv
 
 echo ""
 echo "=============================="
-echo "OCServ $VERSION Installed"
+echo "OCServ $VERSION Installed Successfully"
 echo "=============================="
