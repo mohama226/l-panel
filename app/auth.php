@@ -1,13 +1,19 @@
 <?php
 
-require_once "session.php";
+require_once __DIR__.'/session.php';
+
 
 
 function checkLogin(){
 
-    if(!isset($_SESSION['admin'])){
+    if(
+        !isset($_SESSION['admin'])
+    ){
 
-        header("Location:/modiran/");
+        header(
+            "Location: index.php"
+        );
+
         exit;
 
     }
@@ -15,39 +21,15 @@ function checkLogin(){
 }
 
 
+function logout(){
 
-function isSuperAdmin(){
+    session_destroy();
 
-    if(!isset($_SESSION['role'])){
-        return false;
-    }
+    header(
+        "Location: index.php"
+    );
 
-
-    return $_SESSION['role']=="superadmin";
-
-}
-
-
-
-
-function requireSuperAdmin(){
-
-    if(!isSuperAdmin()){
-
-        http_response_code(403);
-
-        die("Access Denied");
-
-    }
-
-}
-
-
-
-function adminName(){
-
-    return $_SESSION['admin'] ?? '';
-
+    exit;
 }
 
 ?>
