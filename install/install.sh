@@ -91,6 +91,7 @@ Listen ${PANEL_PORT}
 </VirtualHost>
 EOF
 
+
 echo "[*] Allowing Apache to use port ${PANEL_PORT} in SELinux..."
 semanage port -a -t http_port_t -p tcp ${PANEL_PORT} 2>/dev/null || \
 semanage port -m -t http_port_t -p tcp ${PANEL_PORT}
