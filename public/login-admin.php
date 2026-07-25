@@ -1,45 +1,34 @@
-<?php
-session_start();
-
-$error = "";
-
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $u = trim($_POST['username']);
-    $p = trim($_POST['password']);
-
-    if ($u === "admin" && $p === "1212") {
-        $_SESSION['admin'] = true;
-        header("Location: dashboard.php");
-        exit;
-    } else {
-        $error = "Invalid admin credentials.";
-    }
-}
-?>
 <!DOCTYPE html>
-<html>
+<html lang="fa">
 <head>
     <meta charset="UTF-8">
     <title>Admin Login</title>
     <link rel="stylesheet" href="assets/css/login.css">
 </head>
 <body>
-<div class="login-container">
-    <div class="login-title">Admin Login</div>
 
-    <?php if ($error): ?>
-        <div class="error-box"><?= $error ?></div>
-    <?php endif; ?>
+<div class="login-box">
+    <h2>Admin Login</h2>
 
-    <form method="post">
-        <label>Username</label>
-        <input type="text" name="username" required>
+    <form method="POST" action="auth-admin.php">
+        <div class="input-group">
+            <label>Username</label>
+            <input type="text" name="username" required>
+        </div>
 
-        <label>Password</label>
-        <input type="password" name="password" required>
+        <div class="input-group">
+            <label>Password</label>
+            <input type="password" name="password" required>
+        </div>
 
-        <button type="submit">Login</button>
+        <button class="btn">Login</button>
     </form>
+
+    <div class="switch-link">
+        <a href="login-user.php">User Login</a> |
+        <a href="login-reseller.php">Reseller Login</a>
+    </div>
 </div>
+
 </body>
 </html>
