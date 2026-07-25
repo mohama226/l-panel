@@ -9,7 +9,7 @@ echo ""
 
 read -p "Super Admin Username: " SUPERADMIN_USER
 read -p "Super Admin Password: " SUPERADMIN_PASS
-read -p "Panel Port (e.g., 80 or 8080): " PANEL_PORT
+read -p "Panel Port (e.g., 80 or 2020): " PANEL_PORT
 
 SUPERADMIN_USER=$(echo "$SUPERADMIN_USER" | tr -cd 'a-zA-Z0-9_-')
 SUPERADMIN_PASS=$(echo "$SUPERADMIN_PASS" | tr -cd 'a-zA-Z0-9_-')
@@ -41,6 +41,7 @@ echo "[*] Installing required packages..."
 dnf install -y epel-release
 dnf install -y httpd php php-mysqlnd mariadb-server git curl unzip policycoreutils-python-utils firewalld
 
+echo "[*] Enabling services..."
 systemctl enable httpd
 systemctl start httpd
 
@@ -75,7 +76,7 @@ INSERT INTO admins (username, password, role)
 VALUES ('${SUPERADMIN_USER}', '${HASHED_PASS}', 'superadmin');
 EOF
 
-echo "[*] Configuring Apache..."
+echo "[*] Writing Apache config..."
 
 CONF="/etc/httpd/conf.d/lpanel.conf"
 
@@ -91,16 +92,30 @@ Listen ${PANEL_PORT}
 </VirtualHost>
 EOF
 
-echo "[*] Allowing Apache to use port ${PANEL_PORT} in SELinux..."
+echo "[*] Configuring SELinux for custom port..."
 semanage port -a -t http_port_t -p tcp ${PANEL_PORT} 2>/dev/null || \
 semanage port -m -t http_port_t -p tcp ${PANEL_PORT}
 
-echo "[*] Opening firewall port..."
+echo "[*] Enabling and configuring firewall..."
+
+# Start and enable firewalld if not running
+if ! systemctl is-active --quiet firewalld; then
+    systemctl start firewalld
+    systemctl enable firewalld
+fi
+
+# Open panel port
 firewall-cmd --add-port=${PANEL_PORT}/tcp --permanent
 firewall-cmd --reload
 
-echo "[*] Restarting Apache..."
+echo "[*] Restarting Apache to apply new port..."
 systemctl restart httpd
+
+echo "[*] Checking if Apache is listening on port ${PANEL_PORT}..."
+if ! ss -tulnp | grep -q ":${PANEL_PORT}"; then
+    echo "ERROR: Apache is not listening on port ${PANEL_PORT}"
+    exit 1
+fi
 
 echo "[*] Installing CLI command..."
 cp "${INSTALL_DIR}/cli/l-panel.sh" /usr/bin/l-panel
