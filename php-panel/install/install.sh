@@ -10,9 +10,9 @@ echo ""
 # -----------------------------
 # Ask for Super Admin
 # -----------------------------
-read -p "Enter Super Admin Username: " SUPERADMIN_USER
-read -p "Enter Super Admin Password: " SUPERADMIN_PASS
-read -p "Enter Panel Port (e.g., 80 or 8080): " PANEL_PORT
+read -p "Super Admin Username: " SUPERADMIN_USER
+read -p "Super Admin Password: " SUPERADMIN_PASS
+read -p "Panel Port (e.g., 80 or 8080): " PANEL_PORT
 
 if [[ -z "$SUPERADMIN_USER" || -z "$SUPERADMIN_PASS" || -z "$PANEL_PORT" ]]; then
     echo "Invalid input. Installation aborted."
@@ -26,7 +26,7 @@ REPO_URL="https://github.com/mohama226/l-panel.git"
 INSTALL_DIR="/var/www/lpanel"
 DB_NAME="lpanel"
 DB_USER="lpanel_user"
-DB_PASS="$(openssl rand -hex 12)"
+DB_PASS="$(openssl rand -hex 16)"
 
 # -----------------------------
 # Detect OS
@@ -63,13 +63,17 @@ systemctl start mariadb || true
 # -----------------------------
 # Create DB
 # -----------------------------
-echo "[*] Creating database..."
+echo "[*] Creating database and user..."
+
 mysql -u root <<EOF
+DROP USER IF EXISTS '${DB_USER}'@'localhost';
 CREATE DATABASE IF NOT EXISTS ${DB_NAME};
-CREATE USER IF NOT EXISTS '${DB_USER}'@'localhost' IDENTIFIED BY '${DB_PASS}';
+CREATE USER '${DB_USER}'@'localhost' IDENTIFIED BY '${DB_PASS}';
 GRANT ALL PRIVILEGES ON ${DB_NAME}.* TO '${DB_USER}'@'localhost';
 FLUSH PRIVILEGES;
 EOF
+
+echo "[*] Database created successfully."
 
 # -----------------------------
 # Clone repo
@@ -143,11 +147,11 @@ echo "=============================================="
 echo ""
 echo "Panel URL: http://YOUR-IP:${PANEL_PORT}/"
 echo ""
-echo "Super Admin Credentials:"
+echo "Super Admin:"
 echo "  Username: ${SUPERADMIN_USER}"
 echo "  Password: ${SUPERADMIN_PASS}"
 echo ""
-echo "Database Info:"
+echo "Database:"
 echo "  DB Name: ${DB_NAME}"
 echo "  DB User: ${DB_USER}"
 echo "  DB Pass: ${DB_PASS}"
