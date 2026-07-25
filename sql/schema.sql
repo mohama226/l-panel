@@ -1,3 +1,12 @@
+-- جدول ادمین‌ها
+CREATE TABLE IF NOT EXISTS admins (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(100) UNIQUE,
+    password VARCHAR(255),
+    role ENUM('superadmin','admin','reseller') DEFAULT 'admin',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
 -- جدول کاربران پنل
 CREATE TABLE IF NOT EXISTS users (
     id INT AUTO_INCREMENT PRIMARY KEY,
@@ -27,7 +36,7 @@ CREATE TABLE IF NOT EXISTS ocserv_servers (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
--- جدول وضعیت سرورها (برای داشبورد)
+-- جدول وضعیت سرورها
 CREATE TABLE IF NOT EXISTS ocserv_status (
     id INT AUTO_INCREMENT PRIMARY KEY,
     server_id INT,
