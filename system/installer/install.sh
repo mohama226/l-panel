@@ -2,8 +2,25 @@
 
 clear
 echo "=========================================="
-echo "     L-PANEL Installer (PHP + PostgreSQL)"
+echo "        L-PANEL Auto Installer"
 echo "=========================================="
+
+# -----------------------------
+# Ask for admin credentials
+# -----------------------------
+echo ""
+read -p "Enter superadmin username: " ADMIN_USER
+read -p "Enter superadmin password: " ADMIN_PASS
+read -p "Enter panel port (default 8080): " PANEL_PORT
+
+if [ -z "$PANEL_PORT" ]; then
+    PANEL_PORT=8080
+fi
+
+echo ""
+echo "[+] Superadmin: $ADMIN_USER"
+echo "[+] Port: $PANEL_PORT"
+echo ""
 
 # -----------------------------
 # Detect OS
@@ -99,32 +116,94 @@ return [
     'db_name' => 'lpanel',
     'db_user' => 'lpaneluser',
     'db_pass' => 'lpanelpass',
+    'panel_port' => '$PANEL_PORT'
 ];
 EOF
 
 # -----------------------------
-# Create Apache/Nginx config (optional)
+# Insert superadmin into database
 # -----------------------------
-echo "[+] Creating web server config..."
+HASHED_PASS=$(php -r "echo password_hash('$ADMIN_PASS', PASSWORD_DEFAULT);")
 
-if command -v apache2 >/dev/null 2>&1 || command -v httpd >/dev/null 2>&1; then
-    echo "[+] Apache detected, configuring..."
-    cat > /etc/httpd/conf.d/lpanel.conf <<EOF
-<VirtualHost *:80>
-    DocumentRoot /var/www/l-panel/public
-    <Directory /var/www/l-panel/public>
-        AllowOverride All
-        Require all granted
-    </Directory>
-</VirtualHost>
+sudo -u postgres psql lpanel <<EOF
+INSERT INTO users (username, password, role, status)
+VALUES ('$ADMIN_USER', '$HASHED_PASS', 'owner', true);
 EOF
-    systemctl restart httpd || systemctl restart apache2
-fi
+
+# -----------------------------
+# Create systemd service
+# -----------------------------
+echo "[+] Creating systemd service..."
+
+cat > /etc/systemd/system/lpanel.service <<EOF
+[Unit]
+Description=L-PANEL PHP Service
+
+[Service]
+ExecStart=/usr/bin/php -S 0.0.0.0:$PANEL_PORT -t /var/www/l-panel/public
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
+EOF
+
+systemctl daemon-reload
+systemctl enable lpanel
+systemctl start lpanel
+
+# -----------------------------
+# Create CLI command: l-panel
+# -----------------------------
+echo "[+] Creating CLI command..."
+
+cat > /usr/bin/l-panel <<EOF
+#!/bin/bash
+
+clear
+echo "=========================================="
+echo "           L-PANEL CLI Manager"
+echo "=========================================="
+echo "1) Update panel from GitHub"
+echo "2) Restart panel service"
+echo "3) Stop panel service"
+echo "4) Start panel service"
+echo "5) Exit"
+echo "------------------------------------------"
+read -p "Choose an option: " CHOICE
+
+case \$CHOICE in
+    1)
+        echo "[+] Updating from GitHub..."
+        cd /var/www/l-panel
+        git pull
+        systemctl restart lpanel
+        echo "[+] Update completed."
+        ;;
+    2)
+        systemctl restart lpanel
+        echo "[+] Service restarted."
+        ;;
+    3)
+        systemctl stop lpanel
+        echo "[+] Service stopped."
+        ;;
+    4)
+        systemctl start lpanel
+        echo "[+] Service started."
+        ;;
+    *)
+        exit 0
+        ;;
+esac
+EOF
+
+chmod +x /usr/bin/l-panel
 
 # -----------------------------
 # Finish
 # -----------------------------
 echo "=========================================="
-echo "   ✔ نصب پنل با موفقیت انجام شد"
-echo "   آدرس پنل:  http://YOUR-IP/login.php"
+echo "   ✔ Installation completed successfully"
+echo "   Panel URL:  http://YOUR-IP:$PANEL_PORT/login.php"
+echo "   CLI Command:  l-panel"
 echo "=========================================="
