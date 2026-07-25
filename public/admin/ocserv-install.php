@@ -1,8 +1,3 @@
-
-<?php
-// صفحه مدیریت نصب ocserv
-?>
-
 <!DOCTYPE html>
 <html lang="fa">
 <head>
@@ -18,7 +13,7 @@
     <form method="POST" action="actions/install-ocserv.php">
         <div class="input-group">
             <label>Port</label>
-            <input type="number" name="port" placeholder="مثلاً 443" required>
+            <input type="number" name="port" placeholder="443" required>
         </div>
 
         <button class="btn">Install Ocserv</button>
