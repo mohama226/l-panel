@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # L-Panel PHP Installer
-# Auto OS Detection + Auto Package Install + Auto Setup
+# Auto OS Detection + Auto Package Install + Auto Setup + User Input
 
 set -e
 
@@ -8,13 +8,33 @@ REPO_URL="https://github.com/mohama226/l-panel.git"
 INSTALL_DIR="/var/www/lpanel"
 DB_NAME="lpanel"
 DB_USER="lpanel_user"
-DB_PASS="$(openssl rand -hex 12)"   # رمز تصادفی امن
+DB_PASS="$(openssl rand -hex 12)"
 
 echo ""
 echo "=============================================="
 echo "     L-Panel PHP Auto Installer"
 echo "=============================================="
 echo ""
+
+# -----------------------------
+# Ask for Super Admin
+# -----------------------------
+echo "[?] نام کاربری سوپر ادمین را وارد کنید:"
+read -r SUPERADMIN_USER
+
+echo "[?] رمز سوپر ادمین را وارد کنید:"
+read -r SUPERADMIN_PASS
+
+# -----------------------------
+# Ask for Port
+# -----------------------------
+echo "[?] پنل روی چه پورتی اجرا شود؟ (مثال: 80 یا 8080)"
+read -r PANEL_PORT
+
+if [[ -z "$PANEL_PORT" ]]; then
+    echo "[!] پورت نامعتبر است"
+    exit 1
+fi
 
 # -----------------------------
 # Detect OS
@@ -93,13 +113,36 @@ echo "[*] Importing SQL schema..."
 mysql -u "$DB_USER" -p"$DB_PASS" "$DB_NAME" < "$INSTALL_DIR/php-panel/sql/schema.sql"
 
 # -----------------------------
+# Insert Super Admin
+# -----------------------------
+echo "[*] Creating Super Admin..."
+
+HASHED_PASS=$(php -r "echo password_hash('$SUPERADMIN_PASS', PASSWORD_DEFAULT);")
+
+mysql -u "$DB_USER" -p"$DB_PASS" "$DB_NAME" <<EOF
+INSERT INTO admins (username, password, role)
+VALUES ('${SUPERADMIN_USER}', '${HASHED_PASS}', 'superadmin');
+EOF
+
+# -----------------------------
+# Update config.php
+# -----------------------------
+echo "[*] Updating config.php..."
+
+CONFIG_FILE="${INSTALL_DIR}/php-panel/app/config.php"
+
+sed -i "s/DB_PASS', '.*'/DB_PASS', '${DB_PASS}'/" "$CONFIG_FILE"
+sed -i "s/DB_USER', '.*'/DB_USER', '${DB_USER}'/" "$CONFIG_FILE"
+sed -i "s/DB_NAME', '.*'/DB_NAME', '${DB_NAME}'/" "$CONFIG_FILE"
+
+# -----------------------------
 # Configure Apache
 # -----------------------------
 echo "[*] Configuring Apache..."
 
 if [[ "$OS_ID" == "ubuntu" || "$OS_ID" == "debian" ]]; then
     cat >/etc/apache2/sites-available/lpanel.conf <<APACHECONF
-<VirtualHost *:80>
+<VirtualHost *:${PANEL_PORT}>
     ServerName lpanel.local
     DocumentRoot ${INSTALL_DIR}/php-panel/public
 
@@ -116,7 +159,7 @@ APACHECONF
 
 else
     cat >/etc/httpd/conf.d/lpanel.conf <<APACHECONF
-<VirtualHost *:80>
+<VirtualHost *:${PANEL_PORT}>
     ServerName lpanel.local
     DocumentRoot ${INSTALL_DIR}/php-panel/public
 
@@ -142,7 +185,12 @@ echo "=============================================="
 echo "   Installation Completed Successfully!"
 echo "=============================================="
 echo ""
-echo "Panel URL: http://YOUR-SERVER-IP/"
+echo "Panel URL: http://YOUR-SERVER-IP:${PANEL_PORT}/"
+echo ""
+echo "Super Admin:"
+echo "  Username: ${SUPERADMIN_USER}"
+echo "  Password: ${SUPERADMIN_PASS}"
+echo ""
 echo "Database Info:"
 echo "  DB Name: ${DB_NAME}"
 echo "  DB User: ${DB_USER}"
