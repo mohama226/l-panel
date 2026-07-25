@@ -9,15 +9,18 @@ $page_title = 'داشبورد مدیریت';
 
 ob_start();
 ?>
+
 <div class="cards">
     <div class="card">
         <div class="card-title">کل کاربران VPN</div>
         <div class="card-value">123</div>
     </div>
+
     <div class="card">
         <div class="card-title">سرورهای فعال</div>
         <div class="card-value">4</div>
     </div>
+
     <div class="card">
         <div class="card-title">نماینده‌ها</div>
         <div class="card-value">7</div>
@@ -28,6 +31,7 @@ ob_start();
     <div class="section-header">
         <h3>آخرین کاربران ساخته‌شده</h3>
     </div>
+
     <table class="table">
         <thead>
             <tr>
@@ -38,6 +42,7 @@ ob_start();
                 <th>وضعیت</th>
             </tr>
         </thead>
+
         <tbody>
             <tr>
                 <td>testuser1</td>
@@ -46,6 +51,7 @@ ob_start();
                 <td>2026-08-01</td>
                 <td><span class="badge badge-success">Active</span></td>
             </tr>
+
             <tr>
                 <td>testuser2</td>
                 <td>NL-2</td>
@@ -56,6 +62,7 @@ ob_start();
         </tbody>
     </table>
 </div>
+
 <?php
 $content = ob_get_clean();
 require __DIR__ . '/layout.php';
