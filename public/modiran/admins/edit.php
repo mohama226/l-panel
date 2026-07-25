@@ -134,13 +134,15 @@ $currentPermissions=$current->fetchAll(PDO::FETCH_COLUMN);
 include "../../includes/header.php";
 include "../../includes/sidebar.php";
 
+<link rel="stylesheet" href="../../assets/css/admin_edit.css">
+  
 ?>
 
 
 <div class="content">
 
 
-<div class="card">
+<div class="admin-edit-box">
 
 
 <h2>
