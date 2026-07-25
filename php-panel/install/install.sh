@@ -1,76 +1,56 @@
 #!/usr/bin/env bash
-# L-Panel PHP Installer
-# Auto OS Detection + Auto Package Install + Auto Setup + User Input
-
 set -e
-
-REPO_URL="https://github.com/mohama226/l-panel.git"
-INSTALL_DIR="/var/www/lpanel"
-DB_NAME="lpanel"
-DB_USER="lpanel_user"
-DB_PASS="$(openssl rand -hex 12)"
 
 echo ""
 echo "=============================================="
-echo "     L-Panel PHP Auto Installer"
+echo "      L-Panel PHP Auto Installer"
 echo "=============================================="
 echo ""
 
 # -----------------------------
 # Ask for Super Admin
 # -----------------------------
-echo "[?] نام کاربری سوپر ادمین را وارد کنید:"
-read -r SUPERADMIN_USER
+read -p "نام کاربری سوپر ادمین: " SUPERADMIN_USER
+read -p "رمز سوپر ادمین: " SUPERADMIN_PASS
+read -p "پنل روی چه پورتی اجرا شود؟ (مثال: 80 یا 8080): " PANEL_PORT
 
-echo "[?] رمز سوپر ادمین را وارد کنید:"
-read -r SUPERADMIN_PASS
-
-# -----------------------------
-# Ask for Port
-# -----------------------------
-echo "[?] پنل روی چه پورتی اجرا شود؟ (مثال: 80 یا 8080)"
-read -r PANEL_PORT
-
-if [[ -z "$PANEL_PORT" ]]; then
-    echo "[!] پورت نامعتبر است"
+if [[ -z "$SUPERADMIN_USER" || -z "$SUPERADMIN_PASS" || -z "$PANEL_PORT" ]]; then
+    echo "ورودی‌ها نامعتبر هستند."
     exit 1
 fi
+
+# -----------------------------
+# Variables
+# -----------------------------
+REPO_URL="https://github.com/mohama226/l-panel.git"
+INSTALL_DIR="/var/www/lpanel"
+DB_NAME="lpanel"
+DB_USER="lpanel_user"
+DB_PASS="$(openssl rand -hex 12)"
 
 # -----------------------------
 # Detect OS
 # -----------------------------
-echo "[*] Detecting operating system..."
-
-if [ -f /etc/os-release ]; then
-    . /etc/os-release
-    OS_ID=$ID
-else
-    echo "[!] Cannot detect OS."
-    exit 1
-fi
-
-echo "[*] OS detected: $OS_ID"
+echo "[*] Detecting OS..."
+. /etc/os-release
+OS_ID=$ID
+echo "[*] OS: $OS_ID"
 
 # -----------------------------
-# Install Packages
+# Install packages
 # -----------------------------
-echo "[*] Installing required packages..."
+echo "[*] Installing packages..."
 
 if [[ "$OS_ID" == "ubuntu" || "$OS_ID" == "debian" ]]; then
     apt update -y
-    apt install -y apache2 php php-cli php-mysql php-json php-curl php-mbstring php-xml git mariadb-server unzip curl
+    apt install -y apache2 php php-mysql mariadb-server git curl unzip
     systemctl enable apache2
     systemctl start apache2
-
-elif [[ "$OS_ID" == "almalinux" || "$OS_ID" == "centos" || "$OS_ID" == "rhel" ]]; then
+else
     dnf install -y epel-release
-    dnf install -y httpd php php-cli php-mysqlnd php-json php-mbstring php-xml git mariadb-server unzip curl
+    dnf install -y httpd php php-mysqlnd mariadb-server git curl unzip
     systemctl enable httpd
     systemctl start httpd
-
-else
-    echo "[!] Unsupported OS: $OS_ID"
-    exit 1
 fi
 
 # -----------------------------
@@ -81,42 +61,40 @@ systemctl enable mariadb || true
 systemctl start mariadb || true
 
 # -----------------------------
-# Create Database
+# Create DB
 # -----------------------------
-echo "[*] Creating database + user..."
-
+echo "[*] Creating database..."
 mysql -u root <<EOF
-CREATE DATABASE IF NOT EXISTS ${DB_NAME} CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+CREATE DATABASE IF NOT EXISTS ${DB_NAME};
 CREATE USER IF NOT EXISTS '${DB_USER}'@'localhost' IDENTIFIED BY '${DB_PASS}';
 GRANT ALL PRIVILEGES ON ${DB_NAME}.* TO '${DB_USER}'@'localhost';
 FLUSH PRIVILEGES;
 EOF
 
-echo "[*] Database created:"
-echo "    DB Name: ${DB_NAME}"
-echo "    DB User: ${DB_USER}"
-echo "    DB Pass: ${DB_PASS}"
-
 # -----------------------------
-# Clone Repository
+# Clone repo
 # -----------------------------
-echo "[*] Cloning L-Panel repository..."
-
+echo "[*] Cloning repository..."
 rm -rf "$INSTALL_DIR"
 git clone "$REPO_URL" "$INSTALL_DIR"
 
 # -----------------------------
-# Import SQL Schema
+# Import SQL
 # -----------------------------
-echo "[*] Importing SQL schema..."
+SQL_FILE="${INSTALL_DIR}/php-panel/sql/schema.sql"
 
-mysql -u "$DB_USER" -p"$DB_PASS" "$DB_NAME" < "$INSTALL_DIR/php-panel/sql/schema.sql"
+if [[ ! -f "$SQL_FILE" ]]; then
+    echo "[!] ERROR: فایل schema.sql پیدا نشد!"
+    echo "مسیر مورد انتظار: $SQL_FILE"
+    exit 1
+fi
+
+echo "[*] Importing SQL..."
+mysql -u "$DB_USER" -p"$DB_PASS" "$DB_NAME" < "$SQL_FILE"
 
 # -----------------------------
 # Insert Super Admin
 # -----------------------------
-echo "[*] Creating Super Admin..."
-
 HASHED_PASS=$(php -r "echo password_hash('$SUPERADMIN_PASS', PASSWORD_DEFAULT);")
 
 mysql -u "$DB_USER" -p"$DB_PASS" "$DB_NAME" <<EOF
@@ -125,75 +103,51 @@ VALUES ('${SUPERADMIN_USER}', '${HASHED_PASS}', 'superadmin');
 EOF
 
 # -----------------------------
-# Update config.php
-# -----------------------------
-echo "[*] Updating config.php..."
-
-CONFIG_FILE="${INSTALL_DIR}/php-panel/app/config.php"
-
-sed -i "s/DB_PASS', '.*'/DB_PASS', '${DB_PASS}'/" "$CONFIG_FILE"
-sed -i "s/DB_USER', '.*'/DB_USER', '${DB_USER}'/" "$CONFIG_FILE"
-sed -i "s/DB_NAME', '.*'/DB_NAME', '${DB_NAME}'/" "$CONFIG_FILE"
-
-# -----------------------------
-# Configure Apache
+# Apache config
 # -----------------------------
 echo "[*] Configuring Apache..."
 
 if [[ "$OS_ID" == "ubuntu" || "$OS_ID" == "debian" ]]; then
-    cat >/etc/apache2/sites-available/lpanel.conf <<APACHECONF
-<VirtualHost *:${PANEL_PORT}>
-    ServerName lpanel.local
-    DocumentRoot ${INSTALL_DIR}/php-panel/public
+    CONF="/etc/apache2/sites-available/lpanel.conf"
+else
+    CONF="/etc/httpd/conf.d/lpanel.conf"
+fi
 
+cat > "$CONF" <<EOF
+<VirtualHost *:${PANEL_PORT}>
+    DocumentRoot ${INSTALL_DIR}/php-panel/public
     <Directory ${INSTALL_DIR}/php-panel/public>
         AllowOverride All
         Require all granted
     </Directory>
 </VirtualHost>
-APACHECONF
+EOF
 
+if [[ "$OS_ID" == "ubuntu" || "$OS_ID" == "debian" ]]; then
     a2ensite lpanel.conf
     a2enmod rewrite
     systemctl reload apache2
-
 else
-    cat >/etc/httpd/conf.d/lpanel.conf <<APACHECONF
-<VirtualHost *:${PANEL_PORT}>
-    ServerName lpanel.local
-    DocumentRoot ${INSTALL_DIR}/php-panel/public
-
-    <Directory ${INSTALL_DIR}/php-panel/public>
-        AllowOverride All
-        Require all granted
-    </Directory>
-</VirtualHost>
-APACHECONF
-
     systemctl reload httpd
 fi
 
 # -----------------------------
 # Permissions
 # -----------------------------
-echo "[*] Setting permissions..."
-
 chown -R apache:apache "$INSTALL_DIR" 2>/dev/null || chown -R www-data:www-data "$INSTALL_DIR"
 
 echo ""
 echo "=============================================="
-echo "   Installation Completed Successfully!"
+echo "   نصب با موفقیت انجام شد!"
 echo "=============================================="
 echo ""
-echo "Panel URL: http://YOUR-SERVER-IP:${PANEL_PORT}/"
+echo "آدرس پنل: http://YOUR-IP:${PANEL_PORT}/"
+echo "سوپر ادمین:"
+echo "  یوزرنیم: ${SUPERADMIN_USER}"
+echo "  پسورد: ${SUPERADMIN_PASS}"
 echo ""
-echo "Super Admin:"
-echo "  Username: ${SUPERADMIN_USER}"
-echo "  Password: ${SUPERADMIN_PASS}"
-echo ""
-echo "Database Info:"
+echo "دیتابیس:"
 echo "  DB Name: ${DB_NAME}"
 echo "  DB User: ${DB_USER}"
 echo "  DB Pass: ${DB_PASS}"
 echo ""
-echo "Enjoy your L-Panel PHP!"
