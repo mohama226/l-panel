@@ -6,7 +6,6 @@ if (!isset($_SESSION['admin'])) {
 }
 
 require_once "../../app/db.php";
-
 $db = getDB();
 
 // افزودن نماینده
