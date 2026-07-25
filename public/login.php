@@ -15,31 +15,26 @@ $error = $_GET['error'] ?? null;
 <head>
     <meta charset="UTF-8">
     <title>ورود به پنل مدیریت</title>
-    <link rel="stylesheet" href="/assets/css/login.css">
-    <script src="/assets/js/login.js" defer></script>
+    <link rel="stylesheet" href="/assets/css/login.css?v=<?=time()?>"> 
 </head>
 <body>
 
-<div class="login-container">
-    <div class="login-box">
-        <h2 class="title">ورود به پنل مدیریت</h2>
+<div class="login-wrapper">
+    <div class="login-card">
+        <h2>ورود به پنل مدیریت</h2>
 
         <?php if ($error): ?>
             <div class="error"><?= htmlspecialchars($error) ?></div>
         <?php endif; ?>
 
-        <form method="POST" action="/auth/login" class="login-form">
-            <div class="input-group">
-                <label>نام کاربری</label>
-                <input type="text" name="username" required>
-            </div>
+        <form method="POST" action="/auth/login">
+            <label>نام کاربری</label>
+            <input type="text" name="username" required>
 
-            <div class="input-group">
-                <label>رمز عبور</label>
-                <input type="password" name="password" required>
-            </div>
+            <label>رمز عبور</label>
+            <input type="password" name="password" required>
 
-            <button type="submit" class="login-btn">ورود</button>
+            <button type="submit">ورود</button>
         </form>
     </div>
 </div>
