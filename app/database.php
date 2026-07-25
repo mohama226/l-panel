@@ -6,8 +6,8 @@ if (!defined('BASE_PATH')) {
 
 $dbHost = "localhost";
 $dbName = "lpanel";
-$dbUser = "lpanel";        // یوزر دیتابیس
-$dbPass = "StrongPass123"; // پسورد دیتابیس
+$dbUser = "lpanel";
+$dbPass = "StrongPass123";
 
 try {
 
