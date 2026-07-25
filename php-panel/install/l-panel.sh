@@ -17,8 +17,12 @@ read -p "Choose an option: " opt
 case "$opt" in
     1)
         echo ""
-        echo "[*] Updating panel from GitHub..."
+        echo "[*] Updating panel..."
+
         cd "$INSTALL_DIR" || { echo "Install dir not found!"; exit 1; }
+
+        # Fix Git ownership issue automatically
+        git config --global --add safe.directory "$INSTALL_DIR"
 
         BEFORE=$(mktemp)
         AFTER=$(mktemp)
@@ -34,7 +38,7 @@ case "$opt" in
         done
         echo ""
 
-        git fetch --all
+        git fetch --all >/dev/null 2>&1
         git pull
 
         git ls-files > "$AFTER"
