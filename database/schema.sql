@@ -74,3 +74,19 @@ CREATE TABLE IF NOT EXISTS users (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 
 );
+
+
+
+/* ============================= */
+/* 🔥 بخش حذف جدول‌ها (نسخه جدید) */
+/* ============================= */
+
+SET FOREIGN_KEY_CHECKS=0;
+
+DROP TABLE IF EXISTS admin_permissions;
+DROP TABLE IF EXISTS permissions;
+DROP TABLE IF EXISTS admin_logs;
+DROP TABLE IF EXISTS admins;
+DROP TABLE IF EXISTS users;
+
+SET FOREIGN_KEY_CHECKS=1;
