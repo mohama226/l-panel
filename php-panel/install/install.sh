@@ -11,6 +11,11 @@ read -p "Super Admin Username: " SUPERADMIN_USER
 read -p "Super Admin Password: " SUPERADMIN_PASS
 read -p "Panel Port (e.g., 80 or 8080): " PANEL_PORT
 
+# sanitize inputs
+SUPERADMIN_USER=$(echo "$SUPERADMIN_USER" | tr -cd 'a-zA-Z0-9_-')
+SUPERADMIN_PASS=$(echo "$SUPERADMIN_PASS" | tr -cd 'a-zA-Z0-9_-')
+PANEL_PORT=$(echo "$PANEL_PORT" | tr -cd '0-9')
+
 if [[ -z "$SUPERADMIN_USER" || -z "$SUPERADMIN_PASS" || -z "$PANEL_PORT" ]]; then
     echo "Invalid input. Installation aborted."
     exit 1
@@ -28,17 +33,14 @@ OS_ID=$ID
 echo "[*] OS Detected: $OS_ID"
 
 echo "[*] Installing required packages..."
-if [[ "$OS_ID" == "ubuntu" || "$OS_ID" == "debian" ]]; then
-    apt update -y
-    apt install -y apache2 php php-mysql mariadb-server git curl unzip policycoreutils-python-utils
-    systemctl enable apache2
-    systemctl start apache2
-else
-    dnf install -y epel-release
-    dnf install -y httpd php php-mysqlnd mariadb-server git curl unzip policycoreutils-python-utils
-    systemctl enable httpd
-    systemctl start httpd
-fi
+dnf install -y epel-release
+dnf install -y httpd php php-mysqlnd mariadb-server git curl unzip policycoreutils-python-utils firewalld
+
+systemctl enable httpd
+systemctl start httpd
+
+systemctl enable firewalld
+systemctl start firewalld
 
 echo "[*] Starting MariaDB..."
 systemctl enable mariadb || true
@@ -48,7 +50,7 @@ echo "[*] Resetting database..."
 mysql -u root <<EOF
 DROP DATABASE IF EXISTS ${DB_NAME};
 DROP USER IF EXISTS '${DB_USER}'@'localhost';
-CREATE DATABASE ${DB_NAME};
+CREATE DATABASE ${DB_NAME} CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 CREATE USER '${DB_USER}'@'localhost' IDENTIFIED BY '${DB_PASS}';
 GRANT ALL PRIVILEGES ON ${DB_NAME}.* TO '${DB_USER}'@'localhost';
 FLUSH PRIVILEGES;
@@ -75,11 +77,7 @@ EOF
 
 echo "[*] Configuring Apache..."
 
-if [[ "$OS_ID" == "ubuntu" || "$OS_ID" == "debian" ]]; then
-    CONF="/etc/apache2/sites-available/lpanel.conf"
-else
-    CONF="/etc/httpd/conf.d/lpanel.conf"
-fi
+CONF="/etc/httpd/conf.d/lpanel.conf"
 
 cat > "$CONF" <<EOF
 Listen ${PANEL_PORT}
@@ -102,17 +100,16 @@ firewall-cmd --add-port=${PANEL_PORT}/tcp --permanent
 firewall-cmd --reload
 
 echo "[*] Restarting Apache..."
-systemctl restart httpd 2>/dev/null || systemctl restart apache2
+systemctl restart httpd
 
 echo "[*] Creating CLI command..."
-
 cp "${INSTALL_DIR}/php-panel/install/l-panel.sh" /usr/bin/l-panel
 chmod +x /usr/bin/l-panel
 
 echo ""
 echo "=============================================="
 echo "   Installation Completed Successfully!"
-echo "=============================================="
+==============================================
 echo ""
 echo "Panel URL: http://YOUR-IP:${PANEL_PORT}/"
 echo ""
