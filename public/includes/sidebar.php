@@ -1,62 +1,19 @@
-<?php
-?>
+<div class="sidebar">
 
-<aside class="sidebar">
-
-    <div class="sidebar-brand">
-        <h2>
-            L-PANEL
-        </h2>
+    <div class="sidebar-header">
+        <h2>L-PANEL</h2>
     </div>
 
+    <ul class="menu">
 
-    <nav>
+        <li><a href="/modiran/dashboard.php">داشبورد</a></li>
+        <li><a href="/modiran/users/index.php">مدیریت کاربران</a></li>
+        <li><a href="/modiran/services/index.php">مدیریت سرویس‌ها</a></li>
+        <li><a href="/modiran/logs/index.php">لاگ‌ها</a></li>
+        <li><a href="/modiran/admins/index.php">مدیران</a></li>
 
+        <li><a href="/logout.php" class="logout">خروج</a></li>
 
-        <a href="/modiran/dashboard.php">
-            🏠 داشبورد
-        </a>
+    </ul>
 
-
-        <a href="/modiran/users/">
-            👥 کاربران VPN
-        </a>
-
-
-
-        <hr>
-
-
-
-        <h4>
-            مدیریت سیستم
-        </h4>
-
-
-
-        <a href="/modiran/admins/">
-            👑 مدیران
-        </a>
-
-
-        <a href="/modiran/admin_logs.php">
-            📋 لاگ مدیران
-        </a>
-
-
-
-        <a href="/modiran/services/">
-            ⚙️ تنظیمات سرویس‌ها
-        </a>
-
-
-
-        <a href="/logout.php">
-            🚪 خروج
-        </a>
-
-
-    </nav>
-
-
-</aside>
+</div>
