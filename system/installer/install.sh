@@ -2,8 +2,10 @@
 
 clear
 echo "=========================================="
-echo "        L-PANEL Auto Installer (Fixed)"
+echo "        L-PANEL Smart Installer"
 echo "=========================================="
+
+INSTALL_PATH="/var/www/l-panel"
 
 # -----------------------------
 # Ask for admin credentials
@@ -39,51 +41,63 @@ echo "[+] OS detected: $OS"
 # -----------------------------
 # Install git
 # -----------------------------
-echo "[+] Installing git..."
-if [ "$OS" = "almalinux" ]; then
-    yum install -y git
+echo "[+] Checking git..."
+if ! command -v git &> /dev/null; then
+    echo "[+] Installing git..."
+    if [ "$OS" = "almalinux" ]; then
+        yum install -y git
+    else
+        apt install -y git
+    fi
 else
-    apt install -y git
+    echo "[+] git already installed."
 fi
 
 # -----------------------------
 # Install PHP + Extensions
 # -----------------------------
-echo "[+] Installing PHP 8.2..."
-
-if [ "$OS" = "almalinux" ]; then
-    yum install -y epel-release
-    yum install -y https://rpms.remirepo.net/enterprise/remi-release-9.rpm
-    yum module reset php -y
-    yum module enable php:remi-8.2 -y
-    yum install -y php php-cli php-common php-pdo php-pgsql php-json php-mbstring php-curl php-xml php-opcache
+echo "[+] Checking PHP..."
+if ! command -v php &> /dev/null; then
+    echo "[+] Installing PHP 8.2..."
+    if [ "$OS" = "almalinux" ]; then
+        yum install -y epel-release
+        yum install -y https://rpms.remirepo.net/enterprise/remi-release-9.rpm
+        yum module reset php -y
+        yum module enable php:remi-8.2 -y
+        yum install -y php php-cli php-common php-pdo php-pgsql php-json php-mbstring php-curl php-xml php-opcache
+    else
+        apt install -y software-properties-common
+        add-apt-repository ppa:ondrej/php -y
+        apt update -y
+        apt install -y php8.2 php8.2-cli php8.2-common php8.2-pgsql php8.2-mbstring php8.2-curl php8.2-xml php8.2-opcache
+    fi
 else
-    apt install -y software-properties-common
-    add-apt-repository ppa:ondrej/php -y
-    apt update -y
-    apt install -y php8.2 php8.2-cli php8.2-common php8.2-pgsql php8.2-mbstring php8.2-curl php8.2-xml php8.2-opcache
+    echo "[+] PHP already installed."
 fi
 
 # -----------------------------
 # Install PostgreSQL
 # -----------------------------
-echo "[+] Installing PostgreSQL..."
-
-if [ "$OS" = "almalinux" ]; then
-    yum install -y postgresql-server postgresql-contrib
-    systemctl enable postgresql
-    systemctl start postgresql
+echo "[+] Checking PostgreSQL..."
+if ! command -v psql &> /dev/null; then
+    echo "[+] Installing PostgreSQL..."
+    if [ "$OS" = "almalinux" ]; then
+        yum install -y postgresql-server postgresql-contrib
+        systemctl enable postgresql
+        systemctl start postgresql
+    else
+        apt install -y postgresql postgresql-contrib
+        systemctl enable postgresql
+        systemctl start postgresql
+    fi
 else
-    apt install -y postgresql postgresql-contrib
-    systemctl enable postgresql
-    systemctl start postgresql
+    echo "[+] PostgreSQL already installed."
 fi
 
 # -----------------------------
 # Create database if not exists
 # -----------------------------
 echo "[+] Checking database..."
-
 sudo -u postgres psql -tAc "SELECT 1 FROM pg_database WHERE datname='lpanel'" | grep -q 1
 if [ $? -ne 0 ]; then
     echo "[+] Creating database lpanel..."
@@ -91,7 +105,7 @@ if [ $? -ne 0 ]; then
 CREATE DATABASE lpanel;
 EOF
 else
-    echo "[+] Database already exists, skipping."
+    echo "[+] Database already exists."
 fi
 
 # -----------------------------
@@ -105,28 +119,34 @@ CREATE USER lpaneluser WITH PASSWORD 'lpanelpass';
 GRANT ALL PRIVILEGES ON DATABASE lpanel TO lpaneluser;
 EOF
 else
-    echo "[+] PostgreSQL user already exists, skipping."
+    echo "[+] PostgreSQL user already exists."
 fi
 
 # -----------------------------
-# Clone project
+# Clone or Update project
 # -----------------------------
-echo "[+] Cloning project from GitHub..."
+echo "[+] Checking project folder..."
 
-mkdir -p /var/www/
-cd /var/www/
-rm -rf l-panel
-git clone https://github.com/mohama226/l-panel.git
+if [ -d "$INSTALL_PATH" ]; then
+    echo "[+] Project exists → updating..."
+    cd $INSTALL_PATH
+    git pull
+else
+    echo "[+] Project not found → cloning..."
+    mkdir -p /var/www/
+    cd /var/www/
+    git clone https://github.com/mohama226/l-panel.git
+fi
 
-chmod -R 755 /var/www/l-panel
-chown -R $USER:$USER /var/www/l-panel
+chmod -R 755 $INSTALL_PATH
+chown -R $USER:$USER $INSTALL_PATH
 
 # -----------------------------
 # Create config.php
 # -----------------------------
-echo "[+] Creating config.php..."
+echo "[+] Updating config.php..."
 
-cat > /var/www/l-panel/system/config.php <<EOF
+cat > $INSTALL_PATH/system/config.php <<EOF
 <?php
 return [
     'db_host' => 'localhost',
@@ -140,7 +160,7 @@ EOF
 # -----------------------------
 # Create users table if not exists
 # -----------------------------
-echo "[+] Creating users table if missing..."
+echo "[+] Checking users table..."
 
 sudo -u postgres psql lpanel <<EOF
 CREATE TABLE IF NOT EXISTS users (
@@ -153,18 +173,20 @@ CREATE TABLE IF NOT EXISTS users (
 EOF
 
 # -----------------------------
-# Insert superadmin
+# Insert superadmin if not exists
 # -----------------------------
+echo "[+] Checking superadmin..."
+
 HASHED_PASS=$(php -r "echo password_hash('$ADMIN_PASS', PASSWORD_DEFAULT);")
 
 sudo -u postgres psql lpanel <<EOF
 INSERT INTO users (username, password, role, status)
-VALUES ('$ADMIN_USER', '$HASHED_PASS', 'owner', true)
-ON CONFLICT DO NOTHING;
+SELECT '$ADMIN_USER', '$HASHED_PASS', 'owner', true
+WHERE NOT EXISTS (SELECT 1 FROM users WHERE username='$ADMIN_USER');
 EOF
 
 # -----------------------------
-# Create systemd service
+# Create or update systemd service
 # -----------------------------
 echo "[+] Creating systemd service..."
 
@@ -236,7 +258,7 @@ chmod +x /usr/bin/l-panel
 # Finish
 # -----------------------------
 echo "=========================================="
-echo "   ✔ Installation completed successfully"
+echo "   ✔ Smart install/update completed"
 echo "   Panel URL:  http://YOUR-IP:$PANEL_PORT/login.php"
 echo "   CLI Command:  l-panel"
 echo "=========================================="
