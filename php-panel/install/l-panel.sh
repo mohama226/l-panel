@@ -3,6 +3,8 @@
 INSTALL_DIR="/var/www/lpanel"
 LAST_UPDATE_FILE="${INSTALL_DIR}/.lpanel_last_update"
 
+git config --global --add safe.directory "$INSTALL_DIR"
+
 echo "=============================================="
 echo "           L-Panel CLI Manager"
 echo "=============================================="
@@ -20,9 +22,6 @@ case "$opt" in
         echo "[*] Updating panel..."
 
         cd "$INSTALL_DIR" || { echo "Install dir not found!"; exit 1; }
-
-        # Fix Git ownership issue automatically
-        git config --global --add safe.directory "$INSTALL_DIR"
 
         BEFORE=$(mktemp)
         AFTER=$(mktemp)
@@ -68,7 +67,7 @@ case "$opt" in
     2)
         echo ""
         echo "[*] Restarting Apache..."
-        systemctl restart httpd 2>/dev/null || systemctl restart apache2
+        systemctl restart httpd
         echo "[*] Apache restarted."
         ;;
     3)
