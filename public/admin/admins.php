@@ -5,8 +5,7 @@ if (!isset($_SESSION['admin'])) {
     exit;
 }
 
-require_once "../../app/db.php";
-$db = getDB();
+
 
 // افزودن ادمین جدید
 if (isset($_POST['add_admin'])) {
