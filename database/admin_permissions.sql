@@ -1,10 +1,10 @@
 CREATE TABLE IF NOT EXISTS permissions (
 
-id INT AUTO_INCREMENT PRIMARY KEY,
+    id INT AUTO_INCREMENT PRIMARY KEY,
 
-name VARCHAR(100) NOT NULL,
+    name VARCHAR(100) NOT NULL UNIQUE,
 
-title VARCHAR(150) NOT NULL
+    title VARCHAR(150) NOT NULL
 
 );
 
@@ -14,22 +14,20 @@ INSERT INTO permissions
 (name,title)
 VALUES
 
-('users_view','مشاهده کاربران'),
+('user_edit','ویرایش یوزر'),
 
-('users_create','ایجاد کاربر'),
+('user_create','ایجاد یوزر'),
 
-('users_edit','ویرایش کاربر'),
+('user_delete','حذف یوزر'),
 
-('users_delete','حذف کاربر'),
+('user_lock','لاک کردن یوزر'),
 
-('users_lock','لاک کردن کاربر'),
+('user_unlock','باز کردن لاک یوزر'),
 
-('users_unlock','باز کردن کاربر'),
+('user_view','مشاهده یوزر'),
 
-('services_manage','مدیریت سرویس ها'),
-
-('logs_view','مشاهده لاگ ها'),
+('traffic_view','مشاهده مصرف'),
 
 ('backup_manage','مدیریت بکاپ'),
 
-('settings_manage','تنظیمات پنل');
+('service_manage','مدیریت سرویس ها');
