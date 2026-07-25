@@ -1,0 +1,148 @@
+/* public/assets/css/style.css */
+
+* {
+    box-sizing: border-box;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+}
+
+body {
+    margin: 0;
+    background: #0f172a;
+    color: #e5e7eb;
+}
+
+/* صفحه لاگین */
+.auth-body {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+}
+
+.auth-container {
+    background: #111827;
+    padding: 2rem;
+    border-radius: 1rem;
+    width: 100%;
+    max-width: 400px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+}
+
+.auth-container h1 {
+    margin-bottom: 1.5rem;
+    text-align: center;
+}
+
+.auth-container label {
+    display: block;
+    margin: 0.5rem 0 0.25rem;
+}
+
+.auth-container input {
+    width: 100%;
+    padding: 0.6rem 0.8rem;
+    border-radius: 0.5rem;
+    border: 1px solid #374151;
+    background: #1f2937;
+    color: #e5e7eb;
+}
+
+.auth-container button {
+    margin-top: 1rem;
+    width: 100%;
+    padding: 0.7rem;
+    border: none;
+    border-radius: 0.5rem;
+    background: linear-gradient(135deg, #6366f1, #ec4899);
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.auth-container button:hover {
+    opacity: 0.9;
+}
+
+.alert {
+    padding: 0.6rem 0.8rem;
+    border-radius: 0.5rem;
+    margin-bottom: 0.8rem;
+    font-size: 0.9rem;
+}
+
+.alert-error {
+    background: #7f1d1d;
+    color: #fecaca;
+}
+
+/* لایه اصلی پنل */
+.layout {
+    display: flex;
+    min-height: 100vh;
+}
+
+.sidebar {
+    width: 240px;
+    background: #020617;
+    border-left: 1px solid #1f2937;
+    padding: 1rem;
+}
+
+.logo {
+    font-size: 1.4rem;
+    font-weight: 700;
+    margin-bottom: 1.5rem;
+}
+
+.menu {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.menu li {
+    margin-bottom: 0.5rem;
+}
+
+.menu a {
+    display: block;
+    padding: 0.6rem 0.8rem;
+    border-radius: 0.5rem;
+    color: #9ca3af;
+    text-decoration: none;
+}
+
+.menu a:hover {
+    background: #111827;
+    color: #e5e7eb;
+}
+
+.content {
+    flex: 1;
+    padding: 1.5rem;
+}
+
+/* جدول‌ها */
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 1rem;
+    background: #020617;
+    border-radius: 0.75rem;
+    overflow: hidden;
+}
+
+.table th,
+.table td {
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid #1f2937;
+}
+
+.table th {
+    background: #0b1120;
+    text-align: right;
+}
+
+.table tr:last-child td {
+    border-bottom: none;
+}
