@@ -18,11 +18,14 @@ $content    = $content    ?? '';
 <body>
 
 <div class="app">
+
+    <!-- Sidebar -->
     <aside class="sidebar">
         <div class="logo">
             <span class="logo-icon">LP</span>
             <span class="logo-text">L-PANEL</span>
         </div>
+
         <nav class="menu">
             <a href="/dashboard" class="menu-item">داشبورد</a>
             <a href="/servers" class="menu-item">سرورها</a>
@@ -32,7 +35,10 @@ $content    = $content    ?? '';
         </nav>
     </aside>
 
+    <!-- Main -->
     <div class="main">
+
+        <!-- Topbar -->
         <header class="topbar">
             <div class="top-title"><?= htmlspecialchars($page_title) ?></div>
             <div class="top-actions">
@@ -40,9 +46,11 @@ $content    = $content    ?? '';
             </div>
         </header>
 
+        <!-- Content -->
         <main class="content">
             <?= $content ?>
         </main>
+
     </div>
 </div>
 
