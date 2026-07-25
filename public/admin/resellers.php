@@ -6,6 +6,7 @@ if (!isset($_SESSION['admin'])) {
 }
 
 $db = new PDO("mysql:host=localhost;dbname=lpanel;charset=utf8", "lpanel_user", "lpanel_pass");
+$db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
 // افزودن نماینده
 if (isset($_POST['add_reseller'])) {
