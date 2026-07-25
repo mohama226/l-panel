@@ -5,7 +5,7 @@ if (!isset($_SESSION['admin'])) {
     exit;
 }
 
-require_once "../../app/db.php";
+require_once __DIR__ . "/../app/db.php";
 $db = getDB();
 
 if (!isset($_GET['id'])) {
@@ -44,12 +44,10 @@ if (isset($_POST['update_admin'])) {
 <head>
     <meta charset="UTF-8">
     <title>ویرایش ادمین</title>
-    <link rel="stylesheet" href="../assets/css/admin-dashboard.css">
 </head>
 <body>
 
-<div class="content">
-    <h1>✏️ ویرایش ادمین</h1>
+    <h1>ویرایش ادمین</h1>
 
     <form method="POST">
         <input type="text" name="username" value="<?php echo $admin['username']; ?>" required>
@@ -63,8 +61,6 @@ if (isset($_POST['update_admin'])) {
 
         <button name="update_admin">ذخیره تغییرات</button>
     </form>
-
-</div>
 
 </body>
 </html>
