@@ -1,20 +1,26 @@
-CREATE TABLE IF NOT EXISTS admins (
+/* ============================= */
+/* 🔥 ساخت جدول admins (نسخه جدید) */
+/* ============================= */
+
+CREATE TABLE admins(
 
     id INT AUTO_INCREMENT PRIMARY KEY,
 
-    username VARCHAR(50) UNIQUE NOT NULL,
+    username VARCHAR(50) NOT NULL UNIQUE,
 
     password VARCHAR(255) NOT NULL,
 
-    role ENUM(
-        'superadmin',
-        'admin'
-    ) DEFAULT 'admin',
+    firstname VARCHAR(100) DEFAULT NULL,
 
-    status ENUM(
-        'active',
-        'disabled'
-    ) DEFAULT 'active',
+    lastname VARCHAR(100) DEFAULT NULL,
+
+    description TEXT DEFAULT NULL,
+
+    role ENUM('superadmin','admin')
+    DEFAULT 'admin',
+
+    status ENUM('active','disabled')
+    DEFAULT 'active',
 
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 
@@ -22,7 +28,42 @@ CREATE TABLE IF NOT EXISTS admins (
 
 
 
-CREATE TABLE IF NOT EXISTS admin_permissions (
+/* ============================= */
+/* 🔥 جدول permissions */
+/* ============================= */
+
+CREATE TABLE permissions(
+
+    id INT AUTO_INCREMENT PRIMARY KEY,
+
+    name VARCHAR(100) UNIQUE NOT NULL,
+
+    title VARCHAR(150) NOT NULL
+
+);
+
+
+
+/* مقداردهی اولیه permissions */
+
+INSERT INTO permissions
+(name,title)
+VALUES
+('user_create','ایجاد یوزر'),
+('user_edit','ویرایش یوزر'),
+('user_delete','حذف یوزر'),
+('user_lock','لاک کردن یوزر'),
+('service_manage','مدیریت سرویس ها'),
+('admin_logs','مشاهده لاگ مدیران'),
+('admin_manage','مدیریت مدیران');
+
+
+
+/* ============================= */
+/* 🔥 جدول admin_permissions */
+/* ============================= */
+
+CREATE TABLE admin_permissions(
 
     id INT AUTO_INCREMENT PRIMARY KEY,
 
@@ -38,7 +79,11 @@ CREATE TABLE IF NOT EXISTS admin_permissions (
 
 
 
-CREATE TABLE IF NOT EXISTS admin_logs (
+/* ============================= */
+/* 🔥 جدول admin_logs */
+/* ============================= */
+
+CREATE TABLE admin_logs (
 
     id INT AUTO_INCREMENT PRIMARY KEY,
 
@@ -54,7 +99,11 @@ CREATE TABLE IF NOT EXISTS admin_logs (
 
 
 
-CREATE TABLE IF NOT EXISTS users (
+/* ============================= */
+/* 🔥 جدول users */
+/* ============================= */
+
+CREATE TABLE users (
 
     id INT AUTO_INCREMENT PRIMARY KEY,
 
@@ -64,10 +113,8 @@ CREATE TABLE IF NOT EXISTS users (
 
     expire_date DATE,
 
-    status ENUM(
-        'active',
-        'blocked'
-    ) DEFAULT 'active',
+    status ENUM('active','blocked')
+    DEFAULT 'active',
 
     created_by INT,
 
@@ -78,7 +125,7 @@ CREATE TABLE IF NOT EXISTS users (
 
 
 /* ============================= */
-/* 🔥 بخش حذف جدول‌ها (نسخه جدید) */
+/* 🔥 حذف جدول‌ها (نسخه جدید) */
 /* ============================= */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -90,3 +137,28 @@ DROP TABLE IF EXISTS admins;
 DROP TABLE IF EXISTS users;
 
 SET FOREIGN_KEY_CHECKS=1;
+
+
+
+/* ============================= */
+/* 🔥 ساخت ادمین اولیه (نسخه جدید) */
+/* ============================= */
+
+INSERT INTO admins
+(
+    username,
+    password,
+    firstname,
+    lastname,
+    description,
+    role
+)
+VALUES
+(
+    'admin',
+    'PASSWORD_HASH',
+    'مدیر',
+    'اصلی',
+    'Super Administrator',
+    'superadmin'
+);
