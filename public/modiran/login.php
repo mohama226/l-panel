@@ -23,9 +23,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $_SESSION['admin']     = $user['username'];
         $_SESSION['role']      = $user['role'];
         $_SESSION['admin_id']  = $user['id'];
-        $_SESSION['login_time'] = time();
 
-        // مسیر صحیح داشبورد
         header("Location: /modiran/dashboard.php");
         exit;
 
@@ -45,20 +43,34 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 <body>
 
-<div class="login-box">
+<div class="login-container">
 
-<h1>L-PANEL</h1>
-<h3>Admin Panel</h3>
+    <div class="login-box">
 
-<?php if($error): ?>
-<div class="error"><?= $error ?></div>
-<?php endif; ?>
+        <h1 class="title">L‑PANEL</h1>
+        <h3 class="subtitle">ورود مدیر سیستم</h3>
 
-<form method="post">
-    <input name="username" placeholder="Username" required>
-    <input type="password" name="password" placeholder="Password" required>
-    <button type="submit">ورود</button>
-</form>
+        <?php if($error): ?>
+        <div class="error-box"><?= $error ?></div>
+        <?php endif; ?>
+
+        <form method="post">
+
+            <div class="input-group">
+                <label>نام کاربری</label>
+                <input name="username" required>
+            </div>
+
+            <div class="input-group">
+                <label>رمز عبور</label>
+                <input type="password" name="password" required>
+            </div>
+
+            <button class="login-btn">ورود</button>
+
+        </form>
+
+    </div>
 
 </div>
 
