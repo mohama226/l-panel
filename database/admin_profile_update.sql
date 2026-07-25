@@ -1,4 +1,4 @@
 ALTER TABLE admins
-ADD firstname VARCHAR(50) NULL,
-ADD lastname VARCHAR(50) NULL,
-ADD description TEXT NULL;
+ADD COLUMN firstname VARCHAR(100) NULL AFTER username,
+ADD COLUMN lastname VARCHAR(100) NULL AFTER firstname,
+ADD COLUMN description TEXT NULL AFTER lastname;
