@@ -1,0 +1,49 @@
+#!/bin/bash
+
+clear
+echo "=========================================="
+echo "           L-PANEL CLI Manager"
+echo "=========================================="
+echo "1) Update panel from GitHub"
+echo "2) Restart panel service"
+echo "3) Stop panel service"
+echo "4) Start panel service"
+echo "5) Exit"
+echo "------------------------------------------"
+read -p "Choose an option: " CHOICE
+
+case $CHOICE in
+    1)
+        echo "[+] Updating from GitHub..."
+        cd /var/www/l-panel
+
+        echo "[+] Stashing local changes..."
+        git stash --include-untracked
+
+        echo "[+] Pulling latest version..."
+        git pull
+
+        echo "[+] Restoring local changes..."
+        git stash pop || echo "[!] Some local changes could not be auto-merged."
+
+        echo "[+] Restarting service..."
+        systemctl restart lpanel
+
+        echo "[+] Update completed."
+        ;;
+    2)
+        systemctl restart lpanel
+        echo "[+] Service restarted."
+        ;;
+    3)
+        systemctl stop lpanel
+        echo "[+] Service stopped."
+        ;;
+    4)
+        systemctl start lpanel
+        echo "[+] Service started."
+        ;;
+    *)
+        exit 0
+        ;;
+esac
