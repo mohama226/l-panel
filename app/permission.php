@@ -1,7 +1,7 @@
 <?php
 
 
-require_once "permissions.php";
+require_once __DIR__ . "/permissions.php";
 
 
 
