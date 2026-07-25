@@ -81,7 +81,6 @@ try {
     }
 
 } catch (Exception $e) {
-    // به‌جای قورت دادن خطا، نمایش برای دیباگ
     echo "<pre style='direction:ltr;text-align:left;background:#fee;padding:10px;border:1px solid #f00;'>";
     echo "Dashboard error:\n";
     echo $e->getMessage() . "\n\n";
@@ -126,13 +125,11 @@ include BASE_PATH . "/public/includes/sidebar.php";
 
     </div>
 
-    <!-- نمودار -->
     <div class="panel-box">
         <h2>📊 مصرف روزانه آپلود و دانلود</h2>
         <canvas id="trafficChart" style="max-height:320px;"></canvas>
     </div>
 
-    <!-- جدول‌ها -->
     <div class="dashboard-tables">
 
         <div class="panel-box">
@@ -195,7 +192,7 @@ include BASE_PATH . "/public/includes/sidebar.php";
 
         </div>
 
-    </div> <!-- پایان dashboard-tables -->
+    </div>
 
     <div class="panel-box">
 
