@@ -7,7 +7,7 @@
 
 /* پس‌زمینه */
 body {
-    background: #0d1b2a; /* رنگ اولیه */
+    background: #0d1b2a;
     font-family: Vazirmatn, sans-serif;
     direction: rtl;
     text-align: right;
@@ -18,10 +18,10 @@ body {
     align-items: center;
 }
 
-/* باکس لاگین ساده */
+/* باکس لاگین */
 .login-box {
     width: 300px;
-    background: #1b263b; /* رنگ اولیه */
+    background: #1b263b;
     padding: 25px;
     border-radius: 8px;
     color: #fff;
@@ -47,7 +47,7 @@ body {
     display: block;
 }
 
-/* فیلدهای ورودی ساده */
+/* فیلدهای ورودی */
 .input-group input {
     width: 100%;
     padding: 10px;
@@ -58,7 +58,7 @@ body {
     font-size: 14px;
 }
 
-/* دکمه ساده */
+/* دکمه */
 .btn {
     width: 100%;
     padding: 10px;
