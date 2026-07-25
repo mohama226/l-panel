@@ -1,103 +1,126 @@
 #!/usr/bin/env bash
-# install/install.sh
-
 set -e
 
+echo ""
+echo "=============================================="
+echo "      L-Panel PHP Auto Installer"
+echo "=============================================="
+echo ""
+
+read -p "Super Admin Username: " SUPERADMIN_USER
+read -p "Super Admin Password: " SUPERADMIN_PASS
+read -p "Panel Port (e.g., 80 or 8080): " PANEL_PORT
+
+# sanitize inputs
+SUPERADMIN_USER=$(echo "$SUPERADMIN_USER" | tr -cd 'a-zA-Z0-9_-')
+SUPERADMIN_PASS=$(echo "$SUPERADMIN_PASS" | tr -cd 'a-zA-Z0-9_-')
+PANEL_PORT=$(echo "$PANEL_PORT" | tr -cd '0-9')
+
+if [[ -z "$SUPERADMIN_USER" || -z "$SUPERADMIN_PASS" || -z "$PANEL_PORT" ]]; then
+    echo "Invalid input. Installation aborted."
+    exit 1
+fi
+
 REPO_URL="https://github.com/mohama226/l-panel.git"
-APP_DIR="/var/www/lpanel"
+INSTALL_DIR="/var/www/lpanel"
 DB_NAME="lpanel"
 DB_USER="lpanel_user"
-DB_PASS="strong_password_here"
+DB_PASS="$(openssl rand -hex 16)"
 
 echo "[*] Detecting OS..."
-if [ -f /etc/os-release ]; then
-    . /etc/os-release
-    OS_ID=$ID
-else
-    echo "Cannot detect OS."
-    exit 1
-fi
+. /etc/os-release
+OS_ID=$ID
+echo "[*] OS Detected: $OS_ID"
 
-echo "[*] Updating packages..."
-if [[ "$OS_ID" == "ubuntu" || "$OS_ID" == "debian" ]]; then
-    apt update
-    apt install -y apache2 php php-mysql git mariadb-server
-    systemctl enable apache2
-    systemctl start apache2
-elif [[ "$OS_ID" == "almalinux" || "$OS_ID" == "centos" || "$OS_ID" == "rhel" ]]; then
-    dnf install -y httpd php php-mysqlnd git mariadb-server
-    systemctl enable httpd
-    systemctl start httpd
-else
-    echo "Unsupported OS: $OS_ID"
-    exit 1
-fi
+echo "[*] Installing required packages..."
+dnf install -y epel-release
+dnf install -y httpd php php-mysqlnd mariadb-server git curl unzip policycoreutils-python-utils firewalld
+
+systemctl enable httpd
+systemctl start httpd
+
+systemctl enable firewalld
+systemctl start firewalld
 
 echo "[*] Starting MariaDB..."
 systemctl enable mariadb || true
 systemctl start mariadb || true
 
-echo "[*] Creating database and user..."
+echo "[*] Resetting database..."
 mysql -u root <<EOF
-CREATE DATABASE IF NOT EXISTS ${DB_NAME} CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-CREATE USER IF NOT EXISTS '${DB_USER}'@'localhost' IDENTIFIED BY '${DB_PASS}';
+DROP DATABASE IF EXISTS ${DB_NAME};
+DROP USER IF EXISTS '${DB_USER}'@'localhost';
+CREATE DATABASE ${DB_NAME} CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
+CREATE USER '${DB_USER}'@'localhost' IDENTIFIED BY '${DB_PASS}';
 GRANT ALL PRIVILEGES ON ${DB_NAME}.* TO '${DB_USER}'@'localhost';
 FLUSH PRIVILEGES;
 EOF
 
 echo "[*] Cloning repository..."
-if [ ! -d "$APP_DIR" ]; then
-    git clone "$REPO_URL" "$APP_DIR"
-else
-    cd "$APP_DIR"
-    git pull
+rm -rf "$INSTALL_DIR"
+git clone "$REPO_URL" "$INSTALL_DIR"
+
+SQL_FILE="${INSTALL_DIR}/public/sql/schema.sql"
+if [[ ! -f "$SQL_FILE" ]]; then
+    echo "[!] ERROR: schema.sql not found!"
+    exit 1
 fi
 
-echo "[*] Copying PHP panel..."
-mkdir -p "$APP_DIR/php-panel/public"
-mkdir -p "$APP_DIR/php-panel/app"
-mkdir -p "$APP_DIR/php-panel/sql"
-mkdir -p "$APP_DIR/php-panel/install"
+echo "[*] Importing SQL..."
+mysql -u "$DB_USER" -p"$DB_PASS" "$DB_NAME" < "$SQL_FILE"
 
-# فرض می‌کنیم فایل‌هایی که بالا دادم رو خودت در ریپو می‌گذاری
-# این اسکریپت فقط اسکیمای دیتابیس را اجرا می‌کند:
-
-mysql -u "$DB_USER" -p"$DB_PASS" "$DB_NAME" < "$APP_DIR/php-panel/sql/schema.sql"
-
-echo "[*] Setting permissions..."
-chown -R www-data:www-data "$APP_DIR" || chown -R apache:apache "$APP_DIR"
+HASHED_PASS=$(php -r "echo password_hash('$SUPERADMIN_PASS', PASSWORD_DEFAULT);")
+mysql -u "$DB_USER" -p"$DB_PASS" "$DB_NAME" <<EOF
+INSERT INTO admins (username, password, role)
+VALUES ('${SUPERADMIN_USER}', '${HASHED_PASS}', 'superadmin');
+EOF
 
 echo "[*] Configuring Apache..."
-if [[ "$OS_ID" == "ubuntu" || "$OS_ID" == "debian" ]]; then
-    cat >/etc/apache2/sites-available/lpanel.conf <<APACHECONF
-<VirtualHost *:80>
-    ServerName lpanel.local
-    DocumentRoot ${APP_DIR}/php-panel/public
 
-    <Directory ${APP_DIR}/php-panel/public>
+CONF="/etc/httpd/conf.d/lpanel.conf"
+
+cat > "$CONF" <<EOF
+Listen ${PANEL_PORT}
+
+<VirtualHost *:${PANEL_PORT}>
+    DocumentRoot ${INSTALL_DIR}/public
+    <Directory ${INSTALL_DIR}/public>
         AllowOverride All
         Require all granted
     </Directory>
 </VirtualHost>
-APACHECONF
+EOF
 
-    a2ensite lpanel.conf
-    systemctl reload apache2
-else
-    cat >/etc/httpd/conf.d/lpanel.conf <<APACHECONF
-<VirtualHost *:80>
-    ServerName lpanel.local
-    DocumentRoot ${APP_DIR}/php-panel/public
+echo "[*] Allowing Apache to use port ${PANEL_PORT} in SELinux..."
+semanage port -a -t http_port_t -p tcp ${PANEL_PORT} 2>/dev/null || \
+semanage port -m -t http_port_t -p tcp ${PANEL_PORT}
 
-    <Directory ${APP_DIR}/php-panel/public>
-        AllowOverride All
-        Require all granted
-    </Directory>
-</VirtualHost>
-APACHECONF
+echo "[*] Opening firewall port..."
+firewall-cmd --add-port=${PANEL_PORT}/tcp --permanent
+firewall-cmd --reload
 
-    systemctl reload httpd
-fi
+echo "[*] Restarting Apache..."
+systemctl restart httpd
 
-echo "[*] Installation finished."
-echo "Open: http://your-server-ip/ (or configure DNS for lpanel.local)"
+echo "[*] Creating CLI command..."
+cp "${INSTALL_DIR}/install/l-panel.sh" /usr/bin/l-panel
+chmod +x /usr/bin/l-panel
+
+echo ""
+echo "=============================================="
+echo "   Installation Completed Successfully!"
+echo "=============================================="
+echo ""
+echo "Panel URL: http://YOUR-IP:${PANEL_PORT}/"
+echo ""
+echo "Super Admin:"
+echo "  Username: ${SUPERADMIN_USER}"
+echo "  Password: ${SUPERADMIN_PASS}"
+echo ""
+echo "Database:"
+echo "  DB Name: ${DB_NAME}"
+echo "  DB User: ${DB_USER}"
+echo "  DB Pass: ${DB_PASS}"
+echo ""
+echo "CLI Command Installed: l-panel"
+echo ""
