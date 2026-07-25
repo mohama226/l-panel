@@ -1,16 +1,15 @@
-/* ریست اولیه */
+/* ریست */
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
 }
 
-/* پس‌زمینه */
+/* پس‌زمینه مدرن */
 body {
-    background: #0d1b2a;
+    background: linear-gradient(135deg, #0d1117, #1b1f24);
     font-family: Vazirmatn, sans-serif;
     direction: rtl;
-    text-align: right;
     min-height: 100vh;
 
     display: flex;
@@ -18,72 +17,98 @@ body {
     align-items: center;
 }
 
-/* باکس لاگین */
-.login-box {
-    width: 300px;
-    background: #1b263b;
-    padding: 25px;
-    border-radius: 8px;
-    color: #fff;
-    border: 1px solid rgba(255,255,255,0.1);
+/* کانتینر */
+.login-wrapper {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
+
+/* کارت لاگین حرفه‌ای */
+.login-card {
+    width: 360px;
+    background: #161b22;
+    padding: 40px;
+    border-radius: 16px;
+    border: 1px solid #30363d;
+    box-shadow: 0 10px 35px rgba(0,0,0,0.55);
+
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
 }
 
 /* عنوان */
-.login-box h2 {
+.login-card h2 {
     text-align: center;
-    font-size: 20px;
-    margin-bottom: 20px;
+    font-size: 24px;
+    font-weight: 700;
+    color: #f0f6fc;
 }
 
 /* گروه ورودی */
 .input-group {
-    margin-bottom: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
 }
 
 /* لیبل */
 .input-group label {
-    font-size: 14px;
-    margin-bottom: 6px;
-    display: block;
+    font-size: 15px;
+    color: #c9d1d9;
 }
 
-/* فیلدهای ورودی */
+/* فیلدهای ورودی حرفه‌ای */
 .input-group input {
     width: 100%;
-    padding: 10px;
-    border-radius: 6px;
-    border: 1px solid #2e3a55;
-    background: #0f1a2b;
-    color: #fff;
-    font-size: 14px;
+    padding: 12px;
+    border-radius: 10px;
+    border: 1px solid #30363d;
+    background: #0d1117;
+    color: #f0f6fc;
+    font-size: 15px;
+    transition: 0.25s;
+}
+
+.input-group input:focus {
+    border-color: #58a6ff;
+    background: #161b22;
+    outline: none;
+    box-shadow: 0 0 10px rgba(88,166,255,0.4);
 }
 
 /* دکمه */
 .btn {
     width: 100%;
-    padding: 10px;
-    background: #4f7cff;
+    padding: 12px;
+    background: #238636;
     border: none;
-    border-radius: 6px;
+    border-radius: 10px;
     color: #fff;
-    font-size: 15px;
+    font-size: 16px;
     cursor: pointer;
+    font-weight: 600;
+    transition: 0.25s;
 }
 
 .btn:hover {
-    background: #3a63d6;
+    background: #2ea043;
+    box-shadow: 0 0 12px rgba(46,160,67,0.5);
 }
 
 /* لینک‌های پایین */
 .switch-link {
     text-align: center;
-    margin-top: 10px;
+    margin-top: 5px;
 }
 
 .switch-link a {
-    color: #bfc4ff;
+    color: #8b949e;
     text-decoration: none;
-    font-size: 13px;
+    font-size: 14px;
+    margin: 0 6px;
+    transition: 0.2s;
 }
 
 .switch-link a:hover {
