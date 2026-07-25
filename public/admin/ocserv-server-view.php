@@ -5,16 +5,16 @@ if (!isset($_SESSION['admin'])) {
     exit;
 }
 
+require_once "../../app/db.php";
+
+$db = getDB();
+
 if (!isset($_GET['id'])) {
     die("Server ID not provided.");
 }
 
 $server_id = intval($_GET['id']);
 
-$db = new PDO("mysql:host=localhost;dbname=lpanel;charset=utf8", "lpanel_user", "lpanel_pass");
-$db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-
-// گرفتن اطلاعات سرور
 $stmt = $db->prepare("SELECT * FROM ocserv_servers WHERE id = ?");
 $stmt->execute([$server_id]);
 $server = $stmt->fetch(PDO::FETCH_ASSOC);
@@ -54,12 +54,6 @@ if (!$server) {
         </div>
 
     </div>
-
-    <hr>
-
-    <h2>عملیات</h2>
-
-    <a class="btn-danger" href="ocserv-servers.php?delete=<?php echo $server_id; ?>">🗑 حذف سرور</a>
 
 </div>
 
