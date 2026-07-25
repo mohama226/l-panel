@@ -60,9 +60,11 @@ echo "[*] Cloning repository..."
 rm -rf "$INSTALL_DIR"
 git clone "$REPO_URL" "$INSTALL_DIR"
 
-SQL_FILE="${INSTALL_DIR}/public/sql/schema.sql"
+# SQL FILE LOCATION (CORRECTED)
+SQL_FILE="${INSTALL_DIR}/sql/schema.sql"
+
 if [[ ! -f "$SQL_FILE" ]]; then
-    echo "[!] ERROR: schema.sql not found!"
+    echo "[!] ERROR: schema.sql not found in /sql/"
     exit 1
 fi
 
@@ -91,7 +93,6 @@ Listen ${PANEL_PORT}
 </VirtualHost>
 EOF
 
-
 echo "[*] Allowing Apache to use port ${PANEL_PORT} in SELinux..."
 semanage port -a -t http_port_t -p tcp ${PANEL_PORT} 2>/dev/null || \
 semanage port -m -t http_port_t -p tcp ${PANEL_PORT}
@@ -103,8 +104,9 @@ firewall-cmd --reload
 echo "[*] Restarting Apache..."
 systemctl restart httpd
 
+# CORRECT CLI PATH
 echo "[*] Creating CLI command..."
-cp "${INSTALL_DIR}/install/l-panel.sh" /usr/bin/l-panel
+cp "${INSTALL_DIR}/cli/l-panel.sh" /usr/bin/l-panel
 chmod +x /usr/bin/l-panel
 
 echo ""
