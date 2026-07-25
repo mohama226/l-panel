@@ -14,9 +14,9 @@ INSERT INTO permissions
 (name,title)
 VALUES
 
-('user_edit','ویرایش یوزر'),
-
 ('user_create','ایجاد یوزر'),
+
+('user_edit','ویرایش یوزر'),
 
 ('user_delete','حذف یوزر'),
 
@@ -24,10 +24,11 @@ VALUES
 
 ('user_unlock','باز کردن لاک یوزر'),
 
-('user_view','مشاهده یوزر'),
+('user_view','مشاهده یوزرها'),
 
-('traffic_view','مشاهده مصرف'),
+('service_manage','مدیریت سرویس‌ها'),
 
-('backup_manage','مدیریت بکاپ'),
+('admin_logs','مشاهده لاگ مدیران')
 
-('service_manage','مدیریت سرویس ها');
+ON DUPLICATE KEY UPDATE
+title=VALUES(title);
