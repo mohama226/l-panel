@@ -7,8 +7,8 @@ TARGET_DIR="/var/www/lpanel"
 rm -rf $TARGET_DIR
 mkdir -p $TARGET_DIR
 
-echo "📥 Pulling latest version from GitHub..."
-git clone https://github.com/mohama226/l-panel $TARGET_DIR
+echo "📥 Copying project..."
+cp -r ./ $TARGET_DIR
 
 echo "📁 Setting permissions..."
 chown -R apache:apache $TARGET_DIR
@@ -51,7 +51,7 @@ FLUSH PRIVILEGES;
 EOF
 
 echo "📦 Importing schema..."
-mysql -u lpanel_user -plpanel_pass lpanel < $TARGET_DIR/sql/schema.sql
+mysql -u lpanel_user -plpanel_pass lpanel < /var/www/lpanel/sql/schema.sql
 
 echo "✅ Installation completed!"
 echo "Panel is now available at: http://YOUR-IP:2096"
