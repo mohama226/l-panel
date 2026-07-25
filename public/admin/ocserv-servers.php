@@ -6,15 +6,17 @@ if (!isset($_SESSION['admin'])) {
 }
 
 $db = new PDO("mysql:host=localhost;dbname=lpanel;charset=utf8", "lpanel_user", "lpanel_pass");
+$db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
 
-// اضافه کردن سرور جدید
+// افزودن سرور جدید
 if (isset($_POST['add_server'])) {
     $ip = $_POST['ip'];
     $ssh_user = $_POST['ssh_user'];
     $ssh_pass = $_POST['ssh_pass'];
+    $ssh_port = $_POST['ssh_port'];
 
-    $stmt = $db->prepare("INSERT INTO ocserv_servers (ip, ssh_user, ssh_pass) VALUES (?, ?, ?)");
-    $stmt->execute([$ip, $ssh_user, $ssh_pass]);
+    $stmt = $db->prepare("INSERT INTO ocserv_servers (ip, ssh_user, ssh_pass, ssh_port) VALUES (?, ?, ?, ?)");
+    $stmt->execute([$ip, $ssh_user, $ssh_pass, $ssh_port]);
 }
 
 // گرفتن لیست سرورها
@@ -37,6 +39,7 @@ $servers = $db->query("SELECT * FROM ocserv_servers")->fetchAll(PDO::FETCH_ASSOC
         <input type="text" name="ip" placeholder="IP سرور" required>
         <input type="text" name="ssh_user" placeholder="SSH User" required>
         <input type="password" name="ssh_pass" placeholder="SSH Password" required>
+        <input type="number" name="ssh_port" placeholder="SSH Port" value="22" required>
         <button name="add_server">افزودن سرور</button>
     </form>
 
@@ -45,6 +48,7 @@ $servers = $db->query("SELECT * FROM ocserv_servers")->fetchAll(PDO::FETCH_ASSOC
         <tr>
             <th>IP</th>
             <th>SSH User</th>
+            <th>SSH Port</th>
             <th>عملیات</th>
         </tr>
 
@@ -52,6 +56,7 @@ $servers = $db->query("SELECT * FROM ocserv_servers")->fetchAll(PDO::FETCH_ASSOC
         <tr>
             <td><?php echo $s['ip']; ?></td>
             <td><?php echo $s['ssh_user']; ?></td>
+            <td><?php echo $s['ssh_port']; ?></td>
             <td>
                 <a href="ocserv-server-view.php?id=<?php echo $s['id']; ?>">مشاهده</a>
             </td>
