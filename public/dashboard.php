@@ -63,6 +63,8 @@ $ocserv_status = trim(shell_exec("systemctl is-active ocserv"));
         <li><a href="users.php">👤 مدیریت کاربران</a></li>
         <li><a href="settings.php">⚙️ تنظیمات پنل</a></li>
         <li><a href="logs.php">📄 لاگ‌ها</a></li>
+        <li><a href="admin/admins.php">👑 مدیریت ادمین‌ها</a></li>
+
 
         <!-- Multi Server Manager -->
         <li><a href="admin/ocserv-servers.php">🌐 تنظیمات سرورهای Ocserv</a></li>
