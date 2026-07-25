@@ -7,26 +7,28 @@
 </head>
 <body>
 
-<div class="login-box">
-    <h2>Reseller Login</h2>
+<div class="login-wrapper">
+    <div class="login-card">
+        <h2>Reseller Login</h2>
 
-    <form method="POST" action="auth-reseller.php">
-        <div class="input-group">
-            <label>Username</label>
-            <input type="text" name="username" required>
+        <form method="POST" action="auth-reseller.php">
+            <div class="input-group">
+                <label>Username</label>
+                <input type="text" name="username" required>
+            </div>
+
+            <div class="input-group">
+                <label>Password</label>
+                <input type="password" name="password" required>
+            </div>
+
+            <button class="btn">Login</button>
+        </form>
+
+        <div class="switch-link">
+            <a href="login-admin.php">Admin Login</a> |
+            <a href="login-user.php">User Login</a>
         </div>
-
-        <div class="input-group">
-            <label>Password</label>
-            <input type="password" name="password" required>
-        </div>
-
-        <button class="btn">Login</button>
-    </form>
-
-    <div class="switch-link">
-        <a href="login-admin.php">Admin Login</a> |
-        <a href="login-user.php">User Login</a>
     </div>
 </div>
 
