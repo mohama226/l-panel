@@ -1,4 +1,4 @@
 ALTER TABLE admins
-ADD COLUMN firstname varchar(50) DEFAULT NULL,
-ADD COLUMN lastname varchar(50) DEFAULT NULL,
-ADD COLUMN description text DEFAULT NULL;
+ADD firstname VARCHAR(50) NULL,
+ADD lastname VARCHAR(50) NULL,
+ADD description TEXT NULL;
