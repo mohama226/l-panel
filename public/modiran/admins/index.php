@@ -1,8 +1,8 @@
 <?php
 
 require "../../../app/auth.php";
-require "../../../app/permission.php";
 require "../../../app/database.php";
+require "../../../app/permission.php";
 
 
 checkLogin();
@@ -10,10 +10,10 @@ checkLogin();
 requireSuperAdmin();
 
 
-$admins=$db->query(
-    "SELECT * FROM admins ORDER BY id DESC"
-)->fetchAll();
 
+$admins=$db->query(
+"SELECT * FROM admins ORDER BY id DESC"
+)->fetchAll();
 
 
 include "../../includes/header.php";
@@ -22,88 +22,57 @@ include "../../includes/sidebar.php";
 ?>
 
 
-<div class="content">
+<link rel="stylesheet" href="/assets/css/admins.css">
 
 
-<div class="page-title">
-
-<h1>
-👑 مدیریت مدیران
-</h1>
-
-<p>
-مدیریت حساب‌های مدیریتی پنل L-PANEL
-</p>
-
-</div>
-
+<div class="admin-page">
 
 
 <div class="admin-box">
 
 
-<div class="admin-header">
+<div class="admin-title">
 
-
-<h2>
-لیست مدیران
-</h2>
-
-
-
-<a class="add-admin-btn" href="add.php">
-➕ افزودن مدیر
-</a>
-
+👑 مدیریت مدیران
 
 </div>
 
 
+<a class="admin-btn" href="add.php">
 
+➕ افزودن مدیر
 
+</a>
 
-<div class="table-wrapper">
 
 
 <table class="admin-table">
 
 
-<thead>
-
 <tr>
-
-<th>
-شناسه
-</th>
-
 
 <th>
 نام کاربری
 </th>
 
-
 <th>
-سطح دسترسی
+نام
 </th>
 
+<th>
+نقش
+</th>
 
 <th>
 وضعیت
 </th>
 
-
 <th>
 عملیات
 </th>
 
-
 </tr>
 
-</thead>
-
-
-
-<tbody>
 
 
 <?php foreach($admins as $a): ?>
@@ -113,48 +82,38 @@ include "../../includes/sidebar.php";
 
 
 <td>
-<?=$a['id']?>
+<?=$a['username']?>
 </td>
-
-
-
-<td class="username">
-
-👤 <?=$a['username']?>
-
-</td>
-
 
 
 <td>
 
-<span class="role-badge">
+<?=$a['first_name']." ".$a['last_name']?>
+
+</td>
+
+
+<td>
 
 <?=$a['role']?>
 
-</span>
-
 </td>
 
 
 
 <td>
 
-
 <?php if($a['status']=="active"): ?>
 
-<span class="status-active">
+<span class="badge badge-green">
 فعال
 </span>
 
-
 <?php else: ?>
 
-
-<span class="status-disabled">
+<span class="badge badge-red">
 غیرفعال
 </span>
-
 
 <?php endif; ?>
 
@@ -166,19 +125,19 @@ include "../../includes/sidebar.php";
 <td>
 
 
-<a class="edit-btn"
-href="edit.php?id=<?=$a['id']?>">
-✏️ ویرایش
+<a href="edit.php?id=<?=$a['id']?>">
+
+ویرایش
+
 </a>
 
 
 
-<a class="delete-btn"
-href="delete.php?id=<?=$a['id']?>"
-onclick="return confirm('حذف شود؟')">
-🗑 حذف
-</a>
+<a href="delete.php?id=<?=$a['id']?>">
 
+حذف
+
+</a>
 
 
 </td>
@@ -190,20 +149,14 @@ onclick="return confirm('حذف شود؟')">
 <?php endforeach; ?>
 
 
-</tbody>
-
-
 </table>
 
 
-</div>
-
 
 </div>
 
 
 </div>
-
 
 
 <?php include "../../includes/footer.php"; ?>
