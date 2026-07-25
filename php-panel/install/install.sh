@@ -109,7 +109,7 @@ chmod +x /usr/bin/l-panel
 echo ""
 echo "=============================================="
 echo "   Installation Completed Successfully!"
-==============================================
+echo "=============================================="
 echo ""
 echo "Panel URL: http://YOUR-IP:${PANEL_PORT}/"
 echo ""
