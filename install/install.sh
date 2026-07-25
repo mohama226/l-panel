@@ -1,141 +1,59 @@
-#!/usr/bin/env bash
-set -e
+#!/bin/bash
 
-echo ""
-echo "=============================================="
-echo "      L-Panel PHP Auto Installer"
-echo "=============================================="
-echo ""
+echo "🔧 Installing L-Panel..."
 
-read -p "Super Admin Username: " SUPERADMIN_USER
-read -p "Super Admin Password: " SUPERADMIN_PASS
-read -p "Panel Port (e.g., 80 or 2020): " PANEL_PORT
+# مسیر اصلی پنل
+TARGET_DIR="/var/www/lpanel"
 
-SUPERADMIN_USER=$(echo "$SUPERADMIN_USER" | tr -cd 'a-zA-Z0-9_-')
-SUPERADMIN_PASS=$(echo "$SUPERADMIN_PASS" | tr -cd 'a-zA-Z0-9_-')
-PANEL_PORT=$(echo "$PANEL_PORT" | tr -cd '0-9')
+# پاک کردن نسخه قبلی
+rm -rf $TARGET_DIR
+mkdir -p $TARGET_DIR
 
-if [[ -z "$SUPERADMIN_USER" || -z "$SUPERADMIN_PASS" || -z "$PANEL_PORT" ]]; then
-    echo "Invalid input. Installation aborted."
-    exit 1
-fi
+echo "📥 Pulling latest version from GitHub..."
+git clone https://github.com/mohama226/l-panel $TARGET_DIR
 
-REPO_URL="https://github.com/mohama226/l-panel.git"
-INSTALL_DIR="/var/www/lpanel"
-DB_NAME="lpanel"
-DB_USER="lpanel_user"
-DB_PASS="$(openssl rand -hex 16)"
+echo "📁 Setting permissions..."
+chown -R apache:apache $TARGET_DIR
+chmod -R 755 $TARGET_DIR
 
-echo "[*] Cleaning previous installation..."
+echo "⚙️ Creating Apache config..."
 
-rm -rf /var/www/lpanel
-rm -f /etc/httpd/conf.d/lpanel.conf
-rm -f /usr/bin/l-panel
+cat >/etc/httpd/conf.d/lpanel.conf <<EOF
+Listen 2096
 
-# Restart httpd only if installed
-if systemctl list-unit-files | grep -q httpd; then
-    systemctl restart httpd || true
-fi
+<VirtualHost *:2096>
+    ServerName lpanel.local
+    DocumentRoot /var/www/lpanel/public
 
-echo "[*] Installing required packages..."
-dnf install -y epel-release
-dnf install -y httpd php php-mysqlnd mariadb-server git curl unzip policycoreutils-python-utils firewalld
-
-echo "[*] Enabling services..."
-systemctl enable httpd
-systemctl start httpd
-
-systemctl enable mariadb
-systemctl start mariadb
-
-echo "[*] Resetting database..."
-mysql -u root <<EOF
-DROP DATABASE IF EXISTS ${DB_NAME};
-DROP USER IF EXISTS '${DB_USER}'@'localhost';
-CREATE DATABASE ${DB_NAME} CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
-CREATE USER '${DB_USER}'@'localhost' IDENTIFIED BY '${DB_PASS}';
-GRANT ALL PRIVILEGES ON ${DB_NAME}.* TO '${DB_USER}'@'localhost';
-FLUSH PRIVILEGES;
-EOF
-
-echo "[*] Cloning repository..."
-git clone "$REPO_URL" "$INSTALL_DIR"
-
-SQL_FILE="${INSTALL_DIR}/sql/schema.sql"
-if [[ ! -f "$SQL_FILE" ]]; then
-    echo "[!] ERROR: schema.sql not found!"
-    exit 1
-fi
-
-echo "[*] Importing SQL..."
-mysql -u "$DB_USER" -p"$DB_PASS" "$DB_NAME" < "$SQL_FILE"
-
-HASHED_PASS=$(php -r "echo password_hash('$SUPERADMIN_PASS', PASSWORD_DEFAULT);")
-mysql -u "$DB_USER" -p"$DB_PASS" "$DB_NAME" <<EOF
-INSERT INTO admins (username, password, role)
-VALUES ('${SUPERADMIN_USER}', '${HASHED_PASS}', 'superadmin');
-EOF
-
-echo "[*] Writing Apache config..."
-
-CONF="/etc/httpd/conf.d/lpanel.conf"
-
-cat > "$CONF" <<EOF
-Listen ${PANEL_PORT}
-
-<VirtualHost *:${PANEL_PORT}>
-    DocumentRoot ${INSTALL_DIR}/public
-    <Directory ${INSTALL_DIR}/public>
+    <Directory /var/www/lpanel/public>
         AllowOverride All
         Require all granted
     </Directory>
+
+    <FilesMatch \.php$>
+        SetHandler "proxy:unix:/var/run/php-fpm/www.sock|fcgi://localhost"
+    </FilesMatch>
+
+    ErrorLog /var/log/httpd/lpanel_error.log
+    CustomLog /var/log/httpd/lpanel_access.log combined
 </VirtualHost>
 EOF
 
-echo "[*] Configuring SELinux for custom port..."
-semanage port -a -t http_port_t -p tcp ${PANEL_PORT} 2>/dev/null || \
-semanage port -m -t http_port_t -p tcp ${PANEL_PORT}
-
-echo "[*] Enabling and configuring firewall..."
-
-# Start and enable firewalld if not running
-if ! systemctl is-active --quiet firewalld; then
-    systemctl start firewalld
-    systemctl enable firewalld
-fi
-
-# Open panel port
-firewall-cmd --add-port=${PANEL_PORT}/tcp --permanent
-firewall-cmd --reload
-
-echo "[*] Restarting Apache to apply new port..."
+echo "🔄 Restarting Apache & PHP-FPM..."
+systemctl restart php-fpm
 systemctl restart httpd
 
-echo "[*] Checking if Apache is listening on port ${PANEL_PORT}..."
-if ! ss -tulnp | grep -q ":${PANEL_PORT}"; then
-    echo "ERROR: Apache is not listening on port ${PANEL_PORT}"
-    exit 1
-fi
+echo "🗄️ Creating database..."
 
-echo "[*] Installing CLI command..."
-cp "${INSTALL_DIR}/cli/l-panel.sh" /usr/bin/l-panel
-chmod +x /usr/bin/l-panel
+mysql -u root <<EOF
+CREATE DATABASE IF NOT EXISTS lpanel;
+CREATE USER IF NOT EXISTS 'lpanel_user'@'localhost' IDENTIFIED BY 'lpanel_pass';
+GRANT ALL PRIVILEGES ON lpanel.* TO 'lpanel_user'@'localhost';
+FLUSH PRIVILEGES;
+EOF
 
-echo ""
-echo "=============================================="
-echo "   Installation Completed Successfully!"
-echo "=============================================="
-echo ""
-echo "Panel URL: http://YOUR-IP:${PANEL_PORT}/"
-echo ""
-echo "Super Admin:"
-echo "  Username: ${SUPERADMIN_USER}"
-echo "  Password: ${SUPERADMIN_PASS}"
-echo ""
-echo "Database:"
-echo "  DB Name: ${DB_NAME}"
-echo "  DB User: ${DB_USER}"
-echo "  DB Pass: ${DB_PASS}"
-echo ""
-echo "CLI Command Installed: l-panel"
-echo ""
+echo "📦 Importing schema..."
+mysql -u lpanel_user -plpanel_pass lpanel < $TARGET_DIR/sql/schema.sql
+
+echo "✅ Installation completed!"
+echo "Panel is now available at: http://YOUR-IP:2096"
