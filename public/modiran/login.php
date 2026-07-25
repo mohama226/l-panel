@@ -25,7 +25,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $_SESSION['admin_id']  = $user['id'];
         $_SESSION['login_time'] = time();
 
-        header("Location: dashboard.php");
+        // مسیر صحیح داشبورد
+        header("Location: /modiran/dashboard.php");
         exit;
 
     } else {
