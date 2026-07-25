@@ -2,72 +2,99 @@
 
 require "../../../app/database.php";
 require "../../../app/auth.php";
-require "../../../app/permissions.php";
+require "../../../app/permission.php";
 
 checkLogin();
+
 requireSuperAdmin();
 
 
-$id = $_GET['id'] ?? null;
+$id=$_GET['id'];
 
 
-if(!$id){
-
-    die("Invalid ID");
-
-}
-
-
-
-$stmt=$db->prepare("
-SELECT id,username,role,status
-FROM admins
-WHERE id=?
-");
-
+$stmt=$db->prepare(
+"SELECT * FROM admins WHERE id=?"
+);
 
 $stmt->execute([$id]);
 
 $admin=$stmt->fetch();
 
 
+
 if(!$admin){
 
-    die("Admin Not Found");
+die("Admin Not Found");
 
 }
 
 
 
-if($_POST){
+if($_SERVER['REQUEST_METHOD']=="POST"){
 
 
-$username=$_POST['username'];
-
-$role=$_POST['role'];
+$firstname=$_POST['firstname'];
+$lastname=$_POST['lastname'];
+$description=$_POST['description'];
 
 $status=$_POST['status'];
+$role=$_POST['role'];
 
 
 
-$stmt=$db->prepare("
-UPDATE admins
-SET username=?,
-role=?,
-status=?
+$db->prepare(
+"
+UPDATE admins SET
+
+firstname=?,
+lastname=?,
+description=?,
+status=?,
+role=?
+
 WHERE id=?
-");
 
+"
+)->execute([
 
-$stmt->execute([
-
-$username,
-$role,
+$firstname,
+$lastname,
+$description,
 $status,
+$role,
 $id
 
 ]);
 
+
+
+$db->prepare(
+"DELETE FROM admin_permissions WHERE admin_id=?"
+)->execute([$id]);
+
+
+
+if(isset($_POST['permissions'])){
+
+
+foreach($_POST['permissions'] as $p){
+
+
+$db->prepare(
+"
+INSERT INTO admin_permissions
+(admin_id,permission)
+
+VALUES(?,?)
+
+"
+)->execute([$id,$p]);
+
+
+}
+
+
+}
 
 
 header("Location:index.php");
@@ -76,6 +103,26 @@ exit;
 
 
 }
+
+
+
+
+$permissions=$db->query(
+"SELECT * FROM permissions"
+)->fetchAll();
+
+
+
+$current=$db->prepare(
+"
+SELECT permission FROM admin_permissions
+WHERE admin_id=?
+"
+);
+
+$current->execute([$id]);
+
+$currentPermissions=$current->fetchAll(PDO::FETCH_COLUMN);
 
 
 
@@ -88,47 +135,76 @@ include "../../includes/sidebar.php";
 <div class="content">
 
 
+<div class="card">
+
+
 <h2>
-ویرایش مدیر
+✏️ ویرایش مدیر
 </h2>
 
 
 
-<form method="post" class="form-box">
+<form method="post">
+
+
+
+<label>
+نام
+</label>
+
+<input class="form-control"
+name="firstname"
+value="<?=$admin['firstname']?>">
+
+
+
+<label>
+نام خانوادگی
+</label>
+
+<input class="form-control"
+name="lastname"
+value="<?=$admin['lastname']?>">
+
 
 
 <label>
 نام کاربری
 </label>
 
-<input 
-name="username"
+<input class="form-control"
 value="<?=$admin['username']?>"
->
+disabled>
 
 
 
 <label>
-سطح دسترسی
+توضیحات
 </label>
 
 
-<select name="role">
+<textarea class="form-control"
+name="description"><?=$admin['description']?></textarea>
+
+
+
+
+<label>
+نقش
+</label>
+
+<select class="form-control" name="role">
 
 
 <option value="admin"
-<?=$admin['role']=="admin"?'selected':''?>>
-
-Admin
-
+<?=$admin['role']=="admin"?"selected":""?>>
+مدیر
 </option>
 
 
 <option value="superadmin"
-<?=$admin['role']=="superadmin"?'selected':''?>>
-
-Super Admin
-
+<?=$admin['role']=="superadmin"?"selected":""?>>
+سوپر ادمین
 </option>
 
 
@@ -142,34 +218,72 @@ Super Admin
 </label>
 
 
-<select name="status">
-
+<select class="form-control" name="status">
 
 <option value="active"
-<?=$admin['status']=="active"?'selected':''?>>
-
+<?=$admin['status']=="active"?"selected":""?>>
 فعال
-
 </option>
 
 
 <option value="disabled"
-<?=$admin['status']=="disabled"?'selected':''?>>
-
+<?=$admin['status']=="disabled"?"selected":""?>>
 غیرفعال
-
 </option>
-
 
 </select>
 
 
 
-<button>
+<hr>
 
-ذخیره
+
+<h3>
+سطح دسترسی
+</h3>
+
+
+<div class="permission-grid">
+
+
+<?php foreach($permissions as $p): ?>
+
+
+<label class="permission-item">
+
+
+<input type="checkbox"
+
+name="permissions[]"
+
+value="<?=$p['name']?>"
+
+<?=in_array($p['name'],$currentPermissions)?"checked":""?>
+
+>
+
+
+<?=$p['title']?>
+
+
+</label>
+
+
+
+<?php endforeach; ?>
+
+
+</div>
+
+
+
+
+<button class="btn-primary">
+
+ذخیره تغییرات
 
 </button>
+
 
 
 </form>
@@ -178,8 +292,8 @@ Super Admin
 </div>
 
 
-<?php
+</div>
 
-include "../../includes/footer.php";
 
-?>
+
+<?php include "../../includes/footer.php"; ?>
