@@ -2,10 +2,8 @@
 
 echo "🔧 Installing L-Panel..."
 
-# مسیر اصلی پنل
 TARGET_DIR="/var/www/lpanel"
 
-# پاک کردن نسخه قبلی
 rm -rf $TARGET_DIR
 mkdir -p $TARGET_DIR
 
