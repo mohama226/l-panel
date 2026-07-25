@@ -14,21 +14,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $username = trim($_POST['username']);
     $password = trim($_POST['password']);
 
-    // دریافت اطلاعات مدیر
     $stmt = $db->prepare("SELECT * FROM admins WHERE username=? LIMIT 1");
     $stmt->execute([$username]);
     $user = $stmt->fetch();
 
-    // بررسی رمز عبور
     if ($user && password_verify($password, $user['password'])) {
 
-        // ذخیره اطلاعات در سشن
         $_SESSION['admin']     = $user['username'];
         $_SESSION['role']      = $user['role'];
         $_SESSION['admin_id']  = $user['id'];
         $_SESSION['login_time'] = time();
 
-        // هدایت به داشبورد
         header("Location: dashboard.php");
         exit;
 
