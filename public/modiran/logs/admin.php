@@ -1,91 +1,64 @@
 <?php
 
-require "../../../app/auth.php";
-checkLogin();
+require_once dirname(__DIR__,2) . "/app/init.php";
+require_once BASE_PATH . "/app/database.php";
 
-require "../../../app/database.php";
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 
+$error = "";
 
-$stmt=$db->query("
-SELECT *
-FROM admin_logs
-ORDER BY id DESC
-");
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
+    $username = trim($_POST['username']);
+    $password = trim($_POST['password']);
 
-$logs=$stmt->fetchAll();
+    $stmt = $db->prepare("SELECT * FROM admins WHERE username=? LIMIT 1");
+    $stmt->execute([$username]);
+    $user = $stmt->fetch();
 
+    if ($user && password_verify($password, $user['password'])) {
 
-include "../../includes/header.php";
-include "../../includes/sidebar.php";
+        $_SESSION['admin'] = $user['username'];
+        $_SESSION['role']  = $user['role'];
+        $_SESSION['admin_id'] = $user['id'];
+
+        header("Location: dashboard.php");
+        exit;
+
+    } else {
+        $error = "نام کاربری یا رمز اشتباه است";
+    }
+}
 
 ?>
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<title>L-PANEL ADMIN</title>
+<link rel="stylesheet" href="/assets/css/login.css">
+</head>
 
+<body>
 
-<div class="content">
+<div class="login-box">
 
+<h1>L-PANEL</h1>
+<h3>Admin Panel</h3>
 
-<h2>
-🛡 لاگ فعالیت مدیران
-</h2>
+<?php if($error): ?>
+<div class="error"><?= $error ?></div>
+<?php endif; ?>
 
-
-<table>
-
-
-<tr>
-
-<th>ادمین</th>
-<th>عملیات</th>
-<th>کاربر</th>
-<th>IP</th>
-<th>زمان</th>
-
-</tr>
-
-
-<?php foreach($logs as $l): ?>
-
-
-<tr>
-
-<td>
-<?=$l['admin']?>
-</td>
-
-
-<td>
-<?=$l['action']?>
-</td>
-
-
-<td>
-<?=$l['target_user']?>
-</td>
-
-
-<td>
-<?=$l['ip']?>
-</td>
-
-
-<td>
-<?=$l['created_at']?>
-</td>
-
-
-</tr>
-
-
-<?php endforeach; ?>
-
-
-</table>
-
+<form method="post">
+    <input name="username" placeholder="Username" required>
+    <input type="password" name="password" placeholder="Password" required>
+    <button type="submit">ورود</button>
+</form>
 
 </div>
 
-
-<?php
-include "../../includes/footer.php";
-?>
+</body>
+</html>
