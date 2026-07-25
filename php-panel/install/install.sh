@@ -61,13 +61,13 @@ systemctl enable mariadb || true
 systemctl start mariadb || true
 
 # -----------------------------
-# Create DB
+# Create DB (clean install)
 # -----------------------------
-echo "[*] Creating database and user..."
+echo "[*] Resetting database..."
 
 mysql -u root <<EOF
-DROP USER IF EXISTS '${DB_USER}'@'localhost';
 DROP DATABASE IF EXISTS ${DB_NAME};
+DROP USER IF EXISTS '${DB_USER}'@'localhost';
 CREATE DATABASE ${DB_NAME};
 CREATE USER '${DB_USER}'@'localhost' IDENTIFIED BY '${DB_PASS}';
 GRANT ALL PRIVILEGES ON ${DB_NAME}.* TO '${DB_USER}'@'localhost';
@@ -141,6 +141,49 @@ fi
 # -----------------------------
 chown -R apache:apache "$INSTALL_DIR" 2>/dev/null || chown -R www-data:www-data "$INSTALL_DIR"
 
+# -----------------------------
+# Create CLI command: l-panel
+# -----------------------------
+echo "[*] Creating CLI command: l-panel"
+
+cat > /usr/bin/l-panel <<EOF
+#!/usr/bin/env bash
+echo "=============================================="
+echo "           L-Panel CLI Manager"
+echo "=============================================="
+echo ""
+echo "1) Update Panel"
+echo "2) Restart Apache"
+echo "3) Show Panel Info"
+echo ""
+read -p "Choose an option: " opt
+
+case \$opt in
+    1)
+        echo "[*] Updating panel..."
+        cd ${INSTALL_DIR}
+        git pull
+        echo "Done."
+        ;;
+    2)
+        echo "[*] Restarting Apache..."
+        systemctl restart httpd 2>/dev/null || systemctl restart apache2
+        echo "Done."
+        ;;
+    3)
+        echo "Panel installed at: ${INSTALL_DIR}"
+        echo "Database: ${DB_NAME}"
+        echo "DB User: ${DB_USER}"
+        echo "Port: ${PANEL_PORT}"
+        ;;
+    *)
+        echo "Invalid option."
+        ;;
+esac
+EOF
+
+chmod +x /usr/bin/l-panel
+
 echo ""
 echo "=============================================="
 echo "   Installation Completed Successfully!"
@@ -156,4 +199,6 @@ echo "Database:"
 echo "  DB Name: ${DB_NAME}"
 echo "  DB User: ${DB_USER}"
 echo "  DB Pass: ${DB_PASS}"
+echo ""
+echo "CLI Command Installed: l-panel"
 echo ""
