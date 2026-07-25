@@ -2,7 +2,6 @@
 
 /**
  * اتصال استاندارد PDO برای کل پروژه L-PANEL
- * این فایل تنها مرجع اتصال دیتابیس است.
  */
 
 if (!defined('BASE_PATH')) {
@@ -11,8 +10,8 @@ if (!defined('BASE_PATH')) {
 
 $dbHost = "localhost";
 $dbName = "lpanel";
-$dbUser = "lpanel";        // یوزری که ساختی
-$dbPass = "StrongPass123"; // پسوردی که ساختی
+$dbUser = "lpanel";        // یوزر دیتابیس
+$dbPass = "StrongPass123"; // پسورد دیتابیس
 
 try {
 
@@ -29,7 +28,6 @@ try {
 
 } catch (Exception $e) {
 
-    // نمایش خطا برای دیباگ
     die(
         "<pre style='direction:ltr;text-align:left;background:#fee;padding:10px;border:1px solid #f00;'>
         DATABASE CONNECTION ERROR:
