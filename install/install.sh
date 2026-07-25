@@ -81,6 +81,7 @@ echo "[*] Configuring Apache..."
 
 CONF="/etc/httpd/conf.d/lpanel.conf"
 
+
 cat > "$CONF" <<EOF
 Listen ${PANEL_PORT}
 
@@ -92,6 +93,7 @@ Listen ${PANEL_PORT}
     </Directory>
 </VirtualHost>
 EOF
+
 
 echo "[*] Allowing Apache to use port ${PANEL_PORT} in SELinux..."
 semanage port -a -t http_port_t -p tcp ${PANEL_PORT} 2>/dev/null || \
