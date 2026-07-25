@@ -5,7 +5,7 @@ if (!isset($_SESSION['admin'])) {
     exit;
 }
 
-require_once "../../app/db.php";
+require_once __DIR__ . "/../app/db.php";
 $db = getDB();
 
 // افزودن ادمین جدید
@@ -43,12 +43,10 @@ $admins = $db->query("SELECT * FROM admins")->fetchAll(PDO::FETCH_ASSOC);
 <head>
     <meta charset="UTF-8">
     <title>مدیریت ادمین‌ها</title>
-    <link rel="stylesheet" href="../assets/css/admin-dashboard.css">
 </head>
 <body>
 
-<div class="content">
-    <h1>👑 مدیریت ادمین‌ها</h1>
+    <h1>مدیریت ادمین‌ها</h1>
 
     <h3>افزودن ادمین جدید</h3>
     <form method="POST">
@@ -64,7 +62,7 @@ $admins = $db->query("SELECT * FROM admins")->fetchAll(PDO::FETCH_ASSOC);
     </form>
 
     <h3>لیست ادمین‌ها</h3>
-    <table>
+    <table border="1" cellpadding="5">
         <tr>
             <th>ID</th>
             <th>نام کاربری</th>
@@ -79,19 +77,17 @@ $admins = $db->query("SELECT * FROM admins")->fetchAll(PDO::FETCH_ASSOC);
             <td><?php echo $a['role']; ?></td>
             <td>
                 <?php if ($a['role'] !== 'blocked'): ?>
-                    <a href="admins.php?block=<?php echo $a['id']; ?>">🔒 بلاک</a>
+                    <a href="admins.php?block=<?php echo $a['id']; ?>">بلاک</a>
                 <?php else: ?>
-                    <a href="admins.php?unblock=<?php echo $a['id']; ?>">🔓 آنبلاک</a>
+                    <a href="admins.php?unblock=<?php echo $a['id']; ?>">آن‌بلاک</a>
                 <?php endif; ?>
 
-                <a href="admin-edit.php?id=<?php echo $a['id']; ?>">✏️ ویرایش</a>
-                <a href="admins.php?delete=<?php echo $a['id']; ?>" style="color:red;">🗑 حذف</a>
+                <a href="admin-edit.php?id=<?php echo $a['id']; ?>">ویرایش</a>
+                <a href="admins.php?delete=<?php echo $a['id']; ?>" style="color:red;">حذف</a>
             </td>
         </tr>
         <?php endforeach; ?>
     </table>
-
-</div>
 
 </body>
 </html>
