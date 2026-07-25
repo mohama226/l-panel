@@ -11,8 +11,9 @@ requireSuperAdmin();
 
 
 $admins=$db->query(
-"SELECT * FROM admins ORDER BY id DESC"
+    "SELECT * FROM admins ORDER BY id DESC"
 )->fetchAll();
+
 
 
 include "../../includes/header.php";
@@ -21,44 +22,88 @@ include "../../includes/sidebar.php";
 ?>
 
 
-<div class="container">
+<div class="content">
+
+
+<div class="page-title">
+
+<h1>
+👑 مدیریت مدیران
+</h1>
+
+<p>
+مدیریت حساب‌های مدیریتی پنل L-PANEL
+</p>
+
+</div>
+
+
+
+<div class="admin-box">
+
+
+<div class="admin-header">
+
 
 <h2>
-مدیریت مدیران
+لیست مدیران
 </h2>
 
 
-<a href="add.php">
+
+<a class="add-admin-btn" href="add.php">
 ➕ افزودن مدیر
 </a>
 
 
-<table class="table">
+</div>
 
+
+
+
+
+<div class="table-wrapper">
+
+
+<table class="admin-table">
+
+
+<thead>
 
 <tr>
 
 <th>
-ID
+شناسه
 </th>
 
-<th>
-Username
-</th>
 
 <th>
-Role
+نام کاربری
 </th>
 
-<th>
-Status
-</th>
 
 <th>
-Action
+سطح دسترسی
 </th>
+
+
+<th>
+وضعیت
+</th>
+
+
+<th>
+عملیات
+</th>
+
 
 </tr>
+
+</thead>
+
+
+
+<tbody>
 
 
 <?php foreach($admins as $a): ?>
@@ -66,36 +111,74 @@ Action
 
 <tr>
 
+
 <td>
 <?=$a['id']?>
 </td>
 
 
-<td>
-<?=$a['username']?>
+
+<td class="username">
+
+👤 <?=$a['username']?>
+
 </td>
 
 
+
 <td>
+
+<span class="role-badge">
+
 <?=$a['role']?>
+
+</span>
+
 </td>
 
 
+
 <td>
-<?=$a['status']?>
+
+
+<?php if($a['status']=="active"): ?>
+
+<span class="status-active">
+فعال
+</span>
+
+
+<?php else: ?>
+
+
+<span class="status-disabled">
+غیرفعال
+</span>
+
+
+<?php endif; ?>
+
+
 </td>
 
 
+
 <td>
 
-<a href="edit.php?id=<?=$a['id']?>">
-ویرایش
+
+<a class="edit-btn"
+href="edit.php?id=<?=$a['id']?>">
+✏️ ویرایش
 </a>
 
 
-<a href="delete.php?id=<?=$a['id']?>">
-حذف
+
+<a class="delete-btn"
+href="delete.php?id=<?=$a['id']?>"
+onclick="return confirm('حذف شود؟')">
+🗑 حذف
 </a>
+
 
 
 </td>
@@ -107,10 +190,20 @@ Action
 <?php endforeach; ?>
 
 
+</tbody>
+
+
 </table>
 
 
 </div>
+
+
+</div>
+
+
+</div>
+
 
 
 <?php include "../../includes/footer.php"; ?>
