@@ -27,6 +27,7 @@ $recentUsers  = [];
 $chartLabels  = [];
 $downloadData = [];
 $uploadData   = [];
+$uploadData   = [];
 
 try {
 
