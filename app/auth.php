@@ -6,7 +6,6 @@ if (session_status() === PHP_SESSION_NONE) {
 
 function checkLogin() {
 
-    // اگر لاگین نیست → بفرست به صفحه لاگین واقعی
     if (!isset($_SESSION['admin'])) {
         header("Location: /modiran/login.php");
         exit;
