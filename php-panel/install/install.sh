@@ -10,12 +10,12 @@ echo ""
 # -----------------------------
 # Ask for Super Admin
 # -----------------------------
-read -p "نام کاربری سوپر ادمین: " SUPERADMIN_USER
-read -p "رمز سوپر ادمین: " SUPERADMIN_PASS
-read -p "پنل روی چه پورتی اجرا شود؟ (مثال: 80 یا 8080): " PANEL_PORT
+read -p "Enter Super Admin Username: " SUPERADMIN_USER
+read -p "Enter Super Admin Password: " SUPERADMIN_PASS
+read -p "Enter Panel Port (e.g., 80 or 8080): " PANEL_PORT
 
 if [[ -z "$SUPERADMIN_USER" || -z "$SUPERADMIN_PASS" || -z "$PANEL_PORT" ]]; then
-    echo "ورودی‌ها نامعتبر هستند."
+    echo "Invalid input. Installation aborted."
     exit 1
 fi
 
@@ -34,12 +34,12 @@ DB_PASS="$(openssl rand -hex 12)"
 echo "[*] Detecting OS..."
 . /etc/os-release
 OS_ID=$ID
-echo "[*] OS: $OS_ID"
+echo "[*] OS Detected: $OS_ID"
 
 # -----------------------------
 # Install packages
 # -----------------------------
-echo "[*] Installing packages..."
+echo "[*] Installing required packages..."
 
 if [[ "$OS_ID" == "ubuntu" || "$OS_ID" == "debian" ]]; then
     apt update -y
@@ -84,8 +84,8 @@ git clone "$REPO_URL" "$INSTALL_DIR"
 SQL_FILE="${INSTALL_DIR}/php-panel/sql/schema.sql"
 
 if [[ ! -f "$SQL_FILE" ]]; then
-    echo "[!] ERROR: فایل schema.sql پیدا نشد!"
-    echo "مسیر مورد انتظار: $SQL_FILE"
+    echo "[!] ERROR: schema.sql not found!"
+    echo "Expected path: $SQL_FILE"
     exit 1
 fi
 
@@ -138,15 +138,16 @@ chown -R apache:apache "$INSTALL_DIR" 2>/dev/null || chown -R www-data:www-data 
 
 echo ""
 echo "=============================================="
-echo "   نصب با موفقیت انجام شد!"
+echo "   Installation Completed Successfully!"
 echo "=============================================="
 echo ""
-echo "آدرس پنل: http://YOUR-IP:${PANEL_PORT}/"
-echo "سوپر ادمین:"
-echo "  یوزرنیم: ${SUPERADMIN_USER}"
-echo "  پسورد: ${SUPERADMIN_PASS}"
+echo "Panel URL: http://YOUR-IP:${PANEL_PORT}/"
 echo ""
-echo "دیتابیس:"
+echo "Super Admin Credentials:"
+echo "  Username: ${SUPERADMIN_USER}"
+echo "  Password: ${SUPERADMIN_PASS}"
+echo ""
+echo "Database Info:"
 echo "  DB Name: ${DB_NAME}"
 echo "  DB User: ${DB_USER}"
 echo "  DB Pass: ${DB_PASS}"
