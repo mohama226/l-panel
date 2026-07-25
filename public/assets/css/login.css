@@ -1,13 +1,20 @@
-/* پس‌زمینه */
-body {
-    background: #0d1b2a;
-    font-family: Vazirmatn, sans-serif;
-    direction: rtl;
+/* ریست اولیه برای هماهنگی استایل‌ها */
+* {
+    box-sizing: border-box;
     margin: 0;
     padding: 0;
 }
 
-/* باکس لاگین */
+/* پس‌زمینه کلی صفحه */
+body {
+    background: #0d1b2a;
+    font-family: Vazirmatn, sans-serif;
+    direction: rtl;
+    text-align: right;
+    min-height: 100vh;
+}
+
+/* باکس لاگین اصلی */
 .login-box {
     width: 320px;
     background: #1b263b;
@@ -18,34 +25,32 @@ body {
     color: #fff;
     border: 1px solid rgba(255,255,255,0.06);
 
-    /* تراز دقیق وسط */
     display: flex;
     flex-direction: column;
     gap: 18px;
 }
 
-/* عنوان */
+/* عنوان بالای فرم */
 .login-box h2 {
     text-align: center;
-    margin: 0;
     font-size: 20px;
     font-weight: 600;
 }
 
-/* گروه ورودی */
+/* گروه هر فیلد ورودی */
 .input-group {
     display: flex;
     flex-direction: column;
     gap: 6px;
 }
 
-/* لیبل */
+/* لیبل فیلدها */
 .input-group label {
     font-size: 14px;
     color: #dcdcdc;
 }
 
-/* فیلدهای ورودی */
+/* خود فیلدهای ورودی */
 .input-group input {
     width: 100%;
     padding: 10px;
@@ -63,7 +68,7 @@ body {
     outline: none;
 }
 
-/* دکمه */
+/* دکمه لاگین */
 .btn {
     width: 100%;
     padding: 11px;
@@ -75,22 +80,24 @@ body {
     cursor: pointer;
     transition: 0.2s;
     font-weight: 600;
+    margin-top: 4px;
 }
 
 .btn:hover {
     background: #3a63d6;
 }
 
-/* لینک‌های پایین */
+/* لینک‌های جابجایی بین لاگین‌ها */
 .switch-link {
     text-align: center;
-    margin-top: 5px;
+    margin-top: 10px;
 }
 
 .switch-link a {
     color: #bfc4ff;
     text-decoration: none;
     font-size: 13px;
+    margin: 0 4px;
 }
 
 .switch-link a:hover {
