@@ -1,36 +1,44 @@
+<?php
+session_start();
+require_once __DIR__ . "/app/db.php";
+$db = getDB();
+
+$error = "";
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $user = $_POST['username'];
+    $pass = $_POST['password'];
+
+    $stmt = $db->prepare("SELECT * FROM admins WHERE username=?");
+    $stmt->execute([$user]);
+    $admin = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if ($admin && password_verify($pass, $admin['password']) && $admin['role'] != 'blocked') {
+        $_SESSION['admin'] = $admin['id'];
+        header("Location: dashboard.php");
+        exit;
+    } else {
+        $error = "نام کاربری یا رمز عبور اشتباه است یا ادمین بلاک شده است.";
+    }
+}
+?>
 <!DOCTYPE html>
 <html lang="fa">
 <head>
     <meta charset="UTF-8">
-    <title>Admin Login</title>
-    <link rel="stylesheet" href="assets/css/login.css">
+    <title>ورود ادمین</title>
 </head>
 <body>
+    <h1>ورود ادمین</h1>
 
-<div class="login-wrapper">
-    <div class="login-card">
-        <h2>Admin Login</h2>
+    <?php if ($error): ?>
+        <p style="color:red;"><?php echo $error; ?></p>
+    <?php endif; ?>
 
-        <form method="POST" action="auth-admin.php">
-            <div class="input-group">
-                <label>Username</label>
-                <input type="text" name="username" required>
-            </div>
-
-            <div class="input-group">
-                <label>Password</label>
-                <input type="password" name="password" required>
-            </div>
-
-            <button class="btn">Login</button>
-        </form>
-
-        <div class="switch-link">
-            <a href="login-user.php">User Login</a> |
-            <a href="login-reseller.php">Reseller Login</a>
-        </div>
-    </div>
-</div>
-
+    <form method="POST">
+        <input type="text" name="username" placeholder="نام کاربری" required>
+        <input type="password" name="password" placeholder="رمز عبور" required>
+        <button type="submit">ورود</button>
+    </form>
 </body>
 </html>
