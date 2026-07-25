@@ -2,7 +2,7 @@
 
 clear
 echo "=========================================="
-echo "        L-PANEL Auto Installer"
+echo "        L-PANEL Auto Installer (Fixed)"
 echo "=========================================="
 
 # -----------------------------
@@ -37,14 +37,13 @@ fi
 echo "[+] OS detected: $OS"
 
 # -----------------------------
-# Update system
+# Install git
 # -----------------------------
-echo "[+] Updating system..."
+echo "[+] Installing git..."
 if [ "$OS" = "almalinux" ]; then
-    yum update -y
+    yum install -y git
 else
-    apt update -y
-    apt upgrade -y
+    apt install -y git
 fi
 
 # -----------------------------
@@ -72,7 +71,6 @@ echo "[+] Installing PostgreSQL..."
 
 if [ "$OS" = "almalinux" ]; then
     yum install -y postgresql-server postgresql-contrib
-    postgresql-setup --initdb
     systemctl enable postgresql
     systemctl start postgresql
 else
@@ -82,21 +80,40 @@ else
 fi
 
 # -----------------------------
-# Create database
+# Create database if not exists
 # -----------------------------
-echo "[+] Creating database lpanel..."
+echo "[+] Checking database..."
 
-sudo -u postgres psql <<EOF
+sudo -u postgres psql -tAc "SELECT 1 FROM pg_database WHERE datname='lpanel'" | grep -q 1
+if [ $? -ne 0 ]; then
+    echo "[+] Creating database lpanel..."
+    sudo -u postgres psql <<EOF
 CREATE DATABASE lpanel;
+EOF
+else
+    echo "[+] Database already exists, skipping."
+fi
+
+# -----------------------------
+# Create user if not exists
+# -----------------------------
+sudo -u postgres psql -tAc "SELECT 1 FROM pg_roles WHERE rolname='lpaneluser'" | grep -q 1
+if [ $? -ne 0 ]; then
+    echo "[+] Creating PostgreSQL user..."
+    sudo -u postgres psql <<EOF
 CREATE USER lpaneluser WITH PASSWORD 'lpanelpass';
 GRANT ALL PRIVILEGES ON DATABASE lpanel TO lpaneluser;
 EOF
+else
+    echo "[+] PostgreSQL user already exists, skipping."
+fi
 
 # -----------------------------
 # Clone project
 # -----------------------------
 echo "[+] Cloning project from GitHub..."
 
+mkdir -p /var/www/
 cd /var/www/
 rm -rf l-panel
 git clone https://github.com/mohama226/l-panel.git
@@ -121,13 +138,29 @@ return [
 EOF
 
 # -----------------------------
-# Insert superadmin into database
+# Create users table if not exists
+# -----------------------------
+echo "[+] Creating users table if missing..."
+
+sudo -u postgres psql lpanel <<EOF
+CREATE TABLE IF NOT EXISTS users (
+    id SERIAL PRIMARY KEY,
+    username VARCHAR(64),
+    password VARCHAR(255),
+    role VARCHAR(20),
+    status BOOLEAN DEFAULT true
+);
+EOF
+
+# -----------------------------
+# Insert superadmin
 # -----------------------------
 HASHED_PASS=$(php -r "echo password_hash('$ADMIN_PASS', PASSWORD_DEFAULT);")
 
 sudo -u postgres psql lpanel <<EOF
 INSERT INTO users (username, password, role, status)
-VALUES ('$ADMIN_USER', '$HASHED_PASS', 'owner', true);
+VALUES ('$ADMIN_USER', '$HASHED_PASS', 'owner', true)
+ON CONFLICT DO NOTHING;
 EOF
 
 # -----------------------------
@@ -149,10 +182,10 @@ EOF
 
 systemctl daemon-reload
 systemctl enable lpanel
-systemctl start lpanel
+systemctl restart lpanel
 
 # -----------------------------
-# Create CLI command: l-panel
+# Create CLI command
 # -----------------------------
 echo "[+] Creating CLI command..."
 
