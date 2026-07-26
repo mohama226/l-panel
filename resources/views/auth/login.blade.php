@@ -1,23 +1,42 @@
-<form method="POST" action="/login">
+<link rel="stylesheet" href="{{ asset('css/login.css') }}">
 
-@csrf
+<div class="login-box">
 
+    <div class="logo">
+        L-PANEL
+    </div>
 
-<input 
-type="text"
-name="username"
-placeholder="Username">
+    @if($errors->any())
+    <div class="error">
+        {{ $errors->first() }}
+    </div>
+    @endif
 
+    <form method="POST" action="/login">
+        @csrf
 
-<input 
-type="password"
-name="password"
-placeholder="Password">
+        <div class="input-group">
+            <input 
+                type="text"
+                name="username"
+                placeholder="Username">
+        </div>
 
+        <div class="input-group">
+            <input 
+                type="password"
+                name="password"
+                placeholder="Password">
+        </div>
 
-<button type="submit">
-Login
-</button>
+        <button class="login-btn">
+            Login
+        </button>
 
+    </form>
 
-</form>
+    <div class="footer">
+        Linux VPN Management Panel
+    </div>
+
+</div>
