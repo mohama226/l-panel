@@ -4,34 +4,29 @@
 install_laravel(){
 
 
-mkdir -p /var/www
+echo "[OK] Installing Laravel"
 
 
-cd /var/www
+mkdir -p /opt
 
 
-composer create-project laravel/laravel l-panel
+if [ ! -d /opt/l-panel ]; then
 
 
-cd /var/www/l-panel
+composer create-project laravel/laravel /opt/l-panel
 
 
-cp .env.example .env
+else
+
+echo "Laravel already exists"
+
+fi
 
 
-php artisan key:generate
+cd /opt/l-panel
 
 
-DB=$(cat /tmp/lpanel_db)
-
-
-sed -i "s/DB_DATABASE=.*/DB_DATABASE=$DB/" .env
-
-
-php artisan migrate
-
-
-success "Laravel installed"
+php artisan key:generate --force
 
 
 }
