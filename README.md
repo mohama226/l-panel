@@ -1,8 +1,4 @@
-bash <(curl -s https://raw.githubusercontent.com/mohama226/l-panel/main/system/installer/install.sh)
-
-bash <(curl -s https://raw.githubusercontent.com/mohama226/l-panel/main/system/installer/install.sh)
-
-
+bash <(curl -fsSL https://raw.githubusercontent.com/mohama226/l-panel/main/install.sh)
 
 لینک‌های لاگین پنل (هر سه)
 🔵 ورود مدیر
