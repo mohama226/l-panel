@@ -1,8 +1,36 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+<title>L-Panel Dashboard</title>
+</head>
+
+
+<body>
+
+
 <h1>
-L-PANEL Dashboard
+L-Panel Dashboard
 </h1>
 
 
-<a href="/logout">
+<p>
+Welcome {{ auth()->user()->email }}
+</p>
+
+
+<form method="POST" action="/logout">
+
+@csrf
+
+<button>
 Logout
-</a>
+</button>
+
+</form>
+
+
+</body>
+
+</html>
