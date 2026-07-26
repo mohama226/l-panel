@@ -4,4 +4,10 @@ declare(strict_types=1);
 
 require dirname(__DIR__).'/bootstrap/app.php';
 
-echo "L-Panel Working";
+use App\Core\App;
+
+App::boot();
+
+require ROOT_PATH.'/routes/web.php';
+
+App::run();
