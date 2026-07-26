@@ -511,29 +511,63 @@ success "Directories created."
 
 }
 
+
 download_project() {
 
 print_line
 
 echo "Downloading L-Panel..."
 
-if [ -d "$INSTALL_DIR/.git" ]; then
+if [ -d "$INSTALL_DIR" ]; then
 
-rm -rf "$INSTALL_DIR"
+    if [ -d "$INSTALL_DIR/.git" ]; then
+
+        echo "Existing L-Panel installation detected."
+
+        cd "$INSTALL_DIR"
+
+        git pull
+
+    else
+
+        echo "Directory exists but is not a git repository."
+
+        read -rp "Remove existing directory? (yes/no): " REMOVE_DIR
+
+        if [ "$REMOVE_DIR" = "yes" ]; then
+
+            rm -rf "$INSTALL_DIR"
+
+            git clone "$REPO" "$INSTALL_DIR"
+
+        else
+
+            error "Installation cancelled."
+
+        fi
+
+    fi
+
+else
+
+    git clone "$REPO" "$INSTALL_DIR"
 
 fi
 
-git clone "$REPO" "$INSTALL_DIR"
 
 cd "$INSTALL_DIR"
+
 
 composer install \
 --no-dev \
 --optimize-autoloader
 
+
 success "Project downloaded."
 
 }
+
+
 create_database() {
 
 print_line
