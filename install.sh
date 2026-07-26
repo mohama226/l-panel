@@ -491,25 +491,29 @@ composer --version
 
 }
 
+
+
 prepare_install_directory() {
 
 print_line
 
-echo "Preparing installation directory..."
+echo "Preparing installation..."
 
-mkdir -p "$INSTALL_DIR"
+if [ -d "$INSTALL_DIR" ]; then
 
-mkdir -p "$INSTALL_DIR/storage"
+    warning "Installation directory already exists."
 
-mkdir -p "$INSTALL_DIR/storage/logs"
+else
 
-mkdir -p "$INSTALL_DIR/storage/cache"
+    mkdir -p "$(dirname "$INSTALL_DIR")"
 
-mkdir -p "$INSTALL_DIR/storage/uploads"
+fi
 
-success "Directories created."
+success "Ready."
 
 }
+
+
 
 
 download_project() {
@@ -551,6 +555,10 @@ if [ -d "$INSTALL_DIR" ]; then
 else
 
     git clone "$REPO" "$INSTALL_DIR"
+
+mkdir -p "$INSTALL_DIR/storage/logs"
+mkdir -p "$INSTALL_DIR/storage/cache"
+mkdir -p "$INSTALL_DIR/storage/uploads"
 
 fi
 
