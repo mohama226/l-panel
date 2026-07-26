@@ -2,14 +2,20 @@
 
 use App\Core\App;
 
-App::$router->get('/',function(){
+use App\Controllers\AuthController;
 
-    echo "L-Panel Home";
+App::$router->get('/',[
 
-});
+AuthController::class,
 
-App::$router->get('/login',function(){
+'login'
 
-    echo "Login Page";
+]);
 
-});
+App::$router->get('/login',[
+
+AuthController::class,
+
+'login'
+
+]);
