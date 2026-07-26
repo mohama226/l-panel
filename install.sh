@@ -2,123 +2,87 @@
 
 set -e
 
-echo "================================"
-echo " Installing l-panel"
-echo " ocserv management panel"
-echo "================================"
+echo "======================================"
+echo "        l-panel Installer"
+echo "   ocserv VPN Management Panel"
+echo "======================================"
 
-
-PROJECT="l-panel"
 INSTALL_DIR="/var/www/l-panel"
 
 
-echo "[1/8] Detecting OS..."
+if [ "$EUID" -ne 0 ]; then
+    echo "Please run as root"
+    exit 1
+fi
 
-OS=$(grep '^ID=' /etc/os-release | cut -d= -f2 | tr -d '"')
+
+echo "[1/6] Detecting operating system..."
+
+
+if [ ! -f /etc/os-release ]; then
+    echo "Cannot detect operating system"
+    exit 1
+fi
+
+
+source /etc/os-release
+
+
+OS=$ID
+
+
+echo "Detected OS: $OS"
+
 
 
 case $OS in
 
 ubuntu|debian)
-    echo "Supported OS: $OS"
+
+    echo "Debian based system detected"
+
+    bash <(curl -s https://raw.githubusercontent.com/mohama226/l-panel/main/installer/install_debian.sh)
+
     ;;
 
-*)
-    echo "Unsupported OS: $OS"
-    exit 1
+
+almalinux|rocky|centos|rhel)
+
+    echo "RHEL based system detected"
+
+    bash <(curl -s https://raw.githubusercontent.com/mohama226/l-panel/main/installer/install_rhel.sh)
+
     ;;
+
+
+*)
+
+    echo ""
+    echo "Unsupported OS: $OS"
+    echo "Supported:"
+    echo "Ubuntu"
+    echo "Debian"
+    echo "AlmaLinux"
+    echo "Rocky Linux"
+    echo "CentOS"
+    exit 1
+
+;;
 
 esac
 
 
-echo "[2/8] Installing packages..."
 
-apt update
-
-apt install -y \
-git \
-curl \
-unzip \
-nginx \
-mysql-server \
-php \
-php-cli \
-php-fpm \
-php-mysql \
-php-curl \
-php-mbstring \
-php-xml \
-php-bcmath \
-php-zip \
-composer
-
-
-echo "[3/8] Download l-panel..."
-
-if [ -d "$INSTALL_DIR" ]; then
-    rm -rf $INSTALL_DIR
-fi
-
-
-git clone \
-https://github.com/mohama226/l-panel.git \
-$INSTALL_DIR
-
-
-cd $INSTALL_DIR
-
-
-echo "[4/8] Installing Laravel..."
-
-composer install \
---no-interaction \
---prefer-dist \
---optimize-autoloader
-
-
-echo "[5/8] Configuring environment..."
-
-cp .env.example .env
-
-
-php artisan key:generate
-
-
-echo "[6/8] Database setup..."
-
-mysql -e "CREATE DATABASE lpanel CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
-
-
-php artisan migrate --force
-
-
-echo "[7/8] Creating admin user..."
-
-php artisan db:seed --class=AdminSeeder
-
-
-echo "[8/8] Starting services..."
-
-
-chown -R www-data:www-data $INSTALL_DIR
-
-
-systemctl restart nginx
-systemctl restart php*-fpm
-
+echo ""
+echo "======================================"
+echo " l-panel installation finished"
+echo "======================================"
 
 IP=$(hostname -I | awk '{print $1}')
 
 
 echo ""
-echo "================================"
-echo " l-panel installed successfully"
+echo "Open browser:"
 echo ""
-echo " Login URL:"
+echo "http://$IP"
 echo ""
-echo " http://$IP"
-echo ""
-echo " Default Admin:"
-echo " admin@l-panel.local"
-echo " password: change-me"
-echo "================================"
