@@ -10,6 +10,7 @@ source installer/functions.sh
 source installer/os.sh
 source installer/composer.sh
 source installer/database.sh
+source installer/admin.sh
 source installer/cli.sh
 
 
