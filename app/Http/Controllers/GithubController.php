@@ -3,29 +3,60 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Process;
 
 class GithubController extends Controller
 {
 
     public function index()
     {
-        return view('settings.github');
+        return view('admin.github');
     }
 
 
-    public function push()
+    public function push(Request $request)
     {
 
-        $output = [];
+        $message = $request->message ?? "Update L-PANEL";
 
-        exec("cd /opt/l-panel && git add . && git commit -m 'Update from L-PANEL' && git push origin main 2>&1", $output);
+
+        $commands = [
+
+            "cd /opt/l-panel",
+
+            "git add .",
+
+            "git commit -m \"$message\"",
+
+            "git push origin main"
+
+        ];
+
+
+        $output = "";
+
+
+        foreach($commands as $cmd)
+        {
+
+            $result = Process::run($cmd);
+
+            $output .= "\n\nCOMMAND:\n".$cmd;
+
+            $output .= "\n".$result->output();
+
+            $output .= "\n".$result->errorOutput();
+
+        }
 
 
         return back()->with(
-            'status',
-            implode("\n",$output)
+            'result',
+            $output
         );
 
+
     }
+
 
 }
