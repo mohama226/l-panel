@@ -1,11 +1,14 @@
 #!/bin/bash
 
+RED="\033[31m"
+GREEN="\033[32m"
+YELLOW="\033[33m"
+RESET="\033[0m"
+
 
 banner(){
 
-clear
-
-echo "
+echo -e "
 =================================
        L-PANEL INSTALLER
           Laravel v1.0
@@ -15,17 +18,22 @@ echo "
 }
 
 
-ok(){
+success(){
 
-echo "[OK] $1"
+echo -e "${GREEN}[OK] $1${RESET}"
 
 }
 
 
 error(){
 
-echo "[ERROR] $1"
+echo -e "${RED}[ERROR] $1${RESET}"
 
-exit 1
+}
+
+
+warning(){
+
+echo -e "${YELLOW}[WARN] $1${RESET}"
 
 }
