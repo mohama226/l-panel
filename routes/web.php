@@ -1,5 +1,15 @@
 <?php
 
-$router->get('/login', 'AuthController@login');
-$router->post('/login', 'AuthController@authenticate');
-$router->get('/logout', 'AuthController@logout');
+use App\Core\App;
+
+App::$router->get('/',function(){
+
+    echo "L-Panel Home";
+
+});
+
+App::$router->get('/login',function(){
+
+    echo "Login Page";
+
+});
