@@ -17,23 +17,42 @@ class AuthController extends Controller
     public function login(Request $request)
     {
 
-        $credentials = $request->validate([
-            'email'=>'required|email',
+        $data = $request->validate([
+            'username'=>'required',
             'password'=>'required'
         ]);
 
 
-        if(Auth::attempt($credentials))
+        if(Auth::guard('admin')->attempt([
+            'username'=>$data['username'],
+            'password'=>$data['password'],
+            'status'=>1
+        ]))
         {
+
             $request->session()->regenerate();
 
             return redirect('/dashboard');
+
         }
 
 
         return back()->withErrors([
-            'email'=>'Login failed'
+            'username'=>'نام کاربری یا رمز عبور اشتباه است'
         ]);
+
+    }
+
+
+
+    public function logout(Request $request)
+    {
+
+        Auth::guard('admin')->logout();
+
+        $request->session()->invalidate();
+
+        return redirect('/login');
 
     }
 
