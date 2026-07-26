@@ -7,16 +7,15 @@ clear
 
 echo "
 =================================
-          L-PANEL
-       Laravel Installer
-          Version 1.0
+       L-PANEL INSTALLER
+          Laravel v1.0
 =================================
 "
 
 }
 
 
-success(){
+ok(){
 
 echo "[OK] $1"
 
