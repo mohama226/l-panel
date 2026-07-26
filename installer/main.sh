@@ -1,7 +1,5 @@
 #!/bin/bash
 
-set -e
-
 
 BASE_DIR="/tmp/lpanel-installer"
 
@@ -29,19 +27,13 @@ install_packages
 install_composer
 
 
-install_dependencies
-
-
 install_laravel
 
 
+install_dependencies
+
+
 create_database
-
-
-create_env
-
-
-run_migrations
 
 
 create_admin
@@ -53,9 +45,4 @@ configure_nginx
 create_command
 
 
-
-echo "
-=================================
- L-PANEL INSTALLED SUCCESSFULLY
-=================================
-"
+success "L-Panel installed successfully"
