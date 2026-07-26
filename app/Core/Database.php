@@ -8,35 +8,44 @@ use PDO;
 
 class Database
 {
+
     private PDO $pdo;
+
 
     public function __construct()
     {
-        $db=require ROOT_PATH.'/config/database.php';
 
-        $dsn="mysql:host={$db['host']};port={$db['port']};dbname={$db['database']};charset={$db['charset']}";
+        $dsn =
+        "mysql:host=".$_ENV['DB_HOST'].
+        ";port=".$_ENV['DB_PORT'].
+        ";dbname=".$_ENV['DB_DATABASE'].
+        ";charset=utf8mb4";
 
-        $this->pdo=new PDO(
+
+        $this->pdo = new PDO(
 
             $dsn,
 
-            $db['username'],
+            $_ENV['DB_USERNAME'],
 
-            $db['password'],
+            $_ENV['DB_PASSWORD'],
 
             [
+                PDO::ATTR_ERRMODE =>
+                PDO::ERRMODE_EXCEPTION,
 
-                PDO::ATTR_ERRMODE=>PDO::ERRMODE_EXCEPTION,
-
-                PDO::ATTR_DEFAULT_FETCH_MODE=>PDO::FETCH_ASSOC,
-
+                PDO::ATTR_DEFAULT_FETCH_MODE =>
+                PDO::FETCH_ASSOC
             ]
 
         );
+
     }
 
-    public function pdo():PDO
+
+    public function connection():PDO
     {
         return $this->pdo;
     }
+
 }
