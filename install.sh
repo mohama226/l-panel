@@ -1221,3 +1221,7 @@ installation_complete
 
 
 main "$@"
+
+cp scripts/l-panel /usr/local/bin/l-panel
+
+chmod +x /usr/local/bin/l-panel
