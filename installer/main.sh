@@ -1,25 +1,42 @@
 #!/bin/bash
 
-set -e
 
-BASE_DIR="/opt/l-panel"
+cd /opt/l-panel || exit 1
+
 
 source installer/functions.sh
-source installer/os.sh
+source installer/packages.sh
 source installer/composer.sh
 source installer/database.sh
+source installer/env.sh
 source installer/admin.sh
-source installer/cli.sh
+
 
 banner
 
+
 detect_os
+
+
 install_packages
+
+
 install_composer
-install_project_dependencies
+
+
+install_dependencies
+
+
 create_database
+
+
 create_env
+
+
 run_migrations
+
+
 create_admin
-install_cli
-success
+
+
+ok "L-Panel installation completed"
