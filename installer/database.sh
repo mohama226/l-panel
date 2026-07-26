@@ -4,7 +4,7 @@ create_database(){
 
     echo "Database Configuration"
 
-    read -p "Database Name [lpanel]: " DB_NAME
+    read -p "Database Name [lpanel]: " DB_NAME < /dev/tty
     DB_NAME=${DB_NAME:-lpanel}
 
     read -p "Database User [lpanel]: " DB_USER
