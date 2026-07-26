@@ -12,8 +12,13 @@ create_database(){
     read -p "Database User [lpanel]: " DB_USER < /dev/tty
     DB_USER=${DB_USER:-lpanel}
 
-    read -s -p "Database Password: " DB_PASS < /dev/tty
+    read -s -p "Database Password (leave empty for auto): " DB_PASS < /dev/tty
     echo ""
+
+    if [ -z "$DB_PASS" ]; then
+        DB_PASS=$(openssl rand -hex 16)
+        echo "Generated Database Password: $DB_PASS"
+    fi
 
     MYSQL_ROOT_PASSWORD=""
 
@@ -50,13 +55,16 @@ run_migrations(){
 
     cd /opt/l-panel
 
+    # Load .env variables
+    export $(grep -v '^#' .env | xargs)
+
     php -r '
         require "vendor/autoload.php";
-        require "bootstrap/app.php";
+        require "app/Core/Migrator.php";
 
         $m = new App\Core\Migrator();
         $m->run();
     '
 
-    ok "Database migrations completed"
+    ok "Database migrated"
 }
