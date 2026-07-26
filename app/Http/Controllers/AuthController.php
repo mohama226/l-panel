@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Auth;
 
 class AuthController extends Controller
 {
+
     public function login()
     {
         return view('login');
@@ -15,26 +16,23 @@ class AuthController extends Controller
 
     public function authenticate(Request $request)
     {
+
         $credentials = $request->validate([
-            'username'=>'required',
+            'email'=>'required',
             'password'=>'required'
         ]);
 
 
-        if(Auth::attempt([
-            'name'=>$credentials['username'],
-            'password'=>$credentials['password']
-        ])){
+        if(Auth::attempt($credentials)){
 
             $request->session()->regenerate();
 
             return redirect('/dashboard');
-
         }
 
 
         return back()->withErrors([
-            'username'=>'Login failed'
+            'email'=>'Invalid login'
         ]);
 
     }
@@ -42,10 +40,13 @@ class AuthController extends Controller
 
     public function logout(Request $request)
     {
+
         Auth::logout();
 
         $request->session()->invalidate();
 
         return redirect('/login');
+
     }
+
 }
