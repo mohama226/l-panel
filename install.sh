@@ -2,52 +2,102 @@
 
 set -e
 
-BASE_DIR="/tmp/lpanel-installer"
 
-rm -rf $BASE_DIR
-mkdir -p $BASE_DIR
+REPO="https://github.com/mohama226/l-panel.git"
 
-cd $BASE_DIR
+TMP="/tmp/l-panel-install"
 
 
-git clone https://github.com/mohama226/l-panel.git .
+echo "
+=================================
+       L-PANEL INSTALLER
+          Laravel v1.0
+=================================
+"
 
 
-source installer/functions.sh
-source installer/os.sh
-source installer/packages.sh
-source installer/composer.sh
-source installer/database.sh
-source installer/nginx.sh
-source installer/laravel.sh
-source installer/admin.sh
-source installer/command.sh
+detect_os(){
+
+if [ -f /etc/almalinux-release ]; then
+
+    OS="almalinux"
+
+elif grep -qi ubuntu /etc/os-release; then
+
+    OS="ubuntu"
+
+else
+
+    echo "Unsupported OS"
+    exit 1
+
+fi
 
 
-banner
+echo "[OK] OS: $OS"
+
+}
+
+
+
+install_base(){
+
+
+if [ "$OS" = "almalinux" ]; then
+
+
+dnf install -y git curl wget unzip
+
+
+else
+
+
+apt update
+
+apt install -y git curl wget unzip
+
+
+fi
+
+
+echo "[OK] Base packages installed"
+
+}
+
+
+
+download(){
+
+
+rm -rf $TMP
+
+
+git clone $REPO $TMP
+
+
+cd $TMP
+
+
+}
+
+
+
+run(){
+
+chmod +x installer/*.sh
+
+
+source installer/main.sh
+
+
+}
+
 
 
 detect_os
 
-install_packages
+install_base
 
-install_composer
+download
 
-install_database
-
-install_laravel
-
-create_admin
-
-configure_nginx
-
-install_command
-
-
-success "L-Panel installation completed"
-
-echo ""
-echo "Run:"
-echo ""
-echo "l-panel"
-echo ""
+run
