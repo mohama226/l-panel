@@ -1,52 +1,77 @@
 #!/bin/bash
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-source "$SCRIPT_DIR/functions.sh" 2>/dev/null || true
 
 create_admin(){
 
+
 echo ""
+
 echo "Create Super Admin"
+
 echo ""
+
 
 read -p "Username: " ADMIN_USER
 
+
 while true
 do
-    read -s -p "Password: " ADMIN_PASS
-    echo ""
 
-    read -s -p "Confirm Password: " ADMIN_PASS2
-    echo ""
+read -s -p "Password: " ADMIN_PASS
+echo ""
 
-    if [ "$ADMIN_PASS" = "$ADMIN_PASS2" ]; then
-        break
-    fi
+read -s -p "Confirm Password: " ADMIN_PASS2
+echo ""
 
-    echo "Passwords do not match"
+
+if [ "$ADMIN_PASS" = "$ADMIN_PASS2" ]
+then
+break
+fi
+
+
+echo "Passwords do not match"
+
+
 done
+
 
 cd /opt/l-panel
 
+
 php -r "
+
 require 'vendor/autoload.php';
+
 require 'bootstrap/app.php';
 
-\$db = new App\Core\Database();
 
-\$stmt = \$db->connection()->prepare(
-    'INSERT INTO admins(username,password,role)
-     VALUES(?,?,?)'
+\$db=new App\Core\Database();
+
+
+\$stmt=\$db->connection()->prepare(
+
+'INSERT INTO admins(username,password,role)
+VALUES(?,?,?)'
+
 );
 
+
 \$stmt->execute([
-    '$ADMIN_USER',
-    password_hash('$ADMIN_PASS', PASSWORD_BCRYPT),
-    'superadmin'
+
+'$ADMIN_USER',
+
+password_hash('$ADMIN_PASS',PASSWORD_BCRYPT),
+
+'superadmin'
+
 ]);
+
+
 "
 
-echo "Admin inserted"
-echo "[OK] SuperAdmin created"
+
+ok "SuperAdmin created"
+
 
 }
