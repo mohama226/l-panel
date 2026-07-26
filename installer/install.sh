@@ -2,36 +2,42 @@
 
 set -e
 
-BASE_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-source "$BASE_DIR/functions.sh"
-source "$BASE_DIR/os.sh"
-source "$BASE_DIR/packages.sh"
-source "$BASE_DIR/php.sh"
-source "$BASE_DIR/mariadb.sh"
-source "$BASE_DIR/nginx.sh"
-source "$BASE_DIR/composer.sh"
-source "$BASE_DIR/project.sh"
-source "$BASE_DIR/cli.sh"
+BASE_DIR="/opt/l-panel"
+
+
+source installer/functions.sh
+source installer/os.sh
+source installer/composer.sh
+source installer/database.sh
+source installer/cli.sh
+
 
 banner
 
-check_root
 
 detect_os
 
-install_base_packages
 
-install_php
+install_packages
 
-install_mariadb
 
-install_nginx
+prepare_directory
 
-install_composer
 
 install_project
 
+
+install_composer
+
+
+configure_database
+
+
+create_admin
+
+
 install_cli
 
-finish_install
+
+success
