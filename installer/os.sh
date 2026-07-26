@@ -1,38 +1,38 @@
 #!/bin/bash
 
-detect_os() {
 
-    if [ ! -f /etc/os-release ]; then
-        error "Unsupported operating system."
-    fi
+detect_os(){
 
-    source /etc/os-release
 
-    case "$ID" in
+if [ -f /etc/almalinux-release ]; then
 
-        ubuntu|debian)
 
-            DISTRO="$ID"
-            PKG="apt"
+OS="almalinux"
 
-        ;;
 
-        almalinux|rocky|centos)
+PKG="dnf"
 
-            DISTRO="$ID"
-            PKG="dnf"
 
-        ;;
+elif [ -f /etc/ubuntu-release ] || [ -f /etc/debian_version ]; then
 
-        *)
 
-            error "Unsupported OS : $ID"
+OS="ubuntu"
 
-        ;;
 
-    esac
+PKG="apt"
 
-    success "Operating System : $PRETTY_NAME"
-    success "Package Manager  : $PKG"
+
+else
+
+
+error "Unsupported OS"
+
+
+fi
+
+
+
+ok "Operating System detected: $OS"
+
 
 }
