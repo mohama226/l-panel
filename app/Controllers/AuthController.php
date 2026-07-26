@@ -1,21 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Controllers;
 
-class AuthController
+use App\Core\Controller;
+
+class AuthController extends Controller
 {
-    public function login()
+    public function login():void
     {
-        require APP_PATH . '/Views/auth/login.php';
-    }
-
-    public function authenticate()
-    {
-
-    }
-
-    public function logout()
-    {
-
+        $this->view('auth/login');
     }
 }
