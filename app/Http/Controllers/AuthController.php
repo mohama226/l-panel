@@ -17,18 +17,16 @@ class AuthController extends Controller
     public function login(Request $request)
     {
 
-        $data = $request->validate([
-            'username'=>'required',
-            'password'=>'required'
+        $request->validate([
+            'username' => 'required',
+            'password' => 'required',
         ]);
 
 
-        if(Auth::guard('admin')->attempt([
-            'username'=>$data['username'],
-            'password'=>$data['password'],
-            'status'=>1
-        ]))
-        {
+        if (Auth::attempt([
+            'name' => $request->username,
+            'password' => $request->password
+        ])) {
 
             $request->session()->regenerate();
 
@@ -38,22 +36,10 @@ class AuthController extends Controller
 
 
         return back()->withErrors([
-            'username'=>'نام کاربری یا رمز عبور اشتباه است'
+            'username' => 'Username or password incorrect'
         ]);
 
     }
 
-
-
-    public function logout(Request $request)
-    {
-
-        Auth::guard('admin')->logout();
-
-        $request->session()->invalidate();
-
-        return redirect('/login');
-
-    }
 
 }
