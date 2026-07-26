@@ -1,65 +1,65 @@
 #!/bin/bash
 
-banner() {
+
+GREEN="\033[0;32m"
+RED="\033[0;31m"
+NC="\033[0m"
+
+
+ok(){
+
+echo -e "${GREEN}[OK]${NC} $1"
+
+}
+
+
+error(){
+
+echo -e "${RED}[ERROR]${NC} $1"
+
+exit 1
+
+}
+
+
+banner(){
 
 clear
 
-cat << "EOF"
+echo "
+================================
 
-############################################################
-#                                                          #
-#                    L-PANEL INSTALLER                     #
-#                                                          #
-#                     Version 2.0.0                        #
-#                                                          #
-############################################################
+          L-PANEL INSTALLER
 
-EOF
+              v2.0
+
+================================
+"
 
 }
 
-check_root() {
 
-if [ "$EUID" -ne 0 ]; then
+success(){
 
-echo "Please run as root."
+echo "
 
-exit 1
+================================
 
-fi
+L-Panel Installed Successfully
 
-}
 
-info() {
+URL:
 
-echo "[INFO] $1"
+http://SERVER-IP:${PANEL_PORT}
 
-}
 
-success() {
+Command:
 
-echo "[ OK ] $1"
+l-panel
 
-}
 
-warning() {
+================================
 
-echo "[WARN] $1"
-
-}
-
-error() {
-
-echo "[FAIL] $1"
-
-exit 1
-
-}
-
-finish_install() {
-
-echo
-
-success "Installation Finished."
+"
 
 }
