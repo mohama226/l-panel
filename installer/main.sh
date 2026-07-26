@@ -1,23 +1,27 @@
 #!/bin/bash
 
 
-banner(){
-
-echo "
-=================================
-       L-PANEL INSTALLER
-              Laravel
-=================================
-"
-
-}
+BASE_DIR="/tmp/lpanel-installer"
 
 
+source $BASE_DIR/installer/functions.sh
+source $BASE_DIR/installer/os.sh
+source $BASE_DIR/installer/packages.sh
+source $BASE_DIR/installer/composer.sh
+source $BASE_DIR/installer/database.sh
+source $BASE_DIR/installer/nginx.sh
+source $BASE_DIR/installer/laravel.sh
+source $BASE_DIR/installer/admin.sh
+source $BASE_DIR/installer/command.sh
 
-run_install(){
+
+
+banner
+
 
 
 detect_os
+
 
 
 install_packages
@@ -45,10 +49,3 @@ install_nginx
 
 
 install_command
-
-
-}
-
-
-
-run_install
