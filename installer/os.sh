@@ -1,38 +1,57 @@
 #!/bin/bash
 
-
 detect_os(){
 
+    if [ -f /etc/almalinux-release ]; then
 
-if [ -f /etc/almalinux-release ]; then
+        OS="almalinux"
+        PKG="dnf"
 
+    elif [ -f /etc/ubuntu-release ] || [ -f /etc/debian_version ]; then
 
-OS="almalinux"
+        OS="ubuntu"
+        PKG="apt"
 
+    else
+        error "Unsupported OS"
+    fi
 
-PKG="dnf"
+    ok "Operating System detected: $OS"
+}
 
+install_packages(){
 
-elif [ -f /etc/ubuntu-release ] || [ -f /etc/debian_version ]; then
+    if [ "$OS" = "almalinux" ]; then
 
+        dnf update -y
 
-OS="ubuntu"
+        dnf install -y \
+            git \
+            curl \
+            wget \
+            unzip \
+            nginx \
+            mariadb-server \
+            php \
+            php-fpm \
+            php-mysqlnd
 
+    else
 
-PKG="apt"
+        apt update -y
 
+        apt install -y \
+            git \
+            curl \
+            wget \
+            unzip \
+            nginx \
+            mariadb-server \
+            php \
+            php-fpm \
+            php-mysql
 
-else
+    fi
 
-
-error "Unsupported OS"
-
-
-fi
-
-
-
-ok "Operating System detected: $OS"
-
-
+    ok "Packages installed"
 }
