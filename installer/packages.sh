@@ -1,37 +1,60 @@
 #!/bin/bash
 
-install_base_packages() {
 
-info "Installing required packages..."
+install_packages(){
 
-if [ "$PKG" = "apt" ]; then
+echo "Installing required packages..."
 
-    apt update
 
-    apt install -y \
-    git \
-    curl \
-    wget \
-    unzip \
-    zip \
-    tar \
-    ca-certificates \
-    software-properties-common
+if [ "$OS" = "almalinux" ]; then
 
-else
-
-    dnf makecache
-
-    dnf install -y \
-    git \
-    curl \
-    wget \
-    unzip \
-    zip \
-    tar
+dnf install -y \
+git \
+curl \
+wget \
+unzip \
+zip \
+nginx \
+mariadb-server \
+php \
+php-cli \
+php-fpm \
+php-mysqlnd \
+php-mbstring \
+php-xml \
+php-gd \
+php-bcmath \
+php-intl \
+php-opcache
 
 fi
 
-success "Base packages installed."
+
+if [ "$OS" = "ubuntu" ]; then
+
+apt update
+
+apt install -y \
+git \
+curl \
+wget \
+unzip \
+zip \
+nginx \
+mariadb-server \
+php \
+php-cli \
+php-fpm \
+php-mysql \
+php-mbstring \
+php-xml \
+php-gd \
+php-bcmath \
+php-intl
+
+fi
+
+
+ok "Packages installed"
 
 }
