@@ -2,15 +2,17 @@
 
 create_database(){
 
+    systemctl enable mariadb --now
+
     echo "Database Configuration"
 
     read -p "Database Name [lpanel]: " DB_NAME < /dev/tty
     DB_NAME=${DB_NAME:-lpanel}
 
-    read -p "Database User [lpanel]: " DB_USER
+    read -p "Database User [lpanel]: " DB_USER < /dev/tty
     DB_USER=${DB_USER:-lpanel}
 
-    read -s -p "Database Password: " DB_PASS
+    read -s -p "Database Password: " DB_PASS < /dev/tty
     echo ""
 
     MYSQL_ROOT_PASSWORD=""
