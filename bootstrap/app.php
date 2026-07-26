@@ -17,20 +17,6 @@ define('STORAGE_PATH', ROOT_PATH . '/storage');
 |--------------------------------------------------------------------------
 | Composer Autoload
 |--------------------------------------------------------------------------
-|
-| اگر autoload در composer.json نبود، باید اضافه شود:
-|
-| {
-|   "autoload": {
-|     "psr-4": {
-|       "App\\": "app/"
-|     }
-|   }
-| }
-|
-| سپس:
-| composer dump-autoload
-|
 */
 
 require ROOT_PATH . '/vendor/autoload.php';
@@ -51,6 +37,18 @@ date_default_timezone_set('UTC');
 */
 
 use App\Core\Container;
+use App\Core\Database;
 
 $container = new Container();
 $GLOBALS['container'] = $container;
+
+/*
+|--------------------------------------------------------------------------
+| Register Database in Container
+|--------------------------------------------------------------------------
+*/
+
+$GLOBALS['container']->set(
+    Database::class,
+    new Database()
+);
