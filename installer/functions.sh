@@ -4,6 +4,19 @@
 ROOT_DIR="/opt/l-panel"
 
 
+
+banner(){
+
+clear
+
+echo "================================="
+echo "       L-PANEL INSTALLER"
+echo "================================="
+
+}
+
+
+
 ok(){
 
 echo "[OK] $1"
@@ -11,10 +24,27 @@ echo "[OK] $1"
 }
 
 
+
 error(){
 
 echo "[ERROR] $1"
 exit 1
+
+}
+
+
+
+info(){
+
+echo "[INFO] $1"
+
+}
+
+
+
+warning(){
+
+echo "[WARN] $1"
 
 }
 
@@ -32,9 +62,9 @@ APP_URL=http://127.0.0.1
 
 DB_HOST=127.0.0.1
 DB_PORT=3306
-DB_DATABASE=$DB_NAME
-DB_USERNAME=$DB_USER
-DB_PASSWORD=$DB_PASS
+DB_DATABASE=${DB_NAME}
+DB_USERNAME=${DB_USER}
+DB_PASSWORD=${DB_PASS}
 
 TIMEZONE=UTC
 
