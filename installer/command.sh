@@ -1,71 +1,53 @@
 #!/bin/bash
 
 
-install_command(){
-
+create_command(){
 
 cat >/usr/local/bin/l-panel <<'EOF'
 
 #!/bin/bash
 
-
-cd /var/www/l-panel
-
+cd /opt/l-panel
 
 echo "
-1) Update Panel
-2) Restart Services
-3) Laravel Cache Clear
-4) Exit
+1) Update
+2) Restart nginx
+3) Restart php
+4) Laravel migrate
 "
 
 
-read -p "Select: " x
+read -p "Select: " c
 
 
-case $x in
-
+case $c in
 
 1)
-
 git pull
-
 composer install
-
-php artisan migrate
-
+php artisan migrate --force
 ;;
-
 
 2)
-
 systemctl restart nginx
-systemctl restart php-fpm
-
 ;;
-
 
 3)
-
-php artisan optimize:clear
-
+systemctl restart php-fpm
 ;;
 
-
-*)
-
-exit
-
+4)
+php artisan migrate --force
 ;;
-
 
 esac
-
 
 EOF
 
 
 chmod +x /usr/local/bin/l-panel
 
+
+echo "[OK] l-panel command created"
 
 }
