@@ -2,103 +2,30 @@
 
 set -e
 
-REPO="https://github.com/mohama226/l-panel.git"
-BASE_DIR="/tmp/lpanel-installer"
+
+INSTALLER_DIR="/tmp/lpanel-installer"
 
 
-echo "
-=================================
-       L-PANEL INSTALLER
-          Laravel v1.0
-=================================
-"
+cd /root
 
 
-detect_os(){
-
-    if [ -f /etc/almalinux-release ]; then
-
-        OS="almalinux"
-
-    elif grep -qi ubuntu /etc/os-release; then
-
-        OS="ubuntu"
-
-    else
-
-        echo "[ERROR] Unsupported OS"
-        exit 1
-
-    fi
+rm -rf "$INSTALLER_DIR"
 
 
-    echo "[OK] OS detected: $OS"
-
-}
+mkdir -p "$INSTALLER_DIR"
 
 
-
-install_base(){
-
-
-    if [ "$OS" = "almalinux" ]; then
+dnf install -y git curl wget unzip >/dev/null
 
 
-        dnf install -y git curl wget unzip
+echo "[OK] Base packages installed"
 
 
-    else
+git clone https://github.com/mohama226/l-panel.git "$INSTALLER_DIR"
 
 
-        apt update
-
-        apt install -y git curl wget unzip
+cd "$INSTALLER_DIR"
 
 
-    fi
-
-
-    echo "[OK] Base packages installed"
-
-}
-
-
-
-download(){
-
-
-    rm -rf $BASE_DIR
-
-    mkdir -p $BASE_DIR
-
-
-    git clone $REPO $BASE_DIR
-
-
-}
-
-
-
-run_installer(){
-
-
-    cd $BASE_DIR
-
-
-    chmod +x installer/*.sh
-
-
-    source installer/main.sh
-
-
-}
-
-
-
-detect_os
-
-install_base
-
-download
-
-run_installer
+source installer/functions.sh
+source installer/main.sh
