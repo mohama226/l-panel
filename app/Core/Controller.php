@@ -6,26 +6,25 @@ namespace App\Core;
 
 abstract class Controller
 {
-    protected function view(string $view,array $data=[]):void
-    {
-        extract($data);
+    protected Request $request;
 
-        require ROOT_PATH.'/app/Views/'.$view.'.php';
+    public function __construct()
+    {
+        $this->request=new Request();
     }
 
-    protected function redirect(string $url):void
+    protected function view(string $view,array $data=[]): void
     {
-        header("Location: ".$url);
-
-        exit;
+        View::render($view,$data);
     }
 
-    protected function json(array $data):void
+    protected function redirect(string $url): never
     {
-        header('Content-Type: application/json');
+        Response::redirect($url);
+    }
 
-        echo json_encode($data,JSON_PRETTY_PRINT);
-
-        exit;
+    protected function json(array $data): never
+    {
+        Response::json($data);
     }
 }
