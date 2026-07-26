@@ -33,7 +33,7 @@ cd /opt/l-panel
 php artisan tinker --execute="
 \App\Models\User::create([
 'name'=>'$ADMIN_USER',
-'email'=>'$ADMIN_USER@example.com',
+'email'=>'$ADMIN_USER@admin.local',
 'password'=>bcrypt('$ADMIN_PASS'),
 ]);
 "
