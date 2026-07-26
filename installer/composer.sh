@@ -1,12 +1,15 @@
 #!/bin/bash
 
-install_composer() {
 
-info "Installing Composer..."
+install_composer(){
 
-if command -v composer >/dev/null 2>&1; then
+echo "Installing Composer..."
 
-    success "Composer already installed."
+
+if command -v composer >/dev/null 2>&1
+then
+
+    ok "Composer already installed"
 
     composer --version
 
@@ -14,14 +17,23 @@ if command -v composer >/dev/null 2>&1; then
 
 fi
 
-php -r "copy('https://getcomposer.org/installer','composer-setup.php');"
 
-php composer-setup.php --install-dir=/usr/local/bin --filename=composer
+
+php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
+
+
+php composer-setup.php \
+--install-dir=/usr/local/bin \
+--filename=composer
+
 
 rm -f composer-setup.php
 
-success "Composer Installed."
+
+ok "Composer installed"
+
 
 composer --version
+
 
 }
