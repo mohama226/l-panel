@@ -1,81 +1,34 @@
 <?php
 
-$title='ورود مدیر';
-
 ob_start();
-
 ?>
 
-<div class="login-wrapper">
+<h2>L-Panel Login</h2>
 
-<div class="login-card">
-
-<div class="logo">
-
-<img src="/assets/images/logo.png">
-
-</div>
-
-<h2>L-Panel</h2>
-
-<p>OCServ Management Platform</p>
-
-<form method="post" action="/login">
+<form method="post">
 
 <input
-type="hidden"
-name="_token"
-value="<?= csrf_token();?>">
-
-<div class="mb-3">
-
-<input
-class="form-control"
-name="username"
-placeholder="نام کاربری">
-
-</div>
-
-<div class="mb-3">
+type="text"
+placeholder="Username"
+name="username">
 
 <input
 type="password"
-class="form-control"
-name="password"
-placeholder="رمز عبور">
+placeholder="Password"
+name="password">
 
-</div>
+<button>
 
-<div class="form-check">
-
-<input
-class="form-check-input"
-type="checkbox"
-name="remember">
-
-<label>
-
-مرا به خاطر بسپار
-
-</label>
-
-</div>
-
-<button
-class="btn btn-primary w-100 mt-3">
-
-ورود
+Login
 
 </button>
 
 </form>
 
-</div>
-
-</div>
-
 <?php
 
 $content=ob_get_clean();
 
-require APP_PATH.'/Views/layouts/auth.php';
+$title='Login';
+
+require ROOT_PATH.'/app/Views/layouts/main.php';
