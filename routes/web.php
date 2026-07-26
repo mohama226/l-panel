@@ -5,35 +5,34 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\DashboardController;
 
 
-Route::get('/', function(){
+Route::get('/', function () {
     return redirect('/login');
 });
 
 
-Route::get('/login',
-[
+Route::get('/login', [
     AuthController::class,
     'show'
 ])->name('login');
 
 
-Route::post('/login',
-[
+Route::post('/login', [
     AuthController::class,
     'login'
 ]);
 
 
-Route::get('/logout',
-[
+Route::post('/logout', [
     AuthController::class,
     'logout'
 ]);
 
 
-Route::get('/dashboard',
-[
-    DashboardController::class,
-    'index'
-])
-->middleware('admin');
+Route::middleware('auth')->group(function () {
+
+    Route::get('/dashboard', [
+        DashboardController::class,
+        'index'
+    ]);
+
+});
