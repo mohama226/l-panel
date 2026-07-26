@@ -1,39 +1,43 @@
 #!/bin/bash
 
-
 install_composer(){
 
-echo "Installing Composer..."
+    echo "Installing Composer..."
 
+    if command -v composer >/dev/null 2>&1
+    then
+        ok "Composer already installed"
+        composer --version
+        return
+    fi
 
-if command -v composer >/dev/null 2>&1
-then
+    php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
 
-    ok "Composer already installed"
+    php composer-setup.php \
+        --install-dir=/usr/local/bin \
+        --filename=composer
+
+    rm -f composer-setup.php
+
+    ok "Composer installed"
 
     composer --version
+}
 
-    return
+install_project_dependencies(){
 
-fi
+    echo "Installing L-Panel dependencies..."
 
+    cd /opt/l-panel
 
+    if [ ! -f composer.json ]; then
+        error "composer.json not found"
+    fi
 
-php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
+    composer install \
+        --no-interaction \
+        --prefer-dist \
+        --optimize-autoloader
 
-
-php composer-setup.php \
---install-dir=/usr/local/bin \
---filename=composer
-
-
-rm -f composer-setup.php
-
-
-ok "Composer installed"
-
-
-composer --version
-
-
+    ok "Composer dependencies installed"
 }
