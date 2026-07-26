@@ -23,10 +23,19 @@ class AuthController extends Controller
         ]);
 
 
-        if (Auth::attempt([
-            'name' => $request->username,
+        $login = $request->username;
+
+
+        $field = filter_var($login, FILTER_VALIDATE_EMAIL)
+            ? 'email'
+            : 'name';
+
+
+        if(Auth::attempt([
+            $field => $login,
             'password' => $request->password
-        ])) {
+        ]))
+        {
 
             $request->session()->regenerate();
 
@@ -36,10 +45,24 @@ class AuthController extends Controller
 
 
         return back()->withErrors([
-            'username' => 'Username or password incorrect'
+            'username'=>'نام کاربری یا رمز عبور اشتباه است'
         ]);
 
     }
 
+
+    public function logout(Request $request)
+    {
+
+        Auth::logout();
+
+        $request->session()->invalidate();
+
+        $request->session()->regenerateToken();
+
+
+        return redirect('/login');
+
+    }
 
 }
