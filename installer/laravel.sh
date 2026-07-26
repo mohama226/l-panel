@@ -1,28 +1,19 @@
 #!/bin/bash
 
-
 install_laravel(){
-
 
 echo "[OK] Installing Laravel"
 
 
-mkdir -p /opt
+if [ -d "/opt/l-panel" ]; then
 
-
-if [ -d /opt/l-panel ]; then
-
-rm -rf /opt/l-panel
-
-fi
-
-
-composer create-project laravel/laravel /opt/l-panel
-
+    echo "[OK] Existing Laravel directory found"
 
 else
 
-echo "Laravel already exists"
+    composer create-project \
+    laravel/laravel \
+    /opt/l-panel
 
 fi
 
@@ -30,7 +21,19 @@ fi
 cd /opt/l-panel
 
 
-php artisan key:generate --force
+if [ ! -f ".env" ]; then
 
+cp .env.example .env
+
+fi
+
+
+php artisan key:generate
+
+
+chmod -R 775 storage bootstrap/cache
+
+
+echo "[OK] Laravel installed"
 
 }
