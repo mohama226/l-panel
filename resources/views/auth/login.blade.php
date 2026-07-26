@@ -12,9 +12,16 @@
 <body>
 
 
-<h1>
-L-Panel
-</h1>
+<h2>
+L-PANEL
+</h2>
+
+
+@if(session('error'))
+<p>
+{{session('error')}}
+</p>
+@endif
 
 
 <form method="POST" action="/login">
@@ -22,21 +29,13 @@ L-Panel
 @csrf
 
 
-<input 
-name="username"
+<input name="username"
 placeholder="Username">
 
 
-<br><br>
-
-
-<input 
+<input name="password"
 type="password"
-name="password"
 placeholder="Password">
-
-
-<br><br>
 
 
 <button>
