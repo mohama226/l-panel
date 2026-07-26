@@ -1,9 +1,5 @@
 <!DOCTYPE html>
 <html>
-<head>
-<title>L-Panel Login</title>
-</head>
-
 <body>
 
 <h2>L-Panel Login</h2>
@@ -14,22 +10,14 @@
 @csrf
 
 
-<input 
-name="email"
-placeholder="Email">
+<input name="username" placeholder="Username">
+
+<br><br>
+
+<input type="password" name="password" placeholder="Password">
 
 
-<br>
-
-
-<input 
-type="password"
-name="password"
-placeholder="Password">
-
-
-<br>
-
+<br><br>
 
 <button>
 Login
