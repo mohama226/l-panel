@@ -55,19 +55,15 @@ run_migrations(){
 
 cd /opt/l-panel
 
-php -r "
+php -r '
 
-require 'vendor/autoload.php';
+require "bootstrap/app.php";
 
-use Dotenv\Dotenv;
+$migrator = new App\Core\Migrator();
 
-\$dotenv = Dotenv::createImmutable('/opt/l-panel');
-\$dotenv->load();
+$migrator->run();
 
-\$m = new App\Core\Migrator();
-\$m->run();
-
-"
+'
 
 ok "Database migrations completed"
 
