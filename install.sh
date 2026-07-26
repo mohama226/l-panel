@@ -2,10 +2,8 @@
 
 set -e
 
-
 REPO="https://github.com/mohama226/l-panel.git"
-
-TMP="/tmp/l-panel-install"
+BASE_DIR="/tmp/lpanel-installer"
 
 
 echo "
@@ -18,23 +16,23 @@ echo "
 
 detect_os(){
 
-if [ -f /etc/almalinux-release ]; then
+    if [ -f /etc/almalinux-release ]; then
 
-    OS="almalinux"
+        OS="almalinux"
 
-elif grep -qi ubuntu /etc/os-release; then
+    elif grep -qi ubuntu /etc/os-release; then
 
-    OS="ubuntu"
+        OS="ubuntu"
 
-else
+    else
 
-    echo "Unsupported OS"
-    exit 1
+        echo "[ERROR] Unsupported OS"
+        exit 1
 
-fi
+    fi
 
 
-echo "[OK] OS: $OS"
+    echo "[OK] OS detected: $OS"
 
 }
 
@@ -43,24 +41,24 @@ echo "[OK] OS: $OS"
 install_base(){
 
 
-if [ "$OS" = "almalinux" ]; then
+    if [ "$OS" = "almalinux" ]; then
 
 
-dnf install -y git curl wget unzip
+        dnf install -y git curl wget unzip
 
 
-else
+    else
 
 
-apt update
+        apt update
 
-apt install -y git curl wget unzip
-
-
-fi
+        apt install -y git curl wget unzip
 
 
-echo "[OK] Base packages installed"
+    fi
+
+
+    echo "[OK] Base packages installed"
 
 }
 
@@ -69,25 +67,28 @@ echo "[OK] Base packages installed"
 download(){
 
 
-rm -rf $TMP
+    rm -rf $BASE_DIR
+
+    mkdir -p $BASE_DIR
 
 
-git clone $REPO $TMP
-
-
-cd $TMP
+    git clone $REPO $BASE_DIR
 
 
 }
 
 
 
-run(){
-
-chmod +x installer/*.sh
+run_installer(){
 
 
-source installer/main.sh
+    cd $BASE_DIR
+
+
+    chmod +x installer/*.sh
+
+
+    source installer/main.sh
 
 
 }
@@ -100,4 +101,4 @@ install_base
 
 download
 
-run
+run_installer
