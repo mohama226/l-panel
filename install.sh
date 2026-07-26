@@ -1083,6 +1083,12 @@ SERVER_IP=$(hostname -I | awk '{print $1}')
 
 clear
 
+echo "Installing L-Panel CLI..."
+
+install -m 755 scripts/l-panel /usr/local/bin/l-panel
+
+echo "[OK] L-Panel CLI Installed"
+
 
 echo
 
@@ -1221,7 +1227,3 @@ installation_complete
 
 
 main "$@"
-
-cp scripts/l-panel /usr/local/bin/l-panel
-
-chmod +x /usr/local/bin/l-panel
