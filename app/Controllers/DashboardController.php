@@ -5,25 +5,17 @@ declare(strict_types=1);
 namespace App\Controllers;
 
 
-use App\Core\Controller;
-use App\Core\Auth;
-
-
-class DashboardController extends Controller
+class DashboardController
 {
 
-
-    public function index():void
+    public function index(): void
     {
 
-        $this->view(
-            'dashboard/index',
-            [
-                'user'=>Auth::user()
-            ]
-        );
+        $username = $_SESSION['admin_username'] ?? 'Admin';
+
+
+        require ROOT_PATH.'/app/Views/dashboard.php';
 
     }
-
 
 }
