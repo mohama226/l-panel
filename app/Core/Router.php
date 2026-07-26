@@ -1,45 +1,37 @@
-<?php
-
-declare(strict_types=1);
-
-namespace App\Core;
-
-class Router
+public function dispatch():void
 {
-    private array $routes = [];
+    $method=$_SERVER['REQUEST_METHOD'];
 
-    public function get(string $uri, callable|array $action): void
-    {
-        $this->routes['GET'][$uri] = $action;
-    }
+    $uri=parse_url($_SERVER['REQUEST_URI'],PHP_URL_PATH);
 
-    public function post(string $uri, callable|array $action): void
-    {
-        $this->routes['POST'][$uri] = $action;
-    }
-
-    public function dispatch(): void
-    {
-        $method = $_SERVER['REQUEST_METHOD'];
-
-        $uri = parse_url($_SERVER['REQUEST_URI'],PHP_URL_PATH);
-
-        if(isset($this->routes[$method][$uri])){
-
-            $action = $this->routes[$method][$uri];
-
-            if(is_callable($action)){
-
-                call_user_func($action);
-
-                return;
-
-            }
-
-        }
+    if(!isset($this->routes[$method][$uri])){
 
         http_response_code(404);
 
-        echo "404 Not Found";
+        echo "404";
+
+        return;
+
     }
+
+    $action=$this->routes[$method][$uri];
+
+    if(is_callable($action)){
+
+        call_user_func($action);
+
+        return;
+
+    }
+
+    if(is_array($action)){
+
+        [$controller,$function]=$action;
+
+        (new $controller)->$function();
+
+        return;
+
+    }
+
 }
