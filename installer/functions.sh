@@ -1,65 +1,46 @@
 #!/bin/bash
 
 
-GREEN="\033[0;32m"
-RED="\033[0;31m"
-NC="\033[0m"
+ROOT_DIR="/opt/l-panel"
 
 
 ok(){
 
-echo -e "${GREEN}[OK]${NC} $1"
+echo "[OK] $1"
 
 }
 
 
 error(){
 
-echo -e "${RED}[ERROR]${NC} $1"
-
+echo "[ERROR] $1"
 exit 1
 
 }
 
 
-banner(){
 
-clear
+create_env(){
 
-echo "
-================================
+cat > $ROOT_DIR/.env <<EOF
 
-          L-PANEL INSTALLER
+APP_NAME=L-Panel
+APP_ENV=production
+APP_DEBUG=false
 
-              v2.0
+APP_URL=http://127.0.0.1
 
-================================
-"
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=$DB_NAME
+DB_USERNAME=$DB_USER
+DB_PASSWORD=$DB_PASS
 
-}
+TIMEZONE=UTC
 
-
-success(){
-
-echo "
-
-================================
-
-L-Panel Installed Successfully
+EOF
 
 
-URL:
-
-http://SERVER-IP:${PANEL_PORT}
-
-
-Command:
-
-l-panel
-
-
-================================
-
-"
+ok ".env created"
 
 }
