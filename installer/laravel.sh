@@ -10,7 +10,11 @@ echo "[OK] Installing Laravel"
 mkdir -p /opt
 
 
-if [ ! -d /opt/l-panel ]; then
+if [ -d /opt/l-panel ]; then
+
+rm -rf /opt/l-panel
+
+fi
 
 
 composer create-project laravel/laravel /opt/l-panel
