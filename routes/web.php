@@ -1,21 +1,24 @@
 <?php
 
 use App\Core\App;
-
 use App\Controllers\AuthController;
 
 App::$router->get('/',[
-
-AuthController::class,
-
-'login'
-
+    AuthController::class,
+    'login'
 ]);
 
 App::$router->get('/login',[
+    AuthController::class,
+    'login'
+]);
 
-AuthController::class,
+App::$router->post('/login',[
+    AuthController::class,
+    'authenticate'
+]);
 
-'login'
-
+App::$router->get('/logout',[
+    AuthController::class,
+    'logout'
 ]);
