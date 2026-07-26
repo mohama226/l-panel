@@ -1,42 +1,60 @@
 <!DOCTYPE html>
-<html>
+<html lang="fa">
+
 <head>
+<meta charset="UTF-8">
 <title>L-PANEL Login</title>
 </head>
 
+
 <body>
 
-<h2>L-PANEL</h2>
+
+<h2>
+L-PANEL
+</h2>
 
 
 <form method="POST" action="/login">
 
 @csrf
 
+
 <input 
-type="email" 
-name="email" 
-placeholder="Email">
+type="text"
+name="username"
+placeholder="نام کاربری">
 
 
 <br>
 
 
-<input 
-type="password" 
-name="password" 
-placeholder="Password">
+<input
+type="password"
+name="password"
+placeholder="رمز عبور">
 
 
 <br>
+
 
 <button type="submit">
-Login
+ورود
 </button>
 
 
 </form>
 
 
+@if($errors->any())
+
+<p>
+{{$errors->first()}}
+</p>
+
+@endif
+
+
 </body>
+
 </html>
