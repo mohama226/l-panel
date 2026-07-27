@@ -1,6 +1,7 @@
 @extends('admin.layout')
 
 
+
 @section('title')
 
 داشبورد
@@ -9,12 +10,20 @@
 
 
 
+
+
+
 @section('content')
 
 
+
 <h1>
+
 داشبورد مدیریت L-PANEL
+
 </h1>
+
+
 
 
 
@@ -22,18 +31,15 @@
 
 
 
-<div class="card">
+<div class="stat-box">
 
-<div>
+<h3>
 ادمین‌ها
-</div>
+</h3>
 
-
-<div class="stat-number">
-
-{{ $stats['admins'] }}
-
-</div>
+<h1>
+{{$stats['admins']}}
+</h1>
 
 </div>
 
@@ -41,37 +47,15 @@
 
 
 
-<div class="card">
+<div class="stat-box">
 
-<div>
-سرورهای OCServ
-</div>
-
-
-<div class="stat-number">
-
-{{ $stats['servers'] }}
-
-</div>
-
-</div>
-
-
-
-
-
-<div class="card">
-
-<div>
+<h3>
 کاربران VPN
-</div>
+</h3>
 
-
-<div class="stat-number">
-
-{{ $stats['users'] }}
-
-</div>
+<h1>
+{{$stats['users']}}
+</h1>
 
 </div>
 
@@ -79,24 +63,40 @@
 
 
 
-<div class="card">
+<div class="stat-box">
 
-<div>
+<h3>
+سرورها
+</h3>
+
+<h1>
+{{$stats['servers']}}
+</h1>
+
+</div>
+
+
+
+
+
+<div class="stat-box">
+
+<h3>
 نمایندگان
-</div>
+</h3>
 
-
-<div class="stat-number">
-
-{{ $stats['resellers'] }}
-
-</div>
+<h1>
+{{$stats['resellers']}}
+</h1>
 
 </div>
 
 
 
+
 </div>
+
+
 
 
 
@@ -109,23 +109,27 @@
 </h3>
 
 
+
 <p>
 
 کاربران فعال:
 
-{{ $stats['active_users'] }}
+{{$stats['active_users']}}
 
 </p>
+
 
 
 <p>
 
-سیستم آماده مدیریت OCServ است.
+سیستم مدیریت OCServ آماده است.
 
 </p>
 
 
+
 </div>
+
 
 
 
