@@ -1,6 +1,12 @@
 <?php
 
+
 use Illuminate\Support\Facades\Route;
+
+
+use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\Auth\LogoutController;
+
 
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\VpnUserController;
@@ -8,18 +14,31 @@ use App\Http\Controllers\Admin\ServerController;
 use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Admin\ResellerController;
 
-use App\Http\Controllers\Auth\LoginController;
-use App\Http\Controllers\Auth\LogoutController;
+
+
+
 
 /*
 |--------------------------------------------------------------------------
-| Public Routes
+| Home
 |--------------------------------------------------------------------------
 */
 
+
 Route::get('/', function () {
-    return redirect('/admin/login');
+
+
+    return redirect()
+    ->route('admin.login');
+
+
 });
+
+
+
+
+
+
 
 /*
 |--------------------------------------------------------------------------
@@ -27,8 +46,11 @@ Route::get('/', function () {
 |--------------------------------------------------------------------------
 */
 
+
 Route::prefix('admin')
-->group(function () {
+->group(function(){
+
+
 
     Route::get(
         '/login',
@@ -36,7 +58,12 @@ Route::prefix('admin')
             LoginController::class,
             'showLogin'
         ]
-    )->name('admin.login');
+    )
+    ->name('admin.login');
+
+
+
+
 
     Route::post(
         '/login',
@@ -44,7 +71,12 @@ Route::prefix('admin')
             LoginController::class,
             'login'
         ]
-    )->name('admin.login.submit');
+    )
+    ->name('admin.login.submit');
+
+
+
+
 
     Route::post(
         '/logout',
@@ -53,221 +85,194 @@ Route::prefix('admin')
             'logout'
         ]
     )
-    ->middleware('admin.auth')
     ->name('admin.logout');
+
+
 
 });
 
+
+
+
+
+
+
+
+
 /*
 |--------------------------------------------------------------------------
-| Admin Panel Routes
+| Admin Panel
 |--------------------------------------------------------------------------
 */
+
 
 Route::prefix('admin')
-->middleware(['auth:admin'])
-->group(function () {
+->middleware('admin.auth')
+->group(function(){
 
-/*
-|--------------------------------------------------------------------------
-| Dashboard
-|--------------------------------------------------------------------------
-*/
 
-Route::get(
-    '/dashboard',
-    [
-        DashboardController::class,
-        'index'
-    ]
-)->name('admin.dashboard');
 
-/*
-|--------------------------------------------------------------------------
-| VPN Users
-|--------------------------------------------------------------------------
-*/
 
-Route::prefix('vpn-users')
-->group(function () {
+
+    /*
+    Dashboard
+    */
+
 
     Route::get(
-        '/',
+        '/dashboard',
         [
-            VpnUserController::class,
+            DashboardController::class,
             'index'
         ]
-    )->name('vpn-users.index');
+    )
+    ->name('admin.dashboard');
 
-    Route::get(
-        '/create',
-        [
-            VpnUserController::class,
-            'create'
-        ]
-    )->name('vpn-users.create');
+
+
+
+
+
+
+
+    /*
+    VPN Users
+    */
+
+
+    Route::resource(
+        '/vpn-users',
+        VpnUserController::class
+    )
+    ->names('vpn-users');
+
+
+
+
 
     Route::post(
-        '/',
-        [
-            VpnUserController::class,
-            'store'
-        ]
-    )->name('vpn-users.store');
-
-    Route::delete(
-        '/{vpnUser}',
-        [
-            VpnUserController::class,
-            'destroy'
-        ]
-    )->name('vpn-users.destroy');
-
-    Route::post(
-        '/{vpnUser}/enable',
+        '/vpn-users/{vpnUser}/enable',
         [
             VpnUserController::class,
             'enable'
         ]
-    )->name('vpn-users.enable');
+    )
+    ->name('vpn-users.enable');
+
+
+
+
 
     Route::post(
-        '/{vpnUser}/disable',
+        '/vpn-users/{vpnUser}/disable',
         [
             VpnUserController::class,
             'disable'
         ]
-    )->name('vpn-users.disable');
+    )
+    ->name('vpn-users.disable');
 
-});
 
-/*
-|--------------------------------------------------------------------------
-| OCServ Servers
-|--------------------------------------------------------------------------
-*/
 
-Route::prefix('servers')
-->group(function () {
 
-    Route::get(
-        '/',
-        [
-            ServerController::class,
-            'index'
-        ]
-    )->name('servers.index');
 
-    Route::get(
-        '/create',
-        [
-            ServerController::class,
-            'create'
-        ]
-    )->name('servers.create');
+
+
+
+
+    /*
+    OCServ Servers
+    */
+
+
+    Route::resource(
+        '/servers',
+        ServerController::class
+    )
+    ->names('servers');
+
+
+
+
 
     Route::post(
-        '/',
-        [
-            ServerController::class,
-            'store'
-        ]
-    )->name('servers.store');
-
-    Route::post(
-        '/{server}/test',
+        '/servers/{server}/test',
         [
             ServerController::class,
             'test'
         ]
-    )->name('servers.test');
+    )
+    ->name('servers.test');
 
-    Route::delete(
-        '/{server}',
+
+
+
+
+    Route::post(
+        '/servers/{server}/restart',
         [
             ServerController::class,
-            'destroy'
+            'restart'
         ]
-    )->name('servers.destroy');
+    )
+    ->name('servers.restart');
 
-});
 
-/*
-|--------------------------------------------------------------------------
-| Admin Management
-|--------------------------------------------------------------------------
-*/
 
-Route::prefix('admins')
-->group(function () {
+
+
+
+
+
+
+    /*
+    Admin Management
+    */
+
 
     Route::get(
-        '/',
+        '/admins',
         [
             AdminController::class,
             'index'
         ]
-    )->name('admins.index');
+    )
+    ->name('admins.index');
+
+
+
+
 
     Route::post(
-        '/',
+        '/admins',
         [
             AdminController::class,
             'store'
         ]
-    )->name('admins.store');
+    )
+    ->name('admins.store');
 
-    Route::delete(
-        '/{admin}',
-        [
-            AdminController::class,
-            'destroy'
-        ]
-    )->name('admins.destroy');
 
-});
 
-/*
-|--------------------------------------------------------------------------
-| Reseller Management
-|--------------------------------------------------------------------------
-*/
 
-Route::prefix('resellers')
-->group(function () {
 
-    Route::get(
-        '/',
-        [
-            ResellerController::class,
-            'index'
-        ]
-    )->name('resellers.index');
 
-    Route::get(
-        '/create',
-        [
-            ResellerController::class,
-            'create'
-        ]
-    )->name('resellers.create');
 
-    Route::post(
-        '/',
-        [
-            ResellerController::class,
-            'store'
-        ]
-    )->name('resellers.store');
 
-    Route::delete(
-        '/{reseller}',
-        [
-            ResellerController::class,
-            'destroy'
-        ]
-    )->name('resellers.destroy');
 
-});
+    /*
+    Resellers
+    */
+
+
+    Route::resource(
+        '/resellers',
+        ResellerController::class
+    )
+    ->names('resellers');
+
+
+
+
 
 });
