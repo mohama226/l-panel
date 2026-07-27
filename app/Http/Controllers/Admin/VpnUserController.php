@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 
 
 use App\Models\VpnUser;
+
 use App\Models\OcservServer;
 
 
@@ -16,15 +17,13 @@ use App\Services\OcservService;
 use Illuminate\Http\Request;
 
 
-use Illuminate\Support\Facades\Hash;
-
-
 
 class VpnUserController extends Controller
 {
 
 
-    protected $ocserv;
+    protected OcservService $ocserv;
+
 
 
 
@@ -33,11 +32,9 @@ class VpnUserController extends Controller
     )
     {
 
-        $this->ocserv = $ocserv;
+        $this->ocserv=$ocserv;
 
     }
-
-
 
 
 
@@ -47,21 +44,23 @@ class VpnUserController extends Controller
     {
 
 
-        $users =
-        VpnUser::with('server')
+
+        $users = VpnUser::with('server')
         ->latest()
         ->get();
 
 
 
         return view(
+
             'vpn-users.index',
+
             compact('users')
+
         );
 
 
     }
-
 
 
 
@@ -81,9 +80,13 @@ class VpnUserController extends Controller
 
 
 
+
         return view(
+
             'vpn-users.create',
+
             compact('servers')
+
         );
 
 
@@ -95,32 +98,24 @@ class VpnUserController extends Controller
 
 
 
-
-    public function store(
-        Request $request
-    )
+    public function store(Request $request)
     {
 
 
 
-        $data =
-        $request->validate([
+        $data=$request->validate([
 
 
-            'username'=>
-            'required|unique:vpn_users',
+            'username'=>'required|unique:vpn_users',
 
 
-            'password'=>
-            'required',
+            'password'=>'required',
 
 
-            'server_id'=>
-            'required',
+            'server_id'=>'required',
 
 
-            'expire_date'=>
-            'nullable|date'
+            'expire_date'=>'required|date'
 
 
         ]);
@@ -128,43 +123,23 @@ class VpnUserController extends Controller
 
 
 
-
-        $data['password']
-        =
-        Hash::make(
-            $data['password']
-        );
-
-
-
-
-
-        $user =
-        VpnUser::create(
-            $data
-        );
-
+        $user=VpnUser::create($data);
 
 
 
 
         $this->ocserv
-        ->createUser(
-            $user
-        );
-
+        ->createUser($user);
 
 
 
 
         return redirect()
-        ->route(
-            'vpn-users.index'
-        );
+        ->route('vpn-users.index');
+
 
 
     }
-
 
 
 
@@ -179,9 +154,7 @@ class VpnUserController extends Controller
 
 
         $this->ocserv
-        ->deleteUser(
-            $vpnUser
-        );
+        ->deleteUser($vpnUser);
 
 
 
@@ -189,7 +162,9 @@ class VpnUserController extends Controller
 
 
 
+
         return back();
+
 
 
     }
@@ -205,13 +180,6 @@ class VpnUserController extends Controller
         VpnUser $vpnUser
     )
     {
-
-
-        $this->ocserv
-        ->enableUser(
-            $vpnUser
-        );
-
 
 
         $vpnUser->update([
@@ -233,18 +201,10 @@ class VpnUserController extends Controller
 
 
 
-
     public function disable(
         VpnUser $vpnUser
     )
     {
-
-
-        $this->ocserv
-        ->disableUser(
-            $vpnUser
-        );
-
 
 
         $vpnUser->update([
