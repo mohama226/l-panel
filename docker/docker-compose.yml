@@ -1,0 +1,186 @@
+version: "3.8"
+
+
+services:
+
+
+
+  app:
+
+
+    build:
+
+      context: ..
+
+      dockerfile: docker/php/Dockerfile
+
+
+
+    container_name: lpanel_app
+
+
+
+    restart: always
+
+
+
+    working_dir: /var/www
+
+
+
+    volumes:
+
+      - ..:/var/www
+
+
+
+    networks:
+
+      - lpanel
+
+
+
+
+
+  nginx:
+
+
+
+    image: nginx:latest
+
+
+
+    container_name: lpanel_nginx
+
+
+
+    restart: always
+
+
+
+    ports:
+
+      - "80:80"
+
+
+
+    volumes:
+
+      - ..:/var/www
+
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+
+
+
+    depends_on:
+
+      - app
+
+
+
+    networks:
+
+      - lpanel
+
+
+
+
+
+  postgres:
+
+
+
+    image: postgres:16
+
+
+
+    container_name: lpanel_postgres
+
+
+
+    restart: always
+
+
+
+    environment:
+
+
+      POSTGRES_DB: lpanel
+
+
+      POSTGRES_USER: lpanel
+
+
+      POSTGRES_PASSWORD: lpanel_password
+
+
+
+    volumes:
+
+      - postgres_data:/var/lib/postgresql/data
+
+
+
+    ports:
+
+      - "5432:5432"
+
+
+
+    networks:
+
+      - lpanel
+
+
+
+
+
+
+  redis:
+
+
+
+    image: redis:latest
+
+
+
+    container_name: lpanel_redis
+
+
+
+    restart: always
+
+
+
+    ports:
+
+      - "6379:6379"
+
+
+
+    networks:
+
+      - lpanel
+
+
+
+
+
+
+networks:
+
+
+  lpanel:
+
+
+    driver: bridge
+
+
+
+
+
+
+volumes:
+
+
+  postgres_data:
