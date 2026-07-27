@@ -2,7 +2,9 @@
 
 
 @section('title')
+
 کاربران VPN
+
 @endsection
 
 
@@ -11,25 +13,24 @@
 
 
 <h1>
-لیست کاربران VPN
+کاربران VPN
 </h1>
 
 
 
-<div class="card">
-
-
-<a href="{{ route('vpn-users.create') }}">
+<a href="{{route('vpn-users.create')}}">
 
 <button>
+
 ساخت کاربر جدید
+
 </button>
 
 </a>
 
 
-</div>
 
+<br><br>
 
 
 
@@ -42,27 +43,32 @@
 <tr>
 
 <th>
-نام کاربری
+ID
 </th>
 
 
 <th>
-سرور
+Username
 </th>
 
 
 <th>
-تاریخ انقضا
+Server
 </th>
 
 
 <th>
-وضعیت
+Expire
 </th>
 
 
 <th>
-عملیات
+Status
+</th>
+
+
+<th>
+Action
 </th>
 
 
@@ -77,27 +83,23 @@
 
 
 <td>
-
-{{ $user->username }}
-
+{{$user->id}}
 </td>
-
 
 
 <td>
-
-{{ $user->server->name ?? '-' }}
-
+{{$user->username}}
 </td>
-
 
 
 <td>
-
-{{ $user->expire_date }}
-
+{{$user->server->name ?? '-'}}
 </td>
 
+
+<td>
+{{$user->expire_date}}
+</td>
 
 
 <td>
@@ -121,8 +123,52 @@
 <td>
 
 
+
+@if($user->status)
+
+
 <form method="POST"
-action="{{ route('vpn-users.destroy',$user) }}">
+action="{{route('vpn-users.disable',$user)}}">
+
+@csrf
+
+
+<button>
+
+غیرفعال
+
+</button>
+
+
+</form>
+
+
+@else
+
+
+<form method="POST"
+action="{{route('vpn-users.enable',$user)}}">
+
+@csrf
+
+
+<button>
+
+فعال
+
+</button>
+
+
+</form>
+
+
+@endif
+
+
+
+
+<form method="POST"
+action="{{route('vpn-users.destroy',$user)}}">
 
 
 @csrf
@@ -141,61 +187,15 @@ action="{{ route('vpn-users.destroy',$user) }}">
 
 
 
-
-@if($user->status)
-
-
-<form method="POST"
-action="{{ route('vpn-users.disable',$user) }}">
-
-
-@csrf
-
-
-<button>
-
-غیرفعال
-
-</button>
-
-
-</form>
-
-
-
-@else
-
-
-
-<form method="POST"
-action="{{ route('vpn-users.enable',$user) }}">
-
-
-@csrf
-
-
-<button>
-
-فعال
-
-</button>
-
-
-</form>
-
-
-
-@endif
-
-
-
 </td>
+
 
 
 </tr>
 
 
 @endforeach
+
 
 
 </table>
