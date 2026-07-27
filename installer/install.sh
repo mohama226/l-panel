@@ -2,7 +2,7 @@
 
 
 #################################################
-# L-PANEL AUTO INSTALLER
+# L-PANEL Installer
 # OCServ VPN Management Panel
 #################################################
 
@@ -12,9 +12,9 @@ set -e
 
 
 echo "
-=================================
-        L-PANEL INSTALLER
-=================================
+===================================
+       L-PANEL INSTALLER
+===================================
 "
 
 
@@ -35,75 +35,47 @@ fi
 #################################################
 
 
-detect_os()
-{
+echo "[+] Detecting operating system..."
+
 
 
 if [ -f /etc/os-release ]
 then
 
-. /etc/os-release
-
-
-case $ID in
-
-
-ubuntu|debian)
-
-OS="debian"
-
-;;
-
-
-almalinux|rocky|centos|rhel)
-
-OS="rhel"
-
-;;
-
-
-*)
-
-echo "Unsupported OS"
-
-exit 1
-
-;;
-
-esac
-
+source /etc/os-release
 
 else
 
-echo "Cannot detect OS"
+echo "Unknown Linux"
 
 exit 1
-
 
 fi
 
 
 
-}
+
+OS=$ID
 
 
 
-detect_os
+echo "[+] OS detected: $OS"
 
-
-
-echo "Detected OS: $OS"
 
 
 
 
 #################################################
-# Install Packages Debian
+# Install Packages
 #################################################
 
 
-install_debian()
+install_ubuntu()
 {
+
+
+echo "[+] Installing Ubuntu packages"
+
 
 
 apt update
@@ -134,15 +106,17 @@ php-fpm \
 
 php-pgsql \
 
-php-curl \
-
 php-mbstring \
 
 php-xml \
 
+php-curl \
+
 php-zip \
 
-php-bcmath
+composer
+
+
 
 
 
@@ -150,16 +124,22 @@ php-bcmath
 
 
 
-#################################################
-# Install Packages RHEL
-#################################################
 
-
-install_rhel()
+install_alma()
 {
 
 
+echo "[+] Installing AlmaLinux packages"
+
+
+
 dnf update -y
+
+
+
+dnf install -y \
+
+epel-release
 
 
 
@@ -191,7 +171,9 @@ php-xml \
 
 php-json \
 
-php-zip
+php-curl \
+
+composer
 
 
 
@@ -199,57 +181,70 @@ php-zip
 
 
 
+
+case $OS in
+
+
+ubuntu|debian)
+
+
+install_ubuntu
+
+;;
+
+
+
+almalinux|rocky|centos)
+
+
+install_alma
+
+;;
+
+
+
+*)
+
+
+echo "Unsupported OS"
+
+exit 1
+
+
+;;
+
+
+esac
+
+
+
+
+
 #################################################
-# Execute Installer
+# Enable Services
 #################################################
 
 
-if [ "$OS" = "debian" ]
-
-then
-
-
-install_debian
-
-
-else
-
-
-install_rhel
-
-
-fi
+echo "[+] Starting services"
 
 
 
+systemctl enable nginx
 
-
-#################################################
-# Composer Install
-#################################################
-
-
-if ! command -v composer &> /dev/null
-
-then
-
-
-php -r "copy('https://getcomposer.org/installer','composer-setup.php');"
-
-
-php composer-setup.php
-
-
-mv composer.phar /usr/local/bin/composer
-
-
-fi
+systemctl start nginx
 
 
 
+systemctl enable redis
+
+systemctl start redis
 
 
-echo "Composer installed"
+
+systemctl enable postgresql
+
+systemctl start postgresql
+
 
 
 
@@ -264,9 +259,25 @@ INSTALL_DIR="/var/www/l-panel"
 
 
 
-if [ ! -d "$INSTALL_DIR" ]
+if [ -d "$INSTALL_DIR" ]
 
 then
+
+
+echo "[+] Existing installation found"
+
+
+
+else
+
+
+
+echo "[+] Downloading L-PANEL"
+
+
+
+mkdir -p /var/www
+
 
 
 git clone \
@@ -283,18 +294,24 @@ fi
 
 
 
-cd $INSTALL_DIR
-
-
-
-
 
 #################################################
 # Laravel Setup
 #################################################
 
 
-composer install --no-interaction
+
+cd $INSTALL_DIR
+
+
+
+echo "[+] Installing Composer packages"
+
+
+
+composer install --no-dev --optimize-autoloader
+
+
 
 
 
@@ -310,6 +327,7 @@ fi
 
 
 
+
 php artisan key:generate
 
 
@@ -317,21 +335,25 @@ php artisan key:generate
 
 
 #################################################
-# Database
+# Database Setup
 #################################################
 
 
-echo "Creating database"
+echo "[+] Creating database"
 
 
 
 sudo -u postgres psql <<EOF
 
+
 CREATE DATABASE lpanel;
 
-CREATE USER lpanel WITH PASSWORD 'change_password';
+
+CREATE USER lpanel WITH PASSWORD 'lpanel_password';
+
 
 GRANT ALL PRIVILEGES ON DATABASE lpanel TO lpanel;
+
 
 EOF
 
@@ -339,13 +361,49 @@ EOF
 
 
 
+
 #################################################
-# Migration
+# Environment
 #################################################
+
+
+sed -i \
+
+"s/DB_DATABASE=.*/DB_DATABASE=lpanel/" \
+
+.env
+
+
+
+sed -i \
+
+"s/DB_USERNAME=.*/DB_USERNAME=lpanel/" \
+
+.env
+
+
+
+sed -i \
+
+"s/DB_PASSWORD=.*/DB_PASSWORD=lpanel_password/" \
+
+.env
+
+
+
+
+
+
+#################################################
+# Laravel Migration
+#################################################
+
+
+echo "[+] Running migrations"
+
 
 
 php artisan migrate --force
-
 
 
 
@@ -356,60 +414,124 @@ php artisan migrate --force
 #################################################
 
 
-chown -R www-data:www-data $INSTALL_DIR/storage
+echo "[+] Setting permissions"
 
-chown -R www-data:www-data $INSTALL_DIR/bootstrap/cache
+
+
+chown -R www-data:www-data $INSTALL_DIR
+
+
+
+chmod -R 775 storage
+
+chmod -R 775 bootstrap/cache
+
 
 
 
 
 
 #################################################
-# Services Start
+# Nginx Config
 #################################################
 
 
-systemctl enable nginx
+cat > /etc/nginx/conf.d/l-panel.conf <<EOF
 
-systemctl enable redis
 
+server {
+
+
+listen 80;
+
+
+server_name _;
+
+
+
+root $INSTALL_DIR/public;
+
+
+
+index index.php index.html;
+
+
+
+location / {
+
+
+try_files \$uri \$uri/ /index.php?\$query_string;
+
+
+}
+
+
+
+location ~ \.php$ {
+
+
+include fastcgi_params;
+
+
+fastcgi_pass unix:/run/php/php-fpm.sock;
+
+
+fastcgi_param SCRIPT_FILENAME \$document_root\$fastcgi_script_name;
+
+
+}
+
+
+
+}
+
+
+EOF
+
+
+
+
+
+
+nginx -t
 
 
 systemctl restart nginx
 
-systemctl restart redis
-
 
 
 
 
 
 #################################################
-# Finish
+# Create Admin
 #################################################
 
 
 echo "
 
-======================================
+===================================
+Installation Finished
+===================================
 
-L-PANEL Installed Successfully
+Admin Panel:
 
-
-Path:
-
-$INSTALL_DIR
-
-
-Next:
-
-Edit .env
-
-Create admin:
-
-php artisan db:seed
+http://SERVER-IP/admin/login
 
 
-======================================
+Default admin:
+
+username:
+admin
+
+
+password:
+admin123
+
+
+Please change password immediately.
 
 "
+
+
+
