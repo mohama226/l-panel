@@ -1,46 +1,111 @@
 {
-    "name": "lpanel/l-panel",
+    "name": "l-panel/l-panel",
     "type": "project",
-    "description": "L-Panel - Multi Server OCServ VPN Management Panel",
+    "description": "L-PANEL OCServ VPN Management Panel",
     "keywords": [
         "laravel",
         "ocserv",
         "vpn",
-        "panel",
-        "management"
+        "panel"
     ],
     "license": "MIT",
+
     "require": {
-        "php": "^8.3",
-        "laravel/framework": "^12.0",
-        "laravel/sanctum": "^4.0",
-        "spatie/laravel-permission": "^6.0",
-        "guzzlehttp/guzzle": "^7.0"
+
+        "php": "^8.2",
+
+        "laravel/framework": "^11.0",
+
+        "laravel/tinker": "^2.9"
+
     },
+
+
     "require-dev": {
+
         "fakerphp/faker": "^1.23",
+
         "laravel/pint": "^1.13",
-        "phpunit/phpunit": "^11.0"
+
+        "phpunit/phpunit": "^10.5"
+
     },
+
+
     "autoload": {
+
         "psr-4": {
+
             "App\\": "app/",
-            "Database\\Factories\\": "database/factories/",
-            "Database\\Seeders\\": "database/seeders/"
+
+            "Database\\Seeders\\": "database/seeders/",
+
+            "Database\\Factories\\": "database/factories/"
+
         }
+
     },
+
+
     "scripts": {
+
+
         "post-autoload-dump": [
+
             "Illuminate\\Foundation\\ComposerScripts::postAutoloadDump",
+
             "@php artisan package:discover --ansi"
+
         ],
+
+
         "post-install-cmd": [
+
             "@php artisan storage:link"
+
+        ],
+
+
+        "post-update-cmd": [
+
+            "@php artisan vendor:publish --tag=laravel-assets --ansi --force"
+
         ]
+
     },
+
+
+    "extra": {
+
+        "laravel": {
+
+            "dont-discover": []
+
+        }
+
+    },
+
+
     "config": {
+
         "optimize-autoloader": true,
+
         "preferred-install": "dist",
-        "sort-packages": true
-    }
+
+        "sort-packages": true,
+
+        "allow-plugins": {
+
+            "pestphp/pest-plugin": true,
+
+            "php-http/discovery": true
+
+        }
+
+    },
+
+
+    "minimum-stability": "stable",
+
+    "prefer-stable": true
 }
