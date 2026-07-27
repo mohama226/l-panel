@@ -15,7 +15,9 @@
 
 
 <h1>
+
 افزودن OCServ Server
+
 </h1>
 
 
@@ -24,7 +26,7 @@
 
 
 <form method="POST"
-action="{{ route('servers.store') }}">
+action="{{route('servers.store')}}">
 
 
 @csrf
@@ -32,35 +34,59 @@ action="{{ route('servers.store') }}">
 
 
 <input
+
 name="name"
-placeholder="نام سرور">
+
+placeholder="نام سرور"
+
+style="width:100%;padding:10px;">
+
+
+
+<br><br>
 
 
 
 <input
+
 name="ip_address"
-placeholder="IP Address">
+
+placeholder="IP Server"
+
+style="width:100%;padding:10px;">
+
+
+
+<br><br>
 
 
 
 <input
+
 name="ssh_username"
+
 placeholder="SSH Username"
-value="root">
 
+style="width:100%;padding:10px;">
+
+
+
+<br><br>
 
 
 <input
+
 name="ssh_port"
+
+value="22"
+
 placeholder="SSH Port"
-value="22">
+
+style="width:100%;padding:10px;">
 
 
 
-<input
-name="ocserv_port"
-placeholder="OCServ Port"
-value="443">
+<br><br>
 
 
 
@@ -76,6 +102,7 @@ value="443">
 
 
 </div>
+
 
 
 @endsection
