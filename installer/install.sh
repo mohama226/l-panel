@@ -1,23 +1,24 @@
 #!/bin/bash
 
 
-#############################################
-# L-PANEL Installer
+##################################################
+# L-PANEL Installer v2
 # Laravel OCServ VPN Management Panel
-#############################################
-
+##################################################
 
 
 set -e
 
 
 
+clear
+
 
 
 echo "
 =================================
 
- L-PANEL INSTALLER
+ L-PANEL INSTALLER v2
 
  OCServ VPN Management System
 
@@ -27,10 +28,9 @@ echo "
 
 
 
-
-#############################################
-# Root Check
-#############################################
+############################################
+# ROOT CHECK
+############################################
 
 
 if [ "$EUID" -ne 0 ]
@@ -46,37 +46,28 @@ fi
 
 
 
-
-
-
-#############################################
+############################################
 # Detect OS
-#############################################
+############################################
 
 
-
-if [ -f /etc/os-release ]
+if [ ! -f /etc/os-release ]
 
 then
 
-    . /etc/os-release
+echo "Cannot detect operating system"
 
-
-else
-
-    echo "Unknown Linux"
-
-    exit 1
+exit 1
 
 fi
 
 
 
+source /etc/os-release
 
 
 
 OS=$ID
-
 
 
 echo "
@@ -91,139 +82,108 @@ $OS
 
 
 
+############################################
+# Update System
+############################################
 
 
+echo "
 
-#############################################
-# Install Packages
-#############################################
+Updating system...
 
+"
 
 
-install_ubuntu(){
 
+case "$OS" in
 
-echo "Installing Ubuntu packages..."
 
 
+ubuntu|debian)
 
-apt update
 
+apt update -y
 
 
-apt install -y \
+;;
 
-nginx \
 
-mariadb-server \
 
-php \
+almalinux|rocky|rhel|centos)
 
-php-cli \
 
-php-fpm \
+dnf update -y
 
-php-mysql \
 
-php-curl \
+;;
 
-php-mbstring \
 
-php-xml \
 
-php-zip \
+*)
 
-php-bcmath \
 
-php-gd \
+echo "Unsupported OS: $OS"
 
-unzip \
+exit 1
 
-git \
 
-curl \
+;;
 
-composer \
 
-nodejs \
 
-npm
+esac
 
 
 
 
-}
 
-
-
-
-
-
-
-
-install_debian(){
-
-
-echo "Installing Debian packages..."
-
-
-
-apt update
-
-
-
-apt install -y \
-
-nginx \
-
-mariadb-server \
-
-php \
-
-php-cli \
-
-php-fpm \
-
-php-mysql \
-
-php-curl \
-
-php-mbstring \
-
-php-xml \
-
-php-zip \
-
-php-bcmath \
-
-unzip \
-
-git \
-
-curl \
-
-composer
-
-
-
-
-}
-
-
-
-
-
-
+############################################
+# Install AlmaLinux Packages
+############################################
 
 
 install_alma(){
 
 
-echo "Installing AlmaLinux packages..."
+echo "
+
+Installing AlmaLinux dependencies...
+
+"
 
 
 
-dnf update -y
+# Enable repositories
+
+
+dnf install -y epel-release || true
+
+
+
+dnf install -y dnf-utils || true
+
+
+
+# PHP Repository
+
+
+if command -v dnf
+
+then
+
+
+dnf install -y https://rpms.remirepo.net/enterprise/remi-release-9.rpm || true
+
+
+dnf module reset php -y || true
+
+
+dnf module enable php:remi-8.2 -y || true
+
+
+fi
+
+
 
 
 
@@ -241,21 +201,29 @@ php-fpm \
 
 php-mysqlnd \
 
-php-curl \
-
 php-mbstring \
 
 php-xml \
 
+php-json \
+
+php-curl \
+
 php-zip \
 
-unzip \
+php-gd \
+
+php-bcmath \
 
 git \
 
-curl
+curl \
 
+wget \
 
+unzip \
+
+tar
 
 
 
@@ -263,62 +231,196 @@ curl
 
 
 
-#############################################
-# OS Switch
-#############################################
+
+############################################
+# Install Ubuntu Packages
+############################################
 
 
-case $OS in
+install_ubuntu(){
+
+
+
+echo "
+
+Installing Ubuntu dependencies...
+
+"
+
+
+
+apt install -y \
+
+nginx \
+
+mariadb-server \
+
+php8.2 \
+
+php8.2-cli \
+
+php8.2-fpm \
+
+php8.2-mysql \
+
+php8.2-mbstring \
+
+php8.2-xml \
+
+php8.2-curl \
+
+php8.2-zip \
+
+php8.2-gd \
+
+php8.2-bcmath \
+
+git \
+
+curl \
+
+wget \
+
+unzip
+
+
+
+}
+
+
+
+
+
+############################################
+# Install Debian Packages
+############################################
+
+
+install_debian(){
+
+
+
+echo "
+
+Installing Debian dependencies...
+
+"
+
+
+
+apt install -y \
+
+nginx \
+
+mariadb-server \
+
+php \
+
+php-cli \
+
+php-fpm \
+
+php-mysql \
+
+php-mbstring \
+
+php-xml \
+
+php-curl \
+
+php-zip \
+
+php-gd \
+
+git \
+
+curl \
+
+wget \
+
+unzip
+
+
+
+}
+
+
+
+
+
+
+############################################
+# Run Installer
+############################################
+
+
+
+case "$OS" in
+
+
+almalinux|rocky|rhel|centos)
+
+
+install_alma
+
+
+;;
+
 
 
 ubuntu)
 
+
 install_ubuntu
 
+
 ;;
+
 
 
 debian)
 
+
 install_debian
 
-;;
-
-
-
-almalinux|rhel|centos)
-
-install_alma
 
 ;;
-
-
-
-*)
-
-echo "Unsupported OS"
-
-exit 1
-
-;;
-
 
 
 esac
 
 
 
+echo "
+
+Base packages installed successfully
+
+"
+############################################
+# Install Composer
+############################################
+
+
+install_composer(){
+
+
+echo "
+
+Checking Composer...
+
+"
 
 
 
-#############################################
-# Composer Check
-#############################################
-
-
-if ! command -v composer &> /dev/null
+if command -v composer >/dev/null 2>&1
 
 then
+
+
+echo "Composer already installed"
+
+
+else
 
 
 
@@ -326,19 +428,82 @@ echo "Installing Composer..."
 
 
 
+cd /tmp
+
+
+
 php -r "copy('https://getcomposer.org/installer','composer-setup.php');"
 
 
 
-php composer-setup.php
+php composer-setup.php --install-dir=/usr/local/bin --filename=composer
 
 
 
-mv composer.phar /usr/local/bin/composer
+rm -f composer-setup.php
 
 
 
-rm composer-setup.php
+fi
+
+
+
+composer --version
+
+
+
+}
+
+
+
+
+
+install_composer
+
+
+
+
+
+
+
+############################################
+# Clone L-PANEL
+############################################
+
+
+
+INSTALL_DIR="/var/www/l-panel"
+
+
+
+
+echo "
+
+Preparing L-PANEL directory...
+
+"
+
+
+
+
+if [ -d "$INSTALL_DIR" ]
+
+then
+
+
+echo "Existing installation found"
+
+
+
+else
+
+
+
+mkdir -p /var/www
+
+
+
+git clone https://github.com/mohama226/l-panel.git $INSTALL_DIR
 
 
 
@@ -349,15 +514,16 @@ fi
 
 
 
-
-
-#############################################
-# Laravel Setup
-#############################################
+cd $INSTALL_DIR
 
 
 
-PROJECT_DIR=$(pwd)
+
+
+
+############################################
+# Laravel Install
+############################################
 
 
 
@@ -369,21 +535,37 @@ Installing Laravel dependencies...
 
 
 
-composer install --no-dev --optimize-autoloader
+
+
+composer install \
+
+--no-interaction \
+
+--prefer-dist \
+
+--optimize-autoloader
 
 
 
 
 
-#############################################
-# Environment
-#############################################
+
+############################################
+# Environment Setup
+############################################
 
 
 
 if [ ! -f .env ]
 
 then
+
+
+echo "
+
+Creating .env file...
+
+"
 
 
 
@@ -397,23 +579,139 @@ fi
 
 
 
-php artisan key:generate
+
+php artisan key:generate --force
 
 
 
 
 
-#############################################
-# Database Setup
-#############################################
+
+
+############################################
+# Database Configuration
+############################################
+
+
+
+DB_NAME="lpanel"
+
+DB_USER="lpanel"
+
+DB_PASS=$(openssl rand -base64 16)
+
+
+
 
 
 
 echo "
 
-Running migrations...
+Creating Database...
 
 "
+
+
+
+
+
+
+systemctl enable mariadb
+
+systemctl start mariadb
+
+
+
+
+
+mysql <<MYSQL_SCRIPT
+
+
+CREATE DATABASE IF NOT EXISTS ${DB_NAME};
+
+
+CREATE USER IF NOT EXISTS '${DB_USER}'@'localhost'
+
+IDENTIFIED BY '${DB_PASS}';
+
+
+
+GRANT ALL PRIVILEGES ON ${DB_NAME}.*
+
+TO '${DB_USER}'@'localhost';
+
+
+
+FLUSH PRIVILEGES;
+
+
+MYSQL_SCRIPT
+
+
+
+
+
+
+############################################
+# Update Laravel ENV
+############################################
+
+
+
+sed -i "s/DB_DATABASE=.*/DB_DATABASE=${DB_NAME}/" .env
+
+
+sed -i "s/DB_USERNAME=.*/DB_USERNAME=${DB_USER}/" .env
+
+
+sed -i "s/DB_PASSWORD=.*/DB_PASSWORD=${DB_PASS}/" .env
+
+
+
+
+
+echo "
+
+Database configured
+
+"
+
+
+
+
+
+
+############################################
+# Storage Link
+############################################
+
+
+
+php artisan storage:link || true
+
+
+
+
+
+echo "
+
+Laravel preparation completed
+
+"
+############################################
+# Laravel Migration
+############################################
+
+
+echo "
+
+Running database migration...
+
+"
+
+
+
+cd /var/www/l-panel
 
 
 
@@ -423,33 +721,219 @@ php artisan migrate --seed --force
 
 
 
+############################################
+# Optimize Laravel
+############################################
 
 
-#############################################
+
+php artisan optimize:clear
+
+
+php artisan config:cache
+
+
+php artisan route:cache
+
+
+php artisan view:cache
+
+
+
+
+
+
+
+############################################
+# Configure Nginx
+############################################
+
+
+
+echo "
+
+Configuring Nginx...
+
+"
+
+
+
+
+
+cat > /etc/nginx/conf.d/l-panel.conf <<EOF
+
+
+server {
+
+
+    listen 80;
+
+
+    server_name _;
+
+
+
+    root /var/www/l-panel/public;
+
+
+    index index.php index.html;
+
+
+
+    access_log /var/log/nginx/lpanel_access.log;
+
+
+    error_log /var/log/nginx/lpanel_error.log;
+
+
+
+
+    location / {
+
+
+        try_files \$uri \$uri/ /index.php?\$query_string;
+
+
+    }
+
+
+
+
+
+
+    location ~ \.php$ {
+
+
+
+        fastcgi_pass unix:/run/php-fpm/www.sock;
+
+
+
+        fastcgi_index index.php;
+
+
+
+        fastcgi_param SCRIPT_FILENAME \$document_root\$fastcgi_script_name;
+
+
+
+        include fastcgi_params;
+
+
+
+    }
+
+
+
+
+
+
+    location ~ /\. {
+
+
+        deny all;
+
+
+    }
+
+
+}
+
+
+EOF
+
+
+
+
+
+
+############################################
+# PHP-FPM Configuration
+############################################
+
+
+
+if [ -f /etc/php-fpm.d/www.conf ]
+
+then
+
+
+sed -i 's/user = apache/user = nginx/g' /etc/php-fpm.d/www.conf
+
+
+sed -i 's/group = apache/group = nginx/g' /etc/php-fpm.d/www.conf
+
+
+
+fi
+
+
+
+
+
+
+
+############################################
 # Permissions
-#############################################
+############################################
 
 
 
-chmod -R 775 storage
+echo "
 
-chmod -R 775 bootstrap/cache
+Setting permissions...
 
-
-
-
+"
 
 
 
-#############################################
-# Services
-#############################################
+
+
+chown -R nginx:nginx /var/www/l-panel/storage || true
+
+
+chown -R nginx:nginx /var/www/l-panel/bootstrap/cache || true
+
+
+
+chmod -R 775 /var/www/l-panel/storage
+
+
+chmod -R 775 /var/www/l-panel/bootstrap/cache
+
+
+
+
+
+
+
+############################################
+# Enable Services
+############################################
+
+
+
+echo "
+
+Starting services...
+
+"
+
+
 
 
 
 systemctl enable nginx
 
 systemctl restart nginx
+
+
+
+
+
+systemctl enable php-fpm || true
+
+systemctl restart php-fpm || true
 
 
 
@@ -464,24 +948,61 @@ systemctl restart mariadb
 
 
 
-#############################################
-# Finish
-#############################################
+
+############################################
+# Firewall
+############################################
+
+
+
+if command -v firewall-cmd >/dev/null 2>&1
+
+then
+
+
+firewall-cmd --permanent --add-service=http || true
+
+
+firewall-cmd --permanent --add-service=https || true
+
+
+firewall-cmd --reload || true
+
+
+
+fi
+
+
+
+
+
+
+############################################
+# Installation Finished
+############################################
+
+
+
+SERVER_IP=$(hostname -I | awk '{print $1}')
+
+
 
 
 
 echo "
 
-=================================
+===========================================
 
- L-PANEL INSTALLED SUCCESSFULLY
+ L-PANEL INSTALLATION COMPLETE
 
-
- Login:
 
  URL:
 
- http://YOUR_SERVER_IP/admin/login
+ http://${SERVER_IP}
+
+
+
+ ADMIN LOGIN:
 
 
  Username:
@@ -489,11 +1010,20 @@ echo "
  admin
 
 
+
  Password:
 
  admin123
 
 
-=================================
+
+ Project Path:
+
+ /var/www/l-panel
+
+
+
+===========================================
+
 
 "
