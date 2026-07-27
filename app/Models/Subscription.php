@@ -4,69 +4,66 @@ namespace App\Models;
 
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+
 
 
 class Subscription extends Model
 {
 
 
-use HasFactory;
+    protected $fillable = [
 
 
+        'vpn_user_id',
 
-protected $fillable=[
+        'plan',
 
+        'start_date',
 
-'vpn_user_id',
-'start_date',
-'end_date',
-'traffic_limit',
-'plan_name',
-'active'
+        'end_date',
 
+        'price',
 
-];
+        'status'
 
 
-
-protected $casts=[
-
-
-'start_date'=>'date',
-
-'end_date'=>'date',
-
-'active'=>'boolean'
-
-
-];
+    ];
 
 
 
 
 
-public function vpnUser()
-{
-
-return $this->belongsTo(
-    VpnUser::class
-);
-
-}
 
 
+    protected $casts = [
 
-public function isActive()
-{
 
-return $this->active &&
-       now()->between(
-           $this->start_date,
-           $this->end_date
-       );
+        'start_date'=>'date',
 
-}
+        'end_date'=>'date',
+
+        'status'=>'boolean'
+
+
+    ];
+
+
+
+
+
+
+
+    public function vpnUser()
+    {
+
+
+        return $this->belongsTo(
+            VpnUser::class
+        );
+
+
+    }
+
 
 
 }
