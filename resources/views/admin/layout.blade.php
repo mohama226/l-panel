@@ -3,132 +3,150 @@
 
 <head>
 
-    <meta charset="UTF-8">
+<meta charset="UTF-8">
 
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>
-        @yield('title', 'L-PANEL')
-    </title>
 
+<title>
+@yield('title','L-PANEL')
+</title>
 
-    <style>
 
-        body {
+<style>
 
-            margin:0;
 
-            font-family:
-            Tahoma,
-            Arial,
-            sans-serif;
+body{
 
-            background:#f4f6f9;
+    margin:0;
 
-        }
+    font-family:tahoma,arial;
 
+    background:#f5f6fa;
 
-        .sidebar {
+}
 
-            width:250px;
 
-            height:100vh;
 
-            background:#111827;
+.sidebar{
 
-            color:white;
 
-            position:fixed;
+    position:fixed;
 
-            right:0;
+    right:0;
 
-            top:0;
+    top:0;
 
-            padding-top:20px;
+    width:250px;
 
-        }
+    height:100vh;
 
+    background:#1e293b;
 
-        .sidebar h2 {
+    color:white;
 
-            text-align:center;
+    padding-top:20px;
 
-            margin-bottom:30px;
 
-        }
+}
 
 
-        .sidebar a {
 
-            display:block;
+.sidebar h2{
 
-            color:white;
 
-            padding:12px 20px;
+    text-align:center;
 
-            text-decoration:none;
 
-        }
+}
 
 
-        .sidebar a:hover {
 
-            background:#1f2937;
+.sidebar a{
 
-        }
 
+    display:block;
 
+    color:white;
 
-        .content {
+    padding:12px 20px;
 
-            margin-right:250px;
+    text-decoration:none;
 
-            padding:30px;
 
-        }
+}
 
 
 
-        .card {
+.sidebar a:hover{
 
-            background:white;
 
-            border-radius:10px;
+    background:#334155;
 
-            padding:20px;
 
-            margin-bottom:20px;
+}
 
-            box-shadow:
-            0 2px 8px rgba(0,0,0,.05);
 
-        }
 
+.content{
 
 
-        .stats {
+    margin-right:250px;
 
-            display:grid;
+    padding:30px;
 
-            grid-template-columns:
-            repeat(4,1fr);
 
-            gap:20px;
+}
 
-        }
 
 
-        .stat-number {
+.card{
 
-            font-size:32px;
 
-            font-weight:bold;
+    background:white;
 
-        }
+    padding:20px;
 
+    border-radius:10px;
 
+    margin-bottom:20px;
 
-    </style>
+
+}
+
+
+
+.stats{
+
+
+    display:grid;
+
+    grid-template-columns:repeat(4,1fr);
+
+    gap:20px;
+
+
+}
+
+
+
+.stat-box{
+
+
+    background:white;
+
+    padding:25px;
+
+    border-radius:10px;
+
+    text-align:center;
+
+
+}
+
+
+
+</style>
 
 
 </head>
@@ -141,61 +159,74 @@
 <div class="sidebar">
 
 
-    <h2>
-        L-PANEL
-    </h2>
-
-
-    <a href="{{ route('admin.dashboard') }}">
-        داشبورد
-    </a>
-
-
-    <a href="{{ route('vpn-users.index') }}">
-        کاربران VPN
-    </a>
-
-
-    <a href="{{ route('servers.index') }}">
-        سرورهای OCServ
-    </a>
-
-
-    <a href="{{ route('admins.index') }}">
-        ادمین‌ها
-    </a>
-
-
-    <a href="{{ route('resellers.index') }}">
-        نمایندگان
-    </a>
+<h2>
+L-PANEL
+</h2>
 
 
 
-    <form method="POST"
-          action="{{ route('admin.logout') }}"
-          style="padding:20px">
+<a href="{{route('admin.dashboard')}}">
+داشبورد
+</a>
 
 
-        @csrf
+
+<a href="{{route('vpn-users.index')}}">
+کاربران VPN
+</a>
 
 
-        <button type="submit">
-            خروج
-        </button>
+
+<a href="{{route('servers.index')}}">
+سرورهای OCServ
+</a>
 
 
-    </form>
+
+<a href="{{route('admins.index')}}">
+ادمین‌ها
+</a>
+
+
+
+<a href="{{route('resellers.index')}}">
+نمایندگان
+</a>
+
+
+
+
+
+<form method="POST" action="{{route('admin.logout')}}">
+
+@csrf
+
+
+<button style="
+margin:20px;
+padding:10px;
+width:200px;
+">
+
+خروج
+
+</button>
+
+
+</form>
+
 
 
 </div>
 
 
 
+
+
 <div class="content">
 
 
-    @yield('content')
+@yield('content')
 
 
 </div>
@@ -203,5 +234,6 @@
 
 
 </body>
+
 
 </html>
