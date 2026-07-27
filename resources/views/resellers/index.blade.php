@@ -1,6 +1,7 @@
 @extends('admin.layout')
 
 
+
 @section('title')
 
 نمایندگان
@@ -9,20 +10,20 @@
 
 
 
+
 @section('content')
 
 
 <h1>
+
 نمایندگان فروش
+
 </h1>
 
 
 
+<a href="{{route('resellers.create')}}">
 
-<div class="card">
-
-
-<a href="{{ route('resellers.create') }}">
 
 <button>
 
@@ -30,10 +31,12 @@
 
 </button>
 
+
 </a>
 
 
-</div>
+
+<br><br>
 
 
 
@@ -46,13 +49,19 @@
 
 <tr>
 
+
 <th>
-نام
+ادمین
 </th>
 
 
 <th>
-سقف کاربر
+تعداد کاربر
+</th>
+
+
+<th>
+تعداد سرور
 </th>
 
 
@@ -73,26 +82,38 @@
 
 <td>
 
-{{ $reseller->admin->name ?? '-' }}
+{{$reseller->admin->name ?? '-'}}
 
 </td>
+
 
 
 <td>
 
-{{ $reseller->user_limit }}
+{{$reseller->user_limit}}
 
 </td>
+
 
 
 <td>
 
-{{ $reseller->balance }}
+{{$reseller->server_limit}}
 
 </td>
+
+
+
+<td>
+
+{{$reseller->balance}}
+
+</td>
+
 
 
 </tr>
+
 
 
 @endforeach
