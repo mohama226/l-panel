@@ -4,87 +4,11 @@ namespace App\Services;
 
 
 use App\Models\OcservServer;
-use Illuminate\Support\Facades\Log;
 
 
 
 class ServerManager
 {
-
-
-
-    /**
-     * Execute command on server
-     */
-
-
-    public function execute(
-        OcservServer $server,
-        string $command
-    )
-    {
-
-
-        try {
-
-
-            $ssh = sprintf(
-
-            "ssh -p %s %s@%s '%s'",
-
-
-            $server->ssh_port,
-
-            $server->ssh_username,
-
-            $server->ip_address,
-
-            $command
-
-
-            );
-
-
-
-            $result = shell_exec($ssh);
-
-
-
-            return [
-
-                'success'=>true,
-
-                'output'=>$result
-
-            ];
-
-
-
-        }
-        catch(\Exception $e)
-        {
-
-
-            Log::error(
-                $e->getMessage()
-            );
-
-
-            return [
-
-                'success'=>false,
-
-                'error'=>$e->getMessage()
-
-            ];
-
-        }
-
-
-
-    }
-
-
 
 
 
@@ -99,11 +23,82 @@ class ServerManager
     {
 
 
-        return $this->execute(
+        $command = sprintf(
 
-            $server,
+            "ssh -p %s %s@%s 'echo OK'",
 
-            "echo connected"
+
+            $server->ssh_port,
+
+
+            $server->ssh_username,
+
+
+            $server->ip_address
+
+
+        );
+
+
+
+        $result = shell_exec(
+            $command
+        );
+
+
+
+        return trim($result) === "OK";
+
+
+    }
+
+
+
+
+
+
+
+    /**
+     * Server Information
+     */
+
+
+    public function information(
+        OcservServer $server
+    )
+    {
+
+
+
+        $command = "
+
+        uname -a &&
+        systemctl is-active ocserv &&
+        uptime
+
+        ";
+
+
+
+        return shell_exec(
+
+            sprintf(
+
+            "ssh -p %s %s@%s '%s'",
+
+
+            $server->ssh_port,
+
+
+            $server->ssh_username,
+
+
+            $server->ip_address,
+
+
+            $command
+
+            )
 
         );
 
@@ -114,29 +109,40 @@ class ServerManager
 
 
 
+
+
     /**
-     * Server Ping
+     * Restart OCServ
      */
 
 
-    public function ping(
+    public function restart(
         OcservServer $server
     )
     {
 
 
-        $command = "ping -c 2 ".$server->ip_address;
+
+        return shell_exec(
+
+            sprintf(
+
+            "ssh -p %s %s@%s 'systemctl restart ocserv'",
 
 
-        exec(
-            $command,
-            $output,
-            $status
+            $server->ssh_port,
+
+
+            $server->ssh_username,
+
+
+            $server->ip_address
+
+
+            )
+
         );
 
-
-
-        return $status === 0;
 
 
     }
