@@ -8,56 +8,76 @@ use Illuminate\Support\Facades\Schema;
 return new class extends Migration
 {
 
-    public function up(): void
-    {
 
-        Schema::create('admins', function (Blueprint $table) {
-
-            $table->id();
-
-            $table->string('name');
-
-            $table->string('email')
-                  ->unique();
-
-            $table->string('username')
-                  ->unique();
+public function up(): void
+{
 
 
-            $table->string('password');
+Schema::create('admins', function (Blueprint $table) {
 
 
-            /*
-            superadmin
-            admin
-            reseller
-            */
-
-            $table->string('role')
-                  ->default('admin');
+$table->id();
 
 
-            $table->boolean('status')
-                  ->default(true);
+$table->string('name');
 
 
-            $table->timestamp('last_login')
-                  ->nullable();
+$table->string('username')
+->unique();
 
 
-            $table->rememberToken();
-
-            $table->timestamps();
-
-
-        });
-
-    }
+$table->string('email')
+->nullable()
+->unique();
 
 
-    public function down(): void
-    {
-        Schema::dropIfExists('admins');
-    }
+
+$table->string('password');
+
+
+
+$table->enum(
+'role',
+[
+'superadmin',
+'admin',
+'reseller'
+]
+)
+->default('admin');
+
+
+
+$table->boolean('status')
+->default(true);
+
+
+
+$table->timestamp('last_login')
+->nullable();
+
+
+
+$table->timestamps();
+
+
+
+});
+
+
+
+}
+
+
+
+public function down(): void
+{
+
+
+Schema::dropIfExists('admins');
+
+
+}
+
 
 };
