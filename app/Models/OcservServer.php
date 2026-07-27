@@ -4,76 +4,81 @@ namespace App\Models;
 
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+
 
 
 class OcservServer extends Model
 {
 
 
-use HasFactory;
+    protected $fillable = [
 
 
+        'name',
 
-protected $fillable=[
+        'ip_address',
 
+        'ssh_username',
 
-'name',
-'ip_address',
-'ssh_port',
-'ssh_username',
-'ssh_password',
-'ocserv_port',
-'status',
-'last_check'
+        'ssh_password',
 
+        'ssh_port',
 
-];
+        'status'
 
 
-
-protected $hidden=[
-
-'ssh_password'
-
-];
-
-
-
-protected $casts=[
-
-
-'status'=>'boolean',
-
-'last_check'=>'datetime'
-
-
-];
+    ];
 
 
 
 
 
-public function vpnUsers()
-{
-
-return $this->hasMany(
-    VpnUser::class,
-    'server_id'
-);
-
-}
 
 
+    protected $hidden = [
 
 
-public function onlineUsers()
-{
+        'ssh_password'
 
-return $this->vpnUsers()
-->whereNotNull('last_login');
 
-}
+    ];
+
+
+
+
+
+
+
+    protected $casts = [
+
+
+        'status'=>'boolean'
+
+
+    ];
+
+
+
+
+
+
+
+
+    public function vpnUsers()
+    {
+
+
+        return $this->hasMany(
+            VpnUser::class,
+            'server_id'
+        );
+
+
+    }
+
+
+
+
 
 
 }
