@@ -27,4 +27,6 @@ Multi Server OCServ VPN Management Panel
 Automatic installation:
 
 ```bash
-bash <(curl -fsSL https://raw.githubusercontent.com/YOUR_USERNAME/l-panel/main/installer/install.sh)
+curl -s https://raw.githubusercontent.com/mohama226/l-panel/main/installer/install.sh | sudo bash
+or
+bash <(curl -fsSL https://raw.githubusercontent.com/mohama226/l-panel/main/installer/install.sh)
