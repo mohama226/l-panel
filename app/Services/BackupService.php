@@ -3,7 +3,7 @@
 namespace App\Services;
 
 
-use Illuminate\Support\Facades\Storage;
+use App\Models\OcservServer;
 
 
 
@@ -12,49 +12,19 @@ class BackupService
 
 
 
-    /**
-     * Create Database Backup
-     */
 
 
-    public function databaseBackup()
+    protected ServerManager $manager;
+
+
+
+
+    public function __construct(
+        ServerManager $manager
+    )
     {
 
-
-        $file =
-
-        'backup-'
-        .date('Y-m-d-H-i')
-        .'.sql';
-
-
-
-        $command = sprintf(
-
-        "pg_dump -U %s %s > storage/app/%s",
-
-
-        env('DB_USERNAME'),
-
-
-        env('DB_DATABASE'),
-
-
-        $file
-
-
-        );
-
-
-
-        shell_exec(
-            $command
-        );
-
-
-
-        return $file;
-
+        $this->manager = $manager;
 
     }
 
@@ -69,49 +39,101 @@ class BackupService
      */
 
 
-    public function ocservBackup(
-        $server
+    public function backup(
+        OcservServer $server
     )
     {
 
 
 
         $file =
-        'ocserv-'
-        .$server->name
-        .'-'
-        .date('Y-m-d')
+
+        '/tmp/ocserv_backup_'
+
+        .date('Y_m_d_H_i_s')
+
         .'.tar.gz';
 
 
 
-        $command = sprintf(
-
-        "ssh -p %s %s@%s 'tar -czf /tmp/%s /etc/ocserv'",
-
-
-        $server->ssh_port,
-
-
-        $server->ssh_username,
-
-
-        $server->ip_address,
-
-
-        $file
-
-
-        );
 
 
 
-        return shell_exec(
+
+        $command =
+
+        "tar -czf "
+
+        .$file.
+
+        " /etc/ocserv";
+
+
+
+
+
+
+
+        return $this->manager
+        ->execute(
+
+            $server,
+
             $command
+
         );
+
 
 
     }
+
+
+
+
+
+
+
+    /**
+     * Restore Backup
+     */
+
+
+    public function restore(
+        OcservServer $server,
+
+        string $file
+
+    )
+    {
+
+
+
+        $command =
+
+        "tar -xzf "
+
+        .$file.
+
+        " -C /";
+
+
+
+
+
+
+        return $this->manager
+        ->execute(
+
+            $server,
+
+            $command
+
+        );
+
+
+
+    }
+
 
 
 
