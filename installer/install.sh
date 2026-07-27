@@ -524,7 +524,7 @@ composer install \
 --no-interaction \
 --prefer-dist \
 --optimize-autoloader \
---no-audit
+--no-security-blocking
 
 
 
