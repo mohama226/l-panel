@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 
 
 use App\Models\Reseller;
+
 use App\Models\Admin;
 
 
@@ -18,24 +19,28 @@ class ResellerController extends Controller
 {
 
 
+
     public function index()
     {
 
 
-        $resellers =
+        $resellers=
         Reseller::with('admin')
         ->get();
 
 
 
+
         return view(
+
             'resellers.index',
+
             compact('resellers')
+
         );
 
 
     }
-
 
 
 
@@ -56,9 +61,13 @@ class ResellerController extends Controller
 
 
         return view(
+
             'resellers.create',
+
             compact('admins')
+
         );
+
 
 
     }
@@ -70,10 +79,9 @@ class ResellerController extends Controller
 
 
 
-    public function store(
-        Request $request
-    )
+    public function store(Request $request)
     {
+
 
 
         Reseller::create(
@@ -81,16 +89,13 @@ class ResellerController extends Controller
             $request->validate([
 
 
-                'admin_id'=>
-                'required',
+                'admin_id'=>'required',
 
 
-                'user_limit'=>
-                'required|integer',
+                'user_limit'=>'required',
 
 
-                'server_limit'=>
-                'required|integer'
+                'server_limit'=>'required'
 
 
             ])
@@ -99,13 +104,14 @@ class ResellerController extends Controller
 
 
 
+
         return redirect()
-        ->route(
-            'resellers.index'
-        );
+        ->route('resellers.index');
+
 
 
     }
+
 
 
 }
