@@ -1,11 +1,19 @@
 <?php
 
+
 namespace App\Http\Controllers\Auth;
 
 
 use App\Http\Controllers\Controller;
+
+
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
+
+
+use App\Models\Admin;
+
+
+use Illuminate\Support\Facades\Hash;
 
 
 
@@ -13,14 +21,15 @@ class LoginController extends Controller
 {
 
 
-    /**
-     * Show Login Page
-     */
 
     public function showLogin()
     {
 
-        return view('admin.login');
+
+        return view(
+            'admin.login'
+        );
+
 
     }
 
@@ -28,25 +37,25 @@ class LoginController extends Controller
 
 
 
-    /**
-     * Login Admin
-     */
 
-    public function login(Request $request)
+
+    public function login(
+        Request $request
+    )
     {
 
 
-        $credentials = $request->validate([
+
+        $data =
+        $request->validate([
 
 
-            'username' => [
-                'required'
-            ],
+            'username'=>
+            'required',
 
 
-            'password' => [
-                'required'
-            ]
+            'password'=>
+            'required'
 
 
         ]);
@@ -55,38 +64,37 @@ class LoginController extends Controller
 
 
 
+
+        $admin =
+        Admin::where(
+            'username',
+            $data['username']
+        )
+        ->first();
+
+
+
+
+
+
+
         if(
-            Auth::guard('admin')
-            ->attempt($credentials)
+            !$admin ||
+            !Hash::check(
+                $data['password'],
+                $admin->password
+            )
         )
         {
 
 
-            $request->session()
-            ->regenerate();
+            return back()
+            ->withErrors([
 
-
-
-            $admin =
-            Auth::guard('admin')
-            ->user();
-
-
-
-
-            $admin->update([
-
-                'last_login'=>now()
+                'username'=>
+                'اطلاعات ورود صحیح نیست'
 
             ]);
-
-
-
-
-            return redirect()
-            ->route(
-                'admin.dashboard'
-            );
 
 
         }
@@ -95,17 +103,78 @@ class LoginController extends Controller
 
 
 
-        return back()
-        ->withErrors([
 
-            'username'=>
-            'اطلاعات ورود صحیح نیست'
+
+
+        if(
+            !$admin->status
+        )
+        {
+
+
+            return back()
+            ->withErrors([
+
+                'username'=>
+                'حساب شما غیرفعال است'
+
+            ]);
+
+
+        }
+
+
+
+
+
+
+
+
+        session([
+
+
+            'admin_id'=>
+            $admin->id,
+
+
+            'admin_role'=>
+            $admin->role
+
+
 
         ]);
 
 
 
+
+
+
+
+
+        $admin->update([
+
+            'last_login'=>
+            now()
+
+        ]);
+
+
+
+
+
+
+
+
+        return redirect()
+        ->route(
+            'admin.dashboard'
+        );
+
+
+
     }
+
+
 
 
 }
