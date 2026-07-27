@@ -13,35 +13,41 @@ public function up(): void
 {
 
 
-Schema::create('settings',function(Blueprint $table){
+Schema::create('settings', function(Blueprint $table){
 
 
 $table->id();
 
 
+
 $table->string('key')
-      ->unique();
+->unique();
 
 
 
 $table->text('value')
-      ->nullable();
+->nullable();
 
 
 
 $table->timestamps();
 
 
+
 });
+
 
 
 }
 
 
+
 public function down(): void
 {
 
+
 Schema::dropIfExists('settings');
+
 
 }
 
