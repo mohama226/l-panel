@@ -13,7 +13,7 @@ public function up(): void
 {
 
 
-Schema::create('subscriptions',function(Blueprint $table){
+Schema::create('subscriptions', function(Blueprint $table){
 
 
 $table->id();
@@ -21,37 +21,40 @@ $table->id();
 
 
 $table->foreignId('vpn_user_id')
-      ->constrained()
-      ->cascadeOnDelete();
+->constrained(
+'vpn_users'
+)
+->cascadeOnDelete();
 
 
 
 $table->date('start_date');
 
 
+
 $table->date('end_date');
 
 
 
-$table->bigInteger('traffic_limit')
-      ->default(0);
+$table->integer('days');
 
 
 
-$table->string('plan_name')
-      ->nullable();
-
-
-
-$table->boolean('active')
-      ->default(true);
+$table->decimal(
+'price',
+10,
+2
+)
+->default(0);
 
 
 
 $table->timestamps();
 
 
+
 });
+
 
 
 }
@@ -60,7 +63,11 @@ $table->timestamps();
 
 public function down(): void
 {
+
+
 Schema::dropIfExists('subscriptions');
+
+
 }
 
 
