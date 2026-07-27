@@ -6,101 +6,69 @@ namespace App\Services;
 use App\Models\OcservServer;
 
 
+use phpseclib3\Net\SSH2;
+
+
+
 
 class ServerManager
 {
 
 
 
-    /**
-     * Test Server Connection
-     */
-
-
-    public function testConnection(
-        OcservServer $server
-    )
-    {
-
-
-        $command = sprintf(
-
-            "ssh -p %s %s@%s 'echo OK'",
-
-
-            $server->ssh_port,
-
-
-            $server->ssh_username,
-
-
-            $server->ip_address
-
-
-        );
-
-
-
-        $result = shell_exec(
-            $command
-        );
-
-
-
-        return trim($result) === "OK";
-
-
-    }
-
-
-
-
-
 
 
     /**
-     * Server Information
+     * Connect SSH
      */
 
 
-    public function information(
+    public function connect(
         OcservServer $server
     )
     {
 
 
 
-        $command = "
-
-        uname -a &&
-        systemctl is-active ocserv &&
-        uptime
-
-        ";
-
-
-
-        return shell_exec(
-
-            sprintf(
-
-            "ssh -p %s %s@%s '%s'",
-
-
-            $server->ssh_port,
-
-
-            $server->ssh_username,
-
+        $ssh = new SSH2(
 
             $server->ip_address,
 
-
-            $command
-
-            )
+            $server->ssh_port
 
         );
+
+
+
+
+
+
+        if(
+            !$ssh->login(
+
+                $server->ssh_username,
+
+                $server->ssh_password
+
+            )
+        )
+        {
+
+
+            throw new \Exception(
+
+                'SSH connection failed'
+
+            );
+
+
+        }
+
+
+
+
+        return $ssh;
+
 
 
     }
@@ -112,40 +80,97 @@ class ServerManager
 
 
     /**
-     * Restart OCServ
+     * Execute Command
      */
 
 
-    public function restart(
+    public function execute(
+
+        OcservServer $server,
+
+        string $command
+
+    )
+    {
+
+
+
+        $ssh = $this->connect(
+            $server
+        );
+
+
+
+
+        return $ssh->exec(
+            $command
+        );
+
+
+
+    }
+
+
+
+
+
+
+
+    /**
+     * Test Server
+     */
+
+
+    public function test(
         OcservServer $server
     )
     {
 
 
 
-        return shell_exec(
-
-            sprintf(
-
-            "ssh -p %s %s@%s 'systemctl restart ocserv'",
+        try {
 
 
-            $server->ssh_port,
+            $ssh =
+            $this->connect(
+                $server
+            );
 
 
-            $server->ssh_username,
+
+            return [
+
+                'status'=>true,
+
+                'message'=>'Connected'
+
+            ];
 
 
-            $server->ip_address
+
+        }
+        catch(\Exception $e)
+        {
 
 
-            )
 
-        );
+            return [
+
+                'status'=>false,
+
+                'message'=>$e->getMessage()
+
+            ];
+
+
+
+        }
 
 
 
     }
+
+
 
 
 
