@@ -1,12 +1,9 @@
-FROM php:8.3-fpm
-
-
-
-WORKDIR /var/www
+FROM php:8.2-fpm
 
 
 
 RUN apt-get update && apt-get install -y \
+
 
     git \
 
@@ -14,23 +11,24 @@ RUN apt-get update && apt-get install -y \
 
     curl \
 
-    libpq-dev \
-
     libzip-dev \
 
-    zip
+    libpng-dev \
+
+    libxml2-dev \
 
 
 
-RUN docker-php-ext-install \
+&& docker-php-ext-install \
+
 
     pdo \
 
-    pdo_pgsql \
-
-    mbstring \
+    pdo_mysql \
 
     zip \
+
+    gd \
 
     xml
 
@@ -40,30 +38,12 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
 
 
-COPY . /var/www
+WORKDIR /var/www/html
 
 
 
-RUN composer install --no-dev --optimize-autoloader
-
-
-
-RUN php artisan storage:link || true
-
-
-
-RUN chown -R www-data:www-data /var/www/storage
-
-RUN chown -R www-data:www-data /var/www/bootstrap/cache
+RUN chown -R www-data:www-data /var/www/html
 
 
 
 EXPOSE 9000
-
-
-
-CMD [
-
-"php-fpm"
-
-]
