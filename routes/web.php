@@ -2,14 +2,14 @@
 
 use Illuminate\Support\Facades\Route;
 
-
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\VpnUserController;
 use App\Http\Controllers\Admin\ServerController;
 use App\Http\Controllers\Admin\AdminController;
 use App\Http\Controllers\Admin\ResellerController;
 
-
+use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\Auth\LogoutController;
 
 /*
 |--------------------------------------------------------------------------
@@ -17,16 +17,46 @@ use App\Http\Controllers\Admin\ResellerController;
 |--------------------------------------------------------------------------
 */
 
-
 Route::get('/', function () {
-
     return redirect('/admin/login');
-
 });
 
+/*
+|--------------------------------------------------------------------------
+| Admin Authentication
+|--------------------------------------------------------------------------
+*/
 
+Route::prefix('admin')
+->group(function () {
 
+    Route::get(
+        '/login',
+        [
+            LoginController::class,
+            'showLogin'
+        ]
+    )->name('admin.login');
 
+    Route::post(
+        '/login',
+        [
+            LoginController::class,
+            'login'
+        ]
+    )->name('admin.login.submit');
+
+    Route::post(
+        '/logout',
+        [
+            LogoutController::class,
+            'logout'
+        ]
+    )
+    ->middleware('admin.auth')
+    ->name('admin.logout');
+
+});
 
 /*
 |--------------------------------------------------------------------------
@@ -34,12 +64,9 @@ Route::get('/', function () {
 |--------------------------------------------------------------------------
 */
 
-
 Route::prefix('admin')
 ->middleware(['auth:admin'])
-->group(function(){
-
-
+->group(function () {
 
 /*
 |--------------------------------------------------------------------------
@@ -47,19 +74,13 @@ Route::prefix('admin')
 |--------------------------------------------------------------------------
 */
 
-
 Route::get(
     '/dashboard',
     [
         DashboardController::class,
         'index'
     ]
-)
-->name('admin.dashboard');
-
-
-
-
+)->name('admin.dashboard');
 
 /*
 |--------------------------------------------------------------------------
@@ -67,10 +88,8 @@ Route::get(
 |--------------------------------------------------------------------------
 */
 
-
 Route::prefix('vpn-users')
-->group(function(){
-
+->group(function () {
 
     Route::get(
         '/',
@@ -78,10 +97,7 @@ Route::prefix('vpn-users')
             VpnUserController::class,
             'index'
         ]
-    )
-    ->name('vpn-users.index');
-
-
+    )->name('vpn-users.index');
 
     Route::get(
         '/create',
@@ -89,10 +105,7 @@ Route::prefix('vpn-users')
             VpnUserController::class,
             'create'
         ]
-    )
-    ->name('vpn-users.create');
-
-
+    )->name('vpn-users.create');
 
     Route::post(
         '/',
@@ -100,10 +113,7 @@ Route::prefix('vpn-users')
             VpnUserController::class,
             'store'
         ]
-    )
-    ->name('vpn-users.store');
-
-
+    )->name('vpn-users.store');
 
     Route::delete(
         '/{vpnUser}',
@@ -111,10 +121,7 @@ Route::prefix('vpn-users')
             VpnUserController::class,
             'destroy'
         ]
-    )
-    ->name('vpn-users.destroy');
-
-
+    )->name('vpn-users.destroy');
 
     Route::post(
         '/{vpnUser}/enable',
@@ -122,10 +129,7 @@ Route::prefix('vpn-users')
             VpnUserController::class,
             'enable'
         ]
-    )
-    ->name('vpn-users.enable');
-
-
+    )->name('vpn-users.enable');
 
     Route::post(
         '/{vpnUser}/disable',
@@ -133,17 +137,9 @@ Route::prefix('vpn-users')
             VpnUserController::class,
             'disable'
         ]
-    )
-    ->name('vpn-users.disable');
-
+    )->name('vpn-users.disable');
 
 });
-
-
-
-
-
-
 
 /*
 |--------------------------------------------------------------------------
@@ -151,81 +147,50 @@ Route::prefix('vpn-users')
 |--------------------------------------------------------------------------
 */
 
-
 Route::prefix('servers')
-->group(function(){
+->group(function () {
 
+    Route::get(
+        '/',
+        [
+            ServerController::class,
+            'index'
+        ]
+    )->name('servers.index');
 
+    Route::get(
+        '/create',
+        [
+            ServerController::class,
+            'create'
+        ]
+    )->name('servers.create');
 
-Route::get(
-    '/',
-    [
-        ServerController::class,
-        'index'
-    ]
-)
-->name('servers.index');
+    Route::post(
+        '/',
+        [
+            ServerController::class,
+            'store'
+        ]
+    )->name('servers.store');
 
+    Route::post(
+        '/{server}/test',
+        [
+            ServerController::class,
+            'test'
+        ]
+    )->name('servers.test');
 
-
-
-Route::get(
-    '/create',
-    [
-        ServerController::class,
-        'create'
-    ]
-)
-->name('servers.create');
-
-
-
-
-Route::post(
-    '/',
-    [
-        ServerController::class,
-        'store'
-    ]
-)
-->name('servers.store');
-
-
-
-
-
-Route::post(
-    '/{server}/test',
-    [
-        ServerController::class,
-        'test'
-    ]
-)
-->name('servers.test');
-
-
-
-
-
-Route::delete(
-    '/{server}',
-    [
-        ServerController::class,
-        'destroy'
-    ]
-)
-->name('servers.destroy');
-
-
+    Route::delete(
+        '/{server}',
+        [
+            ServerController::class,
+            'destroy'
+        ]
+    )->name('servers.destroy');
 
 });
-
-
-
-
-
-
-
 
 /*
 |--------------------------------------------------------------------------
@@ -233,55 +198,34 @@ Route::delete(
 |--------------------------------------------------------------------------
 */
 
-
 Route::prefix('admins')
-->group(function(){
+->group(function () {
 
+    Route::get(
+        '/',
+        [
+            AdminController::class,
+            'index'
+        ]
+    )->name('admins.index');
 
+    Route::post(
+        '/',
+        [
+            AdminController::class,
+            'store'
+        ]
+    )->name('admins.store');
 
-Route::get(
-    '/',
-    [
-        AdminController::class,
-        'index'
-    ]
-)
-->name('admins.index');
-
-
-
-
-Route::post(
-    '/',
-    [
-        AdminController::class,
-        'store'
-    ]
-)
-->name('admins.store');
-
-
-
-
-Route::delete(
-    '/{admin}',
-    [
-        AdminController::class,
-        'destroy'
-    ]
-)
-->name('admins.destroy');
-
-
+    Route::delete(
+        '/{admin}',
+        [
+            AdminController::class,
+            'destroy'
+        ]
+    )->name('admins.destroy');
 
 });
-
-
-
-
-
-
-
 
 /*
 |--------------------------------------------------------------------------
@@ -289,61 +233,41 @@ Route::delete(
 |--------------------------------------------------------------------------
 */
 
-
 Route::prefix('resellers')
-->group(function(){
+->group(function () {
 
+    Route::get(
+        '/',
+        [
+            ResellerController::class,
+            'index'
+        ]
+    )->name('resellers.index');
 
+    Route::get(
+        '/create',
+        [
+            ResellerController::class,
+            'create'
+        ]
+    )->name('resellers.create');
 
-Route::get(
-    '/',
-    [
-        ResellerController::class,
-        'index'
-    ]
-)
-->name('resellers.index');
+    Route::post(
+        '/',
+        [
+            ResellerController::class,
+            'store'
+        ]
+    )->name('resellers.store');
 
-
-
-
-Route::get(
-    '/create',
-    [
-        ResellerController::class,
-        'create'
-    ]
-)
-->name('resellers.create');
-
-
-
-
-Route::post(
-    '/',
-    [
-        ResellerController::class,
-        'store'
-    ]
-)
-->name('resellers.store');
-
-
-
-
-Route::delete(
-    '/{reseller}',
-    [
-        ResellerController::class,
-        'destroy'
-    ]
-)
-->name('resellers.destroy');
-
-
+    Route::delete(
+        '/{reseller}',
+        [
+            ResellerController::class,
+            'destroy'
+        ]
+    )->name('resellers.destroy');
 
 });
-
-
 
 });
