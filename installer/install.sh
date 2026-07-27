@@ -33,6 +33,43 @@ fi
 
 
 ############################################
+# L-PANEL INSTALL SETTINGS
+############################################
+
+echo "
+L-PANEL Initial Setup
+"
+
+read -p "Enter Super Admin Username: " ADMIN_USERNAME
+
+while true
+do
+    read -s -p "Enter Super Admin Password: " ADMIN_PASSWORD
+    echo
+    read -s -p "Confirm Password: " ADMIN_PASSWORD_CONFIRM
+    echo
+
+    if [ "$ADMIN_PASSWORD" == "$ADMIN_PASSWORD_CONFIRM" ]
+    then
+        break
+    else
+        echo "Passwords do not match"
+    fi
+done
+
+read -p "Enter Panel Port (default 80): " PANEL_PORT
+if [ -z "$PANEL_PORT" ]
+then
+    PANEL_PORT=80
+fi
+
+echo "
+Admin Username: $ADMIN_USERNAME
+Panel Port: $PANEL_PORT
+"
+
+
+############################################
 # Detect OS
 ############################################
 
@@ -246,7 +283,13 @@ echo "
 Installing Laravel dependencies...
 "
 
-composer install --no-interaction --prefer-dist --optimize-autoloader
+composer config audit.block-insecure false
+
+composer install \
+--no-interaction \
+--prefer-dist \
+--optimize-autoloader \
+--no-audit
 
 
 ############################################
@@ -343,7 +386,7 @@ Configuring Nginx...
 
 cat > /etc/nginx/conf.d/l-panel.conf <<EOF
 server {
-    listen 80;
+    listen $PANEL_PORT;
     server_name _;
     root /var/www/l-panel/public;
     index index.php index.html;
@@ -436,11 +479,11 @@ echo "
  L-PANEL INSTALLATION COMPLETE
 
  URL:
- http://${SERVER_IP}
+ http://${SERVER_IP}:${PANEL_PORT}
 
  ADMIN LOGIN:
- Username: admin
- Password: admin123
+ Username: $ADMIN_USERNAME
+ Password: (the one you entered)
 
  Project Path:
  /var/www/l-panel
