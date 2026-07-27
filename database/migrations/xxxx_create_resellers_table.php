@@ -12,49 +12,60 @@ return new class extends Migration
 public function up(): void
 {
 
-Schema::create('resellers',function(Blueprint $table){
+
+Schema::create('resellers', function(Blueprint $table){
+
 
 $table->id();
 
 
+
 $table->foreignId('admin_id')
-      ->constrained('admins')
-      ->cascadeOnDelete();
+->constrained(
+'admins'
+)
+->cascadeOnDelete();
 
 
 
 $table->integer('user_limit')
-      ->default(0);
+->default(100);
 
 
 
 $table->integer('server_limit')
-      ->default(0);
+->default(1);
 
 
 
-$table->decimal('balance',10,2)
-      ->default(0);
-
-
-
-$table->boolean('status')
-      ->default(true);
+$table->decimal(
+'balance',
+10,
+2
+)
+->default(0);
 
 
 
 $table->timestamps();
 
 
+
 });
+
 
 
 }
 
 
+
 public function down(): void
 {
+
+
 Schema::dropIfExists('resellers');
+
+
 }
 
 
