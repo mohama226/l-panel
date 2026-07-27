@@ -4,7 +4,6 @@ namespace App\Services;
 
 
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\DB;
 
 
 
@@ -14,7 +13,7 @@ class BackupService
 
 
     /**
-     * Database Backup
+     * Create Database Backup
      */
 
 
@@ -22,41 +21,39 @@ class BackupService
     {
 
 
-        $database = config(
-            'database.connections.pgsql.database'
-        );
+        $file =
 
-
-        $file = 
-        "backup_"
-        .date('Y-m-d_H-i-s')
-        .".sql";
-
-
-
-        $path = storage_path(
-            "app/backups/".$file
-        );
+        'backup-'
+        .date('Y-m-d-H-i')
+        .'.sql';
 
 
 
         $command = sprintf(
 
-        "pg_dump %s > %s",
+        "pg_dump -U %s %s > storage/app/%s",
 
-        $database,
 
-        $path
+        env('DB_USERNAME'),
+
+
+        env('DB_DATABASE'),
+
+
+        $file
+
 
         );
 
 
 
-        exec($command);
+        shell_exec(
+            $command
+        );
 
 
 
-        return $path;
+        return $file;
 
 
     }
@@ -65,94 +62,53 @@ class BackupService
 
 
 
+
+
     /**
-     * Full Panel Backup
+     * Backup OCServ Config
      */
 
 
-    public function fullBackup()
+    public function ocservBackup(
+        $server
+    )
     {
 
 
 
         $file =
-        "lpanel_backup_"
+        'ocserv-'
+        .$server->name
+        .'-'
         .date('Y-m-d')
-        .".tar.gz";
-
-
-
-        $path =
-        storage_path(
-            "app/backups/".$file
-        );
+        .'.tar.gz';
 
 
 
         $command = sprintf(
 
-        "tar -czf %s %s",
+        "ssh -p %s %s@%s 'tar -czf /tmp/%s /etc/ocserv'",
 
-        $path,
 
-        base_path()
+        $server->ssh_port,
+
+
+        $server->ssh_username,
+
+
+        $server->ip_address,
+
+
+        $file
+
 
         );
 
 
 
-        exec($command);
-
-
-
-        return $path;
-
-
-    }
-
-
-
-
-
-    /**
-     * Delete Old Backups
-     */
-
-
-    public function cleanOldBackups(
-        int $days = 30
-    )
-    {
-
-
-        $files =
-        Storage::files(
-            'backups'
+        return shell_exec(
+            $command
         );
-
-
-
-        foreach($files as $file){
-
-
-            if(
-                Storage::lastModified($file)
-                <
-                now()
-                ->subDays($days)
-                ->timestamp
-            )
-            {
-
-
-                Storage::delete($file);
-
-
-            }
-
-
-        }
-
 
 
     }
