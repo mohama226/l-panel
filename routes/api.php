@@ -5,7 +5,9 @@ use Illuminate\Support\Facades\Route;
 
 
 
-use App\Http\Controllers\Admin\VpnUserController;
+use App\Http\Controllers\Admin\ServerController;
+
+
 
 
 
@@ -17,16 +19,6 @@ use App\Http\Controllers\Admin\VpnUserController;
 
 
 
-Route::prefix('v1')
-->group(function(){
-
-
-
-/*
-|--------------------------------------------------------------------------
-| Health Check
-|--------------------------------------------------------------------------
-*/
 
 
 Route::get(
@@ -35,19 +27,45 @@ Route::get(
 
         return response()->json([
 
+
             'name'=>'L-PANEL',
 
             'status'=>'running',
 
-            'version'=>'1.0.0'
+            'version'=>'1.0'
+
 
         ]);
+
 
     }
 );
 
 
 
+
+
+
+
+/*
+|--------------------------------------------------------------------------
+| Server API
+|--------------------------------------------------------------------------
+*/
+
+
+Route::prefix('servers')
+->group(function(){
+
+
+
+    Route::get(
+        '/{server}/status',
+        [
+            ServerController::class,
+            'test'
+        ]
+    );
 
 
 });
