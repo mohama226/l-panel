@@ -4,10 +4,11 @@ namespace App\Http\Controllers\Admin;
 
 
 use App\Http\Controllers\Controller;
+
+use App\Models\Admin;
 use App\Models\VpnUser;
 use App\Models\OcservServer;
 use App\Models\Reseller;
-use App\Models\Admin;
 
 
 
@@ -23,26 +24,27 @@ class DashboardController extends Controller
 
 
             'admins' =>
-                Admin::count(),
-
-
-            'servers' =>
-                OcservServer::count(),
+            Admin::count(),
 
 
             'users' =>
-                VpnUser::count(),
+            VpnUser::count(),
 
 
-            'active_users' =>
-                VpnUser::where(
-                    'status',
-                    true
-                )->count(),
+            'servers' =>
+            OcservServer::count(),
 
 
             'resellers' =>
-                Reseller::count()
+            Reseller::count(),
+
+
+
+            'active_users' =>
+            VpnUser::where(
+                'status',
+                true
+            )->count()
 
 
         ];
