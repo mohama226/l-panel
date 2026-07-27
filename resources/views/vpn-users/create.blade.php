@@ -1,6 +1,7 @@
 @extends('admin.layout')
 
 
+
 @section('title')
 
 ساخت کاربر VPN
@@ -10,76 +11,100 @@
 
 
 
+
 @section('content')
 
 
+
 <h1>
+
 ساخت کاربر VPN
+
 </h1>
+
 
 
 
 <div class="card">
 
 
-
 <form method="POST"
-action="{{ route('vpn-users.store') }}">
+action="{{route('vpn-users.store')}}">
 
 
 @csrf
 
 
 
+
 <label>
+
 نام کاربری
+
 </label>
 
 
 <input
-type="text"
+
 name="username"
-required>
+
+style="width:100%;padding:10px;">
 
 
 
-<br>
+
+
+<br><br>
+
 
 
 
 <label>
+
 رمز عبور
+
 </label>
+
 
 
 <input
-type="password"
+
 name="password"
-required>
+
+type="password"
+
+style="width:100%;padding:10px;">
 
 
 
-<br>
+
+
+<br><br>
+
 
 
 
 <label>
+
 سرور
+
 </label>
 
 
-<select name="server_id">
+
+<select name="server_id"
+style="width:100%;padding:10px;">
 
 
-@foreach(
-\App\Models\OcservServer::all()
-as $server
-)
+
+@foreach($servers as $server)
 
 
-<option value="{{ $server->id }}">
+<option value="{{$server->id}}">
 
-{{ $server->name }}
+
+{{$server->name}}
+
 
 </option>
 
@@ -87,40 +112,53 @@ as $server
 @endforeach
 
 
+
 </select>
 
 
 
-<br>
+
+<br><br>
 
 
 
 <label>
+
 تاریخ انقضا
+
 </label>
 
 
+
 <input
+
 type="date"
-name="expire_date">
+
+name="expire_date"
+
+style="width:100%;padding:10px;">
 
 
 
-<br>
+
+
+<br><br>
 
 
 
 <button>
 
-ثبت کاربر
+ایجاد کاربر
 
 </button>
+
 
 
 </form>
 
 
 </div>
+
 
 
 @endsection
