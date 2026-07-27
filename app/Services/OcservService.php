@@ -3,8 +3,8 @@
 namespace App\Services;
 
 
-use App\Models\VpnUser;
 use App\Models\OcservServer;
+use App\Models\VpnUser;
 use Illuminate\Support\Facades\Log;
 
 
@@ -13,25 +13,10 @@ class OcservService
 {
 
 
-    protected ServerManager $serverManager;
-
-
-
-    public function __construct(
-        ServerManager $serverManager
-    )
-    {
-
-        $this->serverManager = $serverManager;
-
-    }
-
-
-
-
     /**
      * Create VPN User on OCServ
      */
+
 
     public function createUser(
         VpnUser $user
@@ -42,26 +27,24 @@ class OcservService
         $server = $user->server;
 
 
-        $command = sprintf(
 
-            "sudo ocpasswd -c /etc/ocserv/ocpasswd %s",
+        $command = "
+        ocpasswd 
+        -c /etc/ocserv/ocpasswd 
+        {$user->username}
+        ";
 
-            escapeshellarg(
-                $user->username
-            )
 
+
+        return $this->execute(
+            $server,
+            $command
         );
 
 
-
-        return $this->serverManager
-            ->execute(
-                $server,
-                $command
-            );
-
-
     }
+
+
 
 
 
@@ -81,26 +64,28 @@ class OcservService
         $server = $user->server;
 
 
-        $command = sprintf(
 
-            "sudo ocpasswd -d -c /etc/ocserv/ocpasswd %s",
+        $command = "
 
-            escapeshellarg(
-                $user->username
-            )
+        ocpasswd 
+        -d 
+        -c /etc/ocserv/ocpasswd 
+        {$user->username}
 
+        ";
+
+
+
+        return $this->execute(
+            $server,
+            $command
         );
 
 
-
-        return $this->serverManager
-            ->execute(
-                $server,
-                $command
-            );
-
-
     }
+
+
+
 
 
 
@@ -117,25 +102,26 @@ class OcservService
     {
 
 
-        $command = sprintf(
+        $command = "
 
-            "sudo ocpasswd -u -c /etc/ocserv/ocpasswd %s",
+        ocpasswd 
+        -u
+        {$user->username}
 
-            escapeshellarg(
-                $user->username
-            )
+        ";
 
+
+
+        return $this->execute(
+            $user->server,
+            $command
         );
 
 
-        return $this->serverManager
-            ->execute(
-                $user->server,
-                $command
-            );
-
-
     }
+
+
+
 
 
 
@@ -152,56 +138,33 @@ class OcservService
     {
 
 
-        $command = sprintf(
+        $command = "
 
-            "sudo ocpasswd -l -c /etc/ocserv/ocpasswd %s",
+        ocpasswd
+        -l
+        {$user->username}
 
-            escapeshellarg(
-                $user->username
-            )
+        ";
 
+
+
+        return $this->execute(
+            $user->server,
+            $command
         );
 
 
-        return $this->serverManager
-            ->execute(
-                $user->server,
-                $command
-            );
-
-
     }
 
 
 
 
 
-    /**
-     * Restart OCServ
-     */
-
-
-    public function restart(
-        OcservServer $server
-    )
-    {
-
-
-        return $this->serverManager
-            ->execute(
-                $server,
-                "sudo systemctl restart ocserv"
-            );
-
-
-    }
-
-
 
 
 
     /**
-     * Check Status
+     * Check OCServ Status
      */
 
 
@@ -211,14 +174,101 @@ class OcservService
     {
 
 
-        return $this->serverManager
-            ->execute(
+        return $this->execute(
+            $server,
+            "systemctl status ocserv"
+        );
 
-                $server,
 
-                "systemctl status ocserv"
+    }
+
+
+
+
+
+
+
+
+
+    /**
+     * Execute SSH Command
+     */
+
+
+    protected function execute(
+        OcservServer $server,
+        string $command
+    )
+    {
+
+
+
+        try {
+
+
+
+            $sshCommand = sprintf(
+
+                "ssh -p %s %s@%s '%s'",
+
+
+                $server->ssh_port,
+
+
+                $server->ssh_username,
+
+
+                $server->ip_address,
+
+
+                $command
+
 
             );
+
+
+
+            $output = shell_exec(
+                $sshCommand
+            );
+
+
+
+            return [
+
+                'success'=>true,
+
+                'output'=>$output
+
+            ];
+
+
+
+
+        }
+        catch(\Exception $e)
+        {
+
+
+
+            Log::error(
+                $e->getMessage()
+            );
+
+
+
+            return [
+
+                'success'=>false,
+
+                'output'=>$e->getMessage()
+
+            ];
+
+
+
+        }
+
 
 
     }
