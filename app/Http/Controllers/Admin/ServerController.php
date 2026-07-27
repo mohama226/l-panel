@@ -4,8 +4,14 @@ namespace App\Http\Controllers\Admin;
 
 
 use App\Http\Controllers\Controller;
+
+
 use App\Models\OcservServer;
+
+
 use App\Services\ServerManager;
+
+
 use Illuminate\Http\Request;
 
 
@@ -14,128 +20,149 @@ class ServerController extends Controller
 {
 
 
-protected ServerManager $manager;
+    protected $manager;
 
 
 
-public function __construct(
-ServerManager $manager
-)
-{
+    public function __construct(
+        ServerManager $manager
+    )
+    {
 
-$this->manager=$manager;
+        $this->manager=$manager;
 
-}
+    }
 
 
 
 
 
-public function index()
-{
 
 
-$servers =
-OcservServer::latest()
-->paginate(20);
 
+    public function index()
+    {
 
 
-return view(
-'servers.index',
-compact('servers')
-);
+        $servers =
+        OcservServer::latest()
+        ->get();
 
 
-}
 
+        return view(
+            'servers.index',
+            compact('servers')
+        );
 
 
+    }
 
 
-public function create()
-{
 
-return view(
-'servers.create'
-);
 
-}
 
 
 
 
+    public function create()
+    {
 
-public function store(Request $request)
-{
 
+        return view(
+            'servers.create'
+        );
 
-$data=$request->validate([
 
+    }
 
-'name'=>'required',
 
-'ip_address'=>'required',
 
-'ssh_username'=>'required'
 
 
-]);
 
 
 
-OcservServer::create($data);
+    public function store(
+        Request $request
+    )
+    {
 
 
+        OcservServer::create(
 
-return redirect()
-->route('servers.index');
+            $request->validate([
 
 
-}
+                'name'=>
+                'required',
 
 
+                'ip_address'=>
+                'required',
 
 
+                'ssh_username'=>
+                'required'
 
 
+            ])
 
-public function test(
-OcservServer $server
-)
-{
+        );
 
 
-$result =
-$this->manager
-->testConnection($server);
 
+        return redirect()
+        ->route(
+            'servers.index'
+        );
 
 
-return response()->json($result);
+    }
 
 
-}
 
 
 
 
 
 
-public function destroy(
-OcservServer $server
-)
-{
+    public function test(
+        OcservServer $server
+    )
+    {
 
 
-$server->delete();
+        return response()->json([
 
+            'status'=>
+            $this->manager
+            ->testConnection($server)
 
+        ]);
 
-return back();
 
+    }
 
-}
+
+
+
+
+
+
+
+    public function restart(
+        OcservServer $server
+    )
+    {
+
+
+        return $this->manager
+        ->restart($server);
+
+
+    }
+
 
 
 }
