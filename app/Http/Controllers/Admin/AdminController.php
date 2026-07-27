@@ -20,8 +20,10 @@ class AdminController extends Controller
 {
 
 
+
     public function index()
     {
+
 
 
         $admins =
@@ -31,8 +33,11 @@ class AdminController extends Controller
 
 
         return view(
-            'admin.admins',
+
+            'admin.admins.index',
+
             compact('admins')
+
         );
 
 
@@ -44,42 +49,46 @@ class AdminController extends Controller
 
 
 
-
-    public function store(
-        Request $request
-    )
+    public function store(Request $request)
     {
 
 
-        Admin::create([
+
+        $data=$request->validate([
 
 
-            'name'=>
-            $request->name,
+            'name'=>'required',
 
 
-            'username'=>
-            $request->username,
+            'username'=>'required|unique:admins',
 
 
-            'password'=>
-            Hash::make(
-                $request->password
-            ),
-
-
-            'role'=>
-            $request->role
+            'password'=>'required'
 
 
         ]);
 
 
 
+
+        $data['password']=Hash::make(
+            $data['password']
+        );
+
+
+
+
+        Admin::create($data);
+
+
+
+
         return back();
 
 
+
     }
+
 
 
 }
