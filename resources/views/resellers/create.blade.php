@@ -1,6 +1,7 @@
 @extends('admin.layout')
 
 
+
 @section('title')
 
 ساخت نماینده
@@ -10,13 +11,15 @@
 
 
 
+
 @section('content')
 
 
 <h1>
-ساخت نماینده
-</h1>
 
+ساخت نماینده
+
+</h1>
 
 
 
@@ -24,27 +27,27 @@
 
 
 <form method="POST"
-action="{{ route('resellers.store') }}">
+action="{{route('resellers.store')}}">
 
 
 @csrf
 
 
 
-<label>
-ادمین نماینده
-</label>
 
+<select name="admin_id"
+style="width:100%;padding:10px;">
 
-<select name="admin_id">
 
 
 @foreach($admins as $admin)
 
 
-<option value="{{ $admin->id }}">
+<option value="{{$admin->id}}">
 
-{{ $admin->name }}
+
+{{$admin->name}}
+
 
 </option>
 
@@ -56,7 +59,8 @@ action="{{ route('resellers.store') }}">
 
 
 
-<br>
+
+<br><br>
 
 
 
@@ -64,7 +68,13 @@ action="{{ route('resellers.store') }}">
 
 name="user_limit"
 
-placeholder="تعداد کاربر مجاز">
+placeholder="محدودیت کاربر"
+
+style="width:100%;padding:10px;">
+
+
+
+<br><br>
 
 
 
@@ -72,21 +82,29 @@ placeholder="تعداد کاربر مجاز">
 
 name="server_limit"
 
-placeholder="تعداد سرور مجاز">
+placeholder="محدودیت سرور"
+
+style="width:100%;padding:10px;">
+
+
+
+<br><br>
 
 
 
 <button>
 
-ساخت نماینده
+ایجاد نماینده
 
 </button>
+
 
 
 </form>
 
 
 </div>
+
 
 
 @endsection
