@@ -214,7 +214,7 @@ install_composer
 
 
 ############################################
-# Clone L-PANEL
+# Clone L-PANEL (UPDATED)
 ############################################
 
 INSTALL_DIR="/var/www/l-panel"
@@ -223,11 +223,15 @@ echo "
 Preparing L-PANEL directory...
 "
 
-if [ -d "$INSTALL_DIR" ]
+if [ -f "$INSTALL_DIR/composer.json" ]
 then
-    echo "Existing installation found"
+    echo "Existing L-PANEL installation found"
 else
+    echo "Downloading L-PANEL..."
+
+    rm -rf $INSTALL_DIR
     mkdir -p /var/www
+
     git clone https://github.com/mohama226/l-panel.git $INSTALL_DIR
 fi
 
