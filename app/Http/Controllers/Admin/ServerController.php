@@ -11,6 +11,8 @@ use App\Models\OcservServer;
 
 use App\Services\ServerManager;
 
+use App\Services\OcservService;
+
 
 use Illuminate\Http\Request;
 
@@ -20,20 +22,27 @@ class ServerController extends Controller
 {
 
 
-    protected $manager;
+    protected ServerManager $manager;
+
+
+    protected OcservService $ocserv;
+
 
 
 
     public function __construct(
-        ServerManager $manager
+        ServerManager $manager,
+        OcservService $ocserv
     )
     {
 
+
         $this->manager=$manager;
 
+        $this->ocserv=$ocserv;
+
+
     }
-
-
 
 
 
@@ -51,13 +60,15 @@ class ServerController extends Controller
 
 
         return view(
+
             'servers.index',
+
             compact('servers')
+
         );
 
 
     }
-
 
 
 
@@ -82,44 +93,42 @@ class ServerController extends Controller
 
 
 
-
-    public function store(
-        Request $request
-    )
+    public function store(Request $request)
     {
 
 
-        OcservServer::create(
 
-            $request->validate([
-
-
-                'name'=>
-                'required',
+        $data=$request->validate([
 
 
-                'ip_address'=>
-                'required',
+            'name'=>'required',
 
 
-                'ssh_username'=>
-                'required'
+            'ip_address'=>'required',
 
 
-            ])
+            'ssh_username'=>'required',
 
-        );
+
+            'ssh_port'=>'required'
+
+
+        ]);
+
+
+
+
+        OcservServer::create($data);
+
 
 
 
         return redirect()
-        ->route(
-            'servers.index'
-        );
+        ->route('servers.index');
+
 
 
     }
-
 
 
 
@@ -133,17 +142,11 @@ class ServerController extends Controller
     {
 
 
-        return response()->json([
-
-            'status'=>
-            $this->manager
-            ->testConnection($server)
-
-        ]);
+        return $this->manager
+        ->test($server);
 
 
     }
-
 
 
 
@@ -157,7 +160,7 @@ class ServerController extends Controller
     {
 
 
-        return $this->manager
+        return $this->ocserv
         ->restart($server);
 
 
