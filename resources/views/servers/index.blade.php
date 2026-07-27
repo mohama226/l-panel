@@ -1,7 +1,6 @@
 @extends('admin.layout')
 
 
-
 @section('title')
 
 سرورهای OCServ
@@ -10,20 +9,18 @@
 
 
 
-
 @section('content')
 
 
 <h1>
+
 سرورهای OCServ
+
 </h1>
 
 
 
-<div class="card">
-
-
-<a href="{{ route('servers.create') }}">
+<a href="{{route('servers.create')}}">
 
 <button>
 
@@ -34,7 +31,8 @@
 </a>
 
 
-</div>
+
+<br><br>
 
 
 
@@ -47,7 +45,6 @@
 
 <tr>
 
-
 <th>
 نام
 </th>
@@ -59,12 +56,7 @@ IP
 
 
 <th>
-پورت
-</th>
-
-
-<th>
-وضعیت
+SSH
 </th>
 
 
@@ -84,39 +76,17 @@ IP
 
 
 <td>
-
-{{ $server->name }}
-
+{{$server->name}}
 </td>
 
 
 <td>
-
-{{ $server->ip_address }}
-
+{{$server->ip_address}}
 </td>
 
 
 <td>
-
-{{ $server->ocserv_port }}
-
-</td>
-
-
-<td>
-
-@if($server->status)
-
-فعال
-
-@else
-
-خاموش
-
-@endif
-
-
+{{$server->ssh_port}}
 </td>
 
 
@@ -124,7 +94,7 @@ IP
 
 
 <form method="POST"
-action="{{ route('servers.test',$server) }}">
+action="{{route('servers.test',$server)}}">
 
 
 @csrf
@@ -141,10 +111,31 @@ action="{{ route('servers.test',$server) }}">
 
 
 
+
+<form method="POST"
+action="{{route('servers.restart',$server)}}">
+
+
+@csrf
+
+
+<button>
+
+Restart OCServ
+
+</button>
+
+
+</form>
+
+
+
 </td>
 
 
+
 </tr>
+
 
 
 @endforeach
@@ -155,6 +146,7 @@ action="{{ route('servers.test',$server) }}">
 
 
 </div>
+
 
 
 @endsection
