@@ -13,7 +13,7 @@ public function up(): void
 {
 
 
-Schema::create('vpn_users',function(Blueprint $table){
+Schema::create('vpn_users', function(Blueprint $table){
 
 
 $table->id();
@@ -21,27 +21,24 @@ $table->id();
 
 
 $table->foreignId('server_id')
-      ->constrained('ocserv_servers')
-      ->cascadeOnDelete();
-
-
-
-$table->foreignId('created_by')
-      ->nullable()
-      ->constrained('admins')
-      ->nullOnDelete();
+->constrained(
+'ocserv_servers'
+)
+->cascadeOnDelete();
 
 
 
 $table->foreignId('reseller_id')
-      ->nullable()
-      ->constrained('resellers')
-      ->nullOnDelete();
+->nullable()
+->constrained(
+'resellers'
+)
+->nullOnDelete();
 
 
 
 $table->string('username')
-      ->unique();
+->unique();
 
 
 
@@ -50,37 +47,12 @@ $table->string('password');
 
 
 $table->date('expire_date')
-      ->nullable();
-
-
-
-$table->bigInteger('traffic_limit')
-      ->default(0);
-
-
-
-$table->bigInteger('traffic_used')
-      ->default(0);
-
-
-
-$table->integer('device_limit')
-      ->default(1);
+->nullable();
 
 
 
 $table->boolean('status')
-      ->default(true);
-
-
-
-$table->timestamp('last_login')
-      ->nullable();
-
-
-
-$table->string('last_ip')
-      ->nullable();
+->default(true);
 
 
 
@@ -88,13 +60,8 @@ $table->timestamps();
 
 
 
-$table->index([
-'server_id',
-'status'
-]);
-
-
 });
+
 
 
 }
@@ -104,7 +71,9 @@ $table->index([
 public function down(): void
 {
 
+
 Schema::dropIfExists('vpn_users');
+
 
 }
 
