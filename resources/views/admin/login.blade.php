@@ -5,7 +5,9 @@
 
 <head>
 
+
 <meta charset="UTF-8">
+
 
 <title>
 ورود L-PANEL
@@ -15,38 +17,38 @@
 <style>
 
 
-body {
+body{
 
-background:#111827;
 
-height:100vh;
-
-display:flex;
-
-align-items:center;
-
-justify-content:center;
+background:#f1f5f9;
 
 font-family:tahoma;
+
 
 }
 
 
-.login-box {
+
+.login{
+
+
+width:350px;
+
+margin:120px auto;
 
 background:white;
 
 padding:30px;
 
-width:350px;
-
 border-radius:10px;
+
 
 }
 
 
 
-input {
+input{
+
 
 width:100%;
 
@@ -54,33 +56,34 @@ padding:12px;
 
 margin-bottom:15px;
 
-box-sizing:border-box;
 
 }
 
 
 
-button {
+button{
+
 
 width:100%;
 
 padding:12px;
 
-background:#111827;
+background:#2563eb;
 
 color:white;
 
-border:none;
+border:0;
 
-cursor:pointer;
 
 }
 
 
 
-.error {
+.error{
+
 
 color:red;
+
 
 }
 
@@ -91,17 +94,17 @@ color:red;
 </head>
 
 
-
 <body>
 
 
 
-<div class="login-box">
+<div class="login">
 
 
 <h2>
-L-PANEL
+ورود مدیریت
 </h2>
+
 
 
 
@@ -109,7 +112,7 @@ L-PANEL
 
 <div class="error">
 
-{{ $errors->first() }}
+{{$errors->first()}}
 
 </div>
 
@@ -117,9 +120,8 @@ L-PANEL
 
 
 
-<form method="POST"
-action="{{ route('admin.login.submit') }}">
 
+<form method="POST" action="{{route('admin.login.submit')}}">
 
 @csrf
 
@@ -127,11 +129,12 @@ action="{{ route('admin.login.submit') }}">
 
 <input
 
-type="text"
-
 name="username"
 
 placeholder="نام کاربری">
+
+
+
 
 
 <input
@@ -141,6 +144,9 @@ type="password"
 name="password"
 
 placeholder="رمز عبور">
+
+
+
 
 
 <button>
@@ -154,10 +160,12 @@ placeholder="رمز عبور">
 </form>
 
 
+
 </div>
 
 
 
 </body>
+
 
 </html>
