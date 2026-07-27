@@ -19,21 +19,34 @@ public function run(): void
 
 Admin::create([
 
+
 'name'=>'Super Admin',
+
 
 'username'=>'admin',
 
-'email'=>'admin@l-panel.local',
 
-'password'=>Hash::make('admin123'),
+'email'=>'admin@l-panel.com',
 
-'role'=>'superadmin'
+
+'password'=>Hash::make(
+'admin123'
+),
+
+
+'role'=>'superadmin',
+
+
+'status'=>true
+
 
 
 ]);
 
 
+
 }
+
 
 
 }
