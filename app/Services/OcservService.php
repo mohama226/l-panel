@@ -3,8 +3,10 @@
 namespace App\Services;
 
 
-use App\Models\OcservServer;
 use App\Models\VpnUser;
+
+use App\Models\OcservServer;
+
 use Illuminate\Support\Facades\Log;
 
 
@@ -13,8 +15,26 @@ class OcservService
 {
 
 
+    protected ServerManager $serverManager;
+
+
+
+    public function __construct(
+        ServerManager $serverManager
+    )
+    {
+
+        $this->serverManager = $serverManager;
+
+    }
+
+
+
+
+
+
     /**
-     * Create VPN User on OCServ
+     * Create OCServ User
      */
 
 
@@ -29,17 +49,19 @@ class OcservService
 
 
         $command = "
-        ocpasswd 
-        -c /etc/ocserv/ocpasswd 
-        {$user->username}
-        ";
+
+        sudo ocpasswd -c /etc/ocserv/ocpasswd "
+
+        .$user->username;
 
 
 
-        return $this->execute(
+        return $this->serverManager
+        ->execute(
             $server,
             $command
         );
+
 
 
     }
@@ -50,8 +72,9 @@ class OcservService
 
 
 
+
     /**
-     * Delete VPN User
+     * Delete OCServ User
      */
 
 
@@ -67,56 +90,19 @@ class OcservService
 
         $command = "
 
-        ocpasswd 
-        -d 
-        -c /etc/ocserv/ocpasswd 
-        {$user->username}
+        sudo ocpasswd -d "
 
-        ";
+        .$user->username;
 
 
 
-        return $this->execute(
+        return $this->serverManager
+        ->execute(
             $server,
             $command
         );
 
 
-    }
-
-
-
-
-
-
-
-
-    /**
-     * Enable User
-     */
-
-
-    public function enableUser(
-        VpnUser $user
-    )
-    {
-
-
-        $command = "
-
-        ocpasswd 
-        -u
-        {$user->username}
-
-        ";
-
-
-
-        return $this->execute(
-            $user->server,
-            $command
-        );
-
 
     }
 
@@ -128,34 +114,28 @@ class OcservService
 
 
     /**
-     * Disable User
+     * Restart OCServ
      */
 
 
-    public function disableUser(
-        VpnUser $user
+    public function restart(
+        OcservServer $server
     )
     {
 
 
-        $command = "
+        return $this->serverManager
+        ->execute(
 
-        ocpasswd
-        -l
-        {$user->username}
+            $server,
 
-        ";
+            'sudo systemctl restart ocserv'
 
-
-
-        return $this->execute(
-            $user->server,
-            $command
         );
 
 
-    }
 
+    }
 
 
 
@@ -174,100 +154,15 @@ class OcservService
     {
 
 
-        return $this->execute(
+
+        return $this->serverManager
+        ->execute(
+
             $server,
-            "systemctl status ocserv"
+
+            'systemctl status ocserv'
+
         );
-
-
-    }
-
-
-
-
-
-
-
-
-
-    /**
-     * Execute SSH Command
-     */
-
-
-    protected function execute(
-        OcservServer $server,
-        string $command
-    )
-    {
-
-
-
-        try {
-
-
-
-            $sshCommand = sprintf(
-
-                "ssh -p %s %s@%s '%s'",
-
-
-                $server->ssh_port,
-
-
-                $server->ssh_username,
-
-
-                $server->ip_address,
-
-
-                $command
-
-
-            );
-
-
-
-            $output = shell_exec(
-                $sshCommand
-            );
-
-
-
-            return [
-
-                'success'=>true,
-
-                'output'=>$output
-
-            ];
-
-
-
-
-        }
-        catch(\Exception $e)
-        {
-
-
-
-            Log::error(
-                $e->getMessage()
-            );
-
-
-
-            return [
-
-                'success'=>false,
-
-                'output'=>$e->getMessage()
-
-            ];
-
-
-
-        }
 
 
 
