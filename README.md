@@ -86,7 +86,7 @@ Clone:
 
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/l-panel.git
+git clone https://github.com/mohama226/l-panel.git
 ```
 
 
@@ -227,5 +227,7 @@ Automatic installation:
 
 ```bash
 curl -s https://raw.githubusercontent.com/mohama226/l-panel/main/installer/install.sh | sudo bash
+
 or
+```bash
 bash <(curl -fsSL https://raw.githubusercontent.com/mohama226/l-panel/main/installer/install.sh)
