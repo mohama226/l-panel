@@ -2,14 +2,13 @@
 
 set -e
 
-echo "================================"
-echo " l-panel Installer"
-echo " Laravel ocserv panel"
-echo "================================"
-
+echo "======================================"
+echo "          l-panel Installer"
+echo "   ocserv VPN Management Panel"
+echo "======================================"
 
 if [ "$EUID" -ne 0 ]; then
-    echo "Please run as root"
+    echo "Run installer as root"
     exit 1
 fi
 
@@ -22,29 +21,25 @@ echo "Detected OS: $ID"
 
 case "$ID" in
 
-
 almalinux|rocky|centos|rhel)
 
-echo "RHEL based system"
+echo "RHEL based system detected"
 
 bash <(curl -fsSL https://raw.githubusercontent.com/mohama226/l-panel/main/installer/rhel.sh)
 
 ;;
 
-
 ubuntu|debian)
 
-echo "Debian based system"
+echo "Debian based system detected"
 
 bash <(curl -fsSL https://raw.githubusercontent.com/mohama226/l-panel/main/installer/debian.sh)
 
 ;;
 
-
 *)
 
-echo "Unsupported OS $ID"
-
+echo "Unsupported OS: $ID"
 exit 1
 
 ;;
